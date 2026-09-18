@@ -1,0 +1,19 @@
+standard: 1.4.0
+
+profiles:
+- nodejs22
+- react18
+- apache24
+- gitlab-ci
+
+skills:
+- create-use-case
+- add-endpoint
+- legacy-refactor
+- review-sql
+
+projectRules:
+- .ai/project-rules.md
+
+disabledRules:
+- require-docker
