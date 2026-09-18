@@ -16,7 +16,7 @@ skills:
 - review-sql
 
 projectRules:
-- .ai/project-rules.md
+- AGENTS.md
 
 disabledRules:
 - require-docker

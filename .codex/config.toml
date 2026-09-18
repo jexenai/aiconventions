@@ -1,0 +1,14 @@
+# Configuración de proyecto para Codex. Requiere una versión que cargue
+# .codex/config.toml en proyectos de confianza.
+# Codex no permite bloquear la lectura de archivos concretos: la protección
+# de secretos depende de .gitignore y de los controles de commit y CI.
+
+# Solo puede escribir dentro del repositorio.
+sandbox_mode = "workspace-write"
+
+# Pide confirmación antes de salir del sandbox.
+approval_policy = "on-request"
+
+[sandbox_workspace_write]
+# Sin acceso a red salvo aprobación.
+network_access = false
