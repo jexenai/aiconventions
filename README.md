@@ -17,6 +17,12 @@ define el workflow que él mismo instala. La plantilla solo aporta la decisión
 de adoptarlo, en `.ai/skills/setup-openspec.md`, y la fila `Especificaciones`
 de la ficha de `AGENTS.md`.
 
+Los servidores MCP tampoco se configuran a mano: `templates/mcp/` guarda un
+fragmento por servidor y cada plantilla de stack declara en `context.mcp` los
+que le corresponden. `setup-project-context` los fusiona en el `.mcp.json` del
+proyecto solo cuando el stack los declara, de modo que un backend sin interfaz
+no arrastra la configuración de un catálogo de componentes.
+
 `CLAUDE.md` importa `AGENTS.md`. No añadas imports de todos los documentos:
 los detalles se consultan solo cuando la tarea los necesita.
 
@@ -83,6 +89,7 @@ proyecto, basta con completar la ficha de `AGENTS.md`:
 4. El comando para arrancarlo en local.
 5. El comando de pruebas más habitual.
 6. Si el proyecto usa OpenSpec o no.
+7. Si el proyecto usa un sistema de diseño servido por MCP o no.
 
 La ficha está en `AGENTS.md` porque es el único archivo que todas las
 herramientas cargan siempre. Completa el resto cuando una tarea necesite esa

@@ -10,6 +10,11 @@ context:
   deployment:
     packaging: Contenido estático generado en el directorio de compilación
     documentRoot: Directorio de compilación publicado en Apache 2.4
+  mcp:
+  - name: shadcn
+    fragment: templates/mcp/shadcn.json
+    purpose: Catálogo de componentes de shadcn/ui para la interfaz React
+    requires: components.json
   conventions:
     paths:
       code: src/

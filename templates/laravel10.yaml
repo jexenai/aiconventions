@@ -14,6 +14,11 @@ context:
     packaging: Código PHP desplegado sobre Apache 2.4
     documentRoot: public/
     assets: Compilados con Vite antes del despliegue
+  mcp:
+  - name: shadcn
+    fragment: templates/mcp/shadcn.json
+    purpose: Catálogo de componentes de shadcn/ui para las vistas React de resources/js/
+    requires: components.json
   conventions:
     paths:
       code: app/

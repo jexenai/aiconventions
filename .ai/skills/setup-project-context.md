@@ -21,6 +21,8 @@ equipo.
 - No sobrescribas cambios ajenos ni sustituyas datos existentes sin comprobar
   que han quedado obsoletos.
 - No reproduzcas secretos ni datos personales encontrados durante la revisión.
+- No apruebes servidores MCP, no los arranques ni instales sus dependencias.
+  Materializar su configuración no es activarlos.
 - No edites `docs/stack.yaml`: lo genera el plugin a partir de la plantilla de
   stack elegida.
 
@@ -61,6 +63,7 @@ reales son los de [.ai/skills/README.md](README.md).
 | `context.database` | Persistencia en `context.md` | Declara una sola base de datos. Documéntala tras contrastarla con la configuración; si la configuración apunta a otra, identifícala y, si no puedes, pregunta. Con el valor `N/A`, indica `No aplica` tras comprobar que el repositorio no contiene configuración de base de datos |
 | `context.dependencies` | Configuración y dependencias en `context.md` | Dependencias que el estándar exige para el stack. Comprueba si están en el manifiesto e informa de su ausencia sin instalarlas |
 | `context.deployment` | Entornos de ejecución y despliegue en `context.md` | Documenta el empaquetado y el destino declarados. Si el manifiesto o el CI producen otro artefacto, informa de la diferencia sin resolverla |
+| `context.mcp` | `.mcp.json` de la raíz y ficha de `AGENTS.md` (sistema de diseño) | Servidores MCP que el estándar asocia al stack. Aplica la sección [Materializar los servidores MCP](#materializar-los-servidores-mcp). Si la clave no existe, el stack no usa ninguno |
 | `context.conventions.paths` | Ficha de `AGENTS.md` (código de aplicación) y mapa del repositorio en `context.md` | Documenta solo las rutas que existan |
 | `context.conventions.generated` | Archivos generados en el mapa del repositorio | Documenta solo los que existan o estén declarados en `.gitignore` |
 | `context.conventions.buildTools` | Ficha de `AGENTS.md` (arranque y pruebas) y comandos de `development.md` | Usa la herramienta cuyo `file` exista. Las claves de `commands` son candidatas del estándar, no comandos garantizados: documenta cada una solo si la respaldan sus scripts, un wrapper del repositorio o el CI; si hay wrapper, prefiérelo. Omite las que no puedas respaldar |
@@ -101,6 +104,28 @@ detengas toda la adaptación por campos que no condicionen el resto del trabajo.
 Mantén cada dato en una única fuente. Enlaza documentos relacionados en lugar
 de copiar reglas completas entre ellos.
 
+## Materializar los servidores MCP
+
+Aplica solo si `docs/stack.yaml` declara `context.mcp`. Aquí no hay decisión
+que plantear: el equipo la tomó al elegir el stack. Materializar la
+configuración tampoco activa nada, porque la aprobación del servidor es del
+usuario y la pide su herramienta en la primera sesión interactiva.
+
+1. Por cada entrada, localiza el fragmento indicado en `fragment`. Si no
+   existe, informa y no inventes la configuración del servidor.
+2. Fusiona sus servidores en el `.mcp.json` de la raíz, creándolo si falta.
+   Conserva los que ya estuvieran declarados.
+3. Si ya existe un servidor con el mismo nombre y valores distintos, no lo
+   sustituyas: informa de la diferencia y deja que el usuario decida.
+4. Si la entrada declara `requires`, comprueba si ese archivo existe. Informa
+   de su ausencia sin crearlo: lo genera la herramienta del stack, no este
+   procedimiento.
+5. Registra en la ficha de `AGENTS.md` el sistema de diseño y el servidor que
+   sirve su catálogo. Si el stack no declara `context.mcp` y no hay otro
+   sistema de diseño documentado, escribe `No se usa`.
+6. Recuerda al usuario, en el reporte, que debe aprobar el servidor y que en
+   ejecuciones desatendidas se carga sin preguntar.
+
 ## Derivar la decisión sobre OpenSpec
 
 Este paso es obligatorio y no puede omitirse: la fila `Especificaciones` es una
@@ -122,15 +147,18 @@ cerrarse dejándola sin resolver por omisión.
    Confirma que la pregunta sobre OpenSpec se ha planteado o que la fila ya
    estaba resuelta.
 2. Comprueba que los enlaces y rutas locales añadidos existen.
-3. Revisa que no se hayan documentado ejemplos como configuración activa.
-4. Contrasta los comandos registrados con scripts, manifiestos o CI.
-5. Revisa el diff para detectar datos inventados, duplicaciones y cambios fuera
+3. Si el stack declara `context.mcp`, comprueba que `.mcp.json` es JSON válido,
+   que conserva los servidores previos y que la ficha coincide con él.
+4. Revisa que no se hayan documentado ejemplos como configuración activa.
+5. Contrasta los comandos registrados con scripts, manifiestos o CI.
+6. Revisa el diff para detectar datos inventados, duplicaciones y cambios fuera
    del alcance documental.
 
 Al terminar, informa de:
 
 - Documentos y secciones completados.
 - Si OpenSpec está inicializado o no, y qué decidió el usuario sobre su uso.
+- Servidores MCP añadidos a `.mcp.json` y qué aprobación les falta.
 - Fuentes utilizadas como evidencia.
 - Datos tomados de `docs/stack.yaml` y diferencias con el código.
 - Decisiones confirmadas por el usuario.

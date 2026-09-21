@@ -16,6 +16,7 @@ con evidencia del repositorio; no ejecutes literalmente los marcadores.
 | Arrancar en local | [POR DEFINIR] |
 | Pruebas habituales | [POR DEFINIR] |
 | Especificaciones | [POR DEFINIR] |
+| Sistema de diseño | [POR DEFINIR] |
 
 ## Reglas generales
 
@@ -51,6 +52,12 @@ La fila `Especificaciones` de la ficha indica si el proyecto usa OpenSpec:
 - `OpenSpec <versión>`: su forma de trabajo la define el workflow que él
   mismo genera.
 - `No se usa`: no propongas OpenSpec salvo que el usuario lo pida.
+
+La fila `Sistema de diseño` indica si el proyecto consume un catálogo de
+componentes por MCP. Cuando tenga valor, el catálogo lo sirve ese servidor y
+las reglas de uso están en
+[.ai/project/development.md](.ai/project/development.md); esta documentación no
+reproduce el catálogo.
 
 No leas toda `.ai/`, todas las especificaciones ni el histórico por defecto.
 Amplía el contexto solo cuando aparezca una dependencia, un riesgo o una
