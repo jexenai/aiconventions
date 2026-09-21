@@ -1,19 +1,39 @@
-standard: 1.4.0
-
-profiles:
-- nodejs22
-- react18
-- apache24
-- gitlab-ci
-
-skills:
-- create-use-case
-- add-endpoint
-- legacy-refactor
-- review-sql
-
-projectRules:
-- AGENTS.md
-
-disabledRules:
-- require-docker
+standard: 26.9.21
+context:
+  template: react18
+  declared:
+    language: Node.js 22 LTS
+    framework: React 18
+    server: Apache 2.4
+    ci: GitLab CI
+  database: N/A
+  deployment:
+    packaging: Contenido estático generado en el directorio de compilación
+    documentRoot: Directorio de compilación publicado en Apache 2.4
+  conventions:
+    paths:
+      code: src/
+      static: public/
+      tests: src/
+      config: vite.config.ts
+      ci: .gitlab-ci.yml
+    generated:
+    - node_modules/
+    - dist/
+    - build/
+    - coverage/
+    buildTools:
+    - file: package.json
+      commands:
+        install: npm ci
+        run: npm run dev
+        build: npm run build
+        test: npm test
+        testE2e: npm run test:e2e
+        format: npm run format
+        staticAnalysis: npm run lint
+    skills:
+    - create-use-case
+    - add-endpoint
+    - legacy-refactor
+    - review-sql

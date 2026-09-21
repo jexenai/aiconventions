@@ -1,22 +1,52 @@
-standard: 1.4.0
-
-profiles:
-- java17
-- springboot3
-- jboss-eap8
-- oracle
-- sqlserver2022
-- mysql8033
-- gitlab-ci
-
-skills:
-- create-use-case
-- add-endpoint
-- legacy-refactor
-- review-sql
-
-projectRules:
-- AGENTS.md
-
-disabledRules:
-- require-docker
+standard: 26.9.21
+context:
+  template: springboot3
+  declared:
+    language: Java 17
+    framework: Spring Boot 3
+    server: JBoss EAP 8
+    ci: GitLab CI
+  database: Oracle 19c
+  deployment:
+    packaging: war
+    target: Despliegue del war en JBoss EAP 8
+    note: El empaquetado embebido no aplica al desplegar sobre un servidor de aplicaciones
+  conventions:
+    paths:
+      code: src/main/java/
+      migrations: src/main/resources/db/migration/
+      tests: src/test/java/
+      testResources: src/test/resources/
+      config: src/main/resources/
+      static: src/main/resources/static/
+      ci: .gitlab-ci.yml
+    generated:
+    - target/
+    - build/
+    - .gradle/
+    - bin/
+    - out/
+    buildTools:
+    - file: pom.xml
+      commands:
+        install: mvn dependency:resolve
+        run: mvn spring-boot:run
+        build: mvn package
+        test: mvn test
+        testIntegration: mvn verify
+        format: mvn spotless:apply
+        staticAnalysis: mvn checkstyle:check
+    - file: build.gradle
+      commands:
+        install: ./gradlew dependencies
+        run: ./gradlew bootRun
+        build: ./gradlew build
+        test: ./gradlew test
+        testIntegration: ./gradlew integrationTest
+        format: ./gradlew spotlessApply
+        staticAnalysis: ./gradlew checkstyleMain
+    skills:
+    - create-use-case
+    - add-endpoint
+    - legacy-refactor
+    - review-sql

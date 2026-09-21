@@ -56,7 +56,10 @@ casos, la protección definitiva está en no versionar secretos.
 ## Adaptación inicial
 
 1. Copia la plantilla en el repositorio sin sobrescribir instrucciones
-   existentes.
+   existentes. El plugin ofrece los stacks resumidos en
+   [pila_tecnologica.md](pila_tecnologica.md) y copia la plantilla elegida de
+   `templates/` como `docs/stack.yaml`. Las tecnologías y versiones solo se
+   mantienen en cada plantilla.
 2. Ejecuta `/setup-project-context` en Claude Code o
    `$setup-project-context` en Codex.
 3. Revisa las decisiones que la herramienta no pueda deducir con evidencia.

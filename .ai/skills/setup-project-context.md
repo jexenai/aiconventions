@@ -20,26 +20,57 @@ equipo.
 - No sobrescribas cambios ajenos ni sustituyas datos existentes sin comprobar
   que han quedado obsoletos.
 - No reproduzcas secretos ni datos personales encontrados durante la revisión.
+- No edites `docs/stack.yaml`: lo genera el plugin a partir de la plantilla de
+  stack elegida.
 
 ## Recopilar evidencia
 
 1. Lee `AGENTS.md`, el `README` principal, `.ai/project/context.md` y
    `.ai/project/development.md`.
-2. Comprueba si OpenSpec está inicializado buscando `openspec/config.yaml` o
+2. Lee `docs/stack.yaml` si existe y aplica la sección
+   [Usar el stack declarado](#usar-el-stack-declarado).
+3. Comprueba si OpenSpec está inicializado buscando `openspec/config.yaml` o
    el directorio `openspec/`. Lee `.ai/project/openspec.md` solo si existe.
-3. Revisa el estado de Git para distinguir el contenido existente de cambios
+4. Revisa el estado de Git para distinguir el contenido existente de cambios
    locales que deban preservarse.
-4. Obtén un mapa acotado del repositorio, excluyendo dependencias descargadas,
+5. Obtén un mapa acotado del repositorio, excluyendo dependencias descargadas,
    binarios generados y resultados de compilación.
-5. Consulta únicamente las fuentes necesarias para completar cada dato:
+6. Consulta únicamente las fuentes necesarias para completar cada dato:
    manifiestos, archivos de bloqueo, scripts, configuración, CI, pruebas,
    contenedores, despliegue y documentación vigente.
-6. Comprueba que las rutas y comandos citados existen. Distingue claramente
+7. Comprueba que las rutas y comandos citados existen. Distingue claramente
    entre comandos observados y comandos realmente ejecutados.
 
 Usa primero operaciones de lectura. Solo ejecuta comprobaciones locales rápidas
 y sin efectos cuando aporten evidencia necesaria, como consultar la versión de
 una herramienta ya instalada.
+
+## Usar el stack declarado
+
+`docs/stack.yaml` recoge el stack estándar que el equipo eligió para el
+proyecto. Es la intención declarada, no la prueba de lo implementado. Usa solo
+su bloque `context`; ignora `profiles`, `projectRules`, `disabledRules` y las
+listas de `skills`, estén en la raíz o dentro de `context.conventions`, porque
+no definen procedimientos disponibles en este repositorio. Los procedimientos
+reales son los de [.ai/skills/README.md](README.md).
+
+| Clave | Destino | Uso |
+| ----- | ------- | --- |
+| `context.declared` | Ficha de `AGENTS.md` (tecnologías y versiones) y entornos de ejecución en `context.md` | Documenta directamente. Si los manifiestos o la configuración indican otra versión, informa de la diferencia sin resolverla |
+| `context.database` | Persistencia en `context.md` | Declara una sola base de datos. Documéntala tras contrastarla con la configuración; si la configuración apunta a otra, identifícala y, si no puedes, pregunta. Con el valor `N/A`, indica `No aplica` tras comprobar que el repositorio no contiene configuración de base de datos |
+| `context.dependencies` | Configuración y dependencias en `context.md` | Dependencias que el estándar exige para el stack. Comprueba si están en el manifiesto e informa de su ausencia sin instalarlas |
+| `context.deployment` | Entornos de ejecución y despliegue en `context.md` | Documenta el empaquetado y el destino declarados. Si el manifiesto o el CI producen otro artefacto, informa de la diferencia sin resolverla |
+| `context.conventions.paths` | Ficha de `AGENTS.md` (código de aplicación) y mapa del repositorio en `context.md` | Documenta solo las rutas que existan |
+| `context.conventions.generated` | Archivos generados en el mapa del repositorio | Documenta solo los que existan o estén declarados en `.gitignore` |
+| `context.conventions.buildTools` | Ficha de `AGENTS.md` (arranque y pruebas) y comandos de `development.md` | Usa la herramienta cuyo `file` exista. Las claves de `commands` son candidatas del estándar, no comandos garantizados: documenta cada una solo si la respaldan sus scripts, un wrapper del repositorio o el CI; si hay wrapper, prefiérelo. Omite las que no puedas respaldar |
+
+El archivo no aporta el propósito, los usuarios, el dominio, las decisiones de
+arquitectura ni la seguridad del proyecto. Complétalos con otra evidencia o
+mantén el marcador.
+
+Si el repositorio aún no contiene código, documenta los datos de
+`context.declared` indicando que proceden de `docs/stack.yaml` y deja
+pendientes las rutas y comandos que no puedan comprobarse.
 
 ## Resolver los campos pendientes
 
@@ -84,6 +115,7 @@ Al terminar, informa de:
 - Documentos y secciones completados.
 - Si OpenSpec está inicializado o no.
 - Fuentes utilizadas como evidencia.
+- Datos tomados de `docs/stack.yaml` y diferencias con el código.
 - Decisiones confirmadas por el usuario.
 - Marcadores pendientes y motivo concreto.
 - Comprobaciones ejecutadas y limitaciones de la revisión.

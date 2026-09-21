@@ -1,22 +1,52 @@
-standard: 1.4.0
-
-profiles:
-- php84
-- laravel10
-- apache24
-- oracle
-- sqlserver2022
-- mysql8033
-- gitlab-ci
-
-skills:
-- create-use-case
-- add-endpoint
-- legacy-refactor
-- review-sql
-
-projectRules:
-- AGENTS.md
-
-disabledRules:
-- require-docker
+standard: 26.9.21
+context:
+  template: laravel10
+  declared:
+    language: PHP 8.4
+    framework: Laravel 10 o superior
+    server: Apache 2.4
+    ci: GitLab CI
+  database: Oracle 19c
+  dependencies:
+  - package: yajra/laravel-oci8
+    purpose: Conexión con Oracle 19c; Laravel no soporta Oracle de serie
+  deployment:
+    packaging: Código PHP desplegado sobre Apache 2.4
+    documentRoot: public/
+    assets: Compilados con Vite antes del despliegue
+  conventions:
+    paths:
+      code: app/
+      routes: routes/
+      migrations: database/migrations/
+      tests: tests/
+      config: config/
+      views: resources/views/
+      assets: resources/
+      static: public/
+      ci: .gitlab-ci.yml
+    generated:
+    - vendor/
+    - node_modules/
+    - bootstrap/cache/
+    - storage/framework/
+    - public/build/
+    buildTools:
+    - file: composer.json
+      commands:
+        install: composer install
+        run: php artisan serve
+        migrate: php artisan migrate
+        test: php artisan test
+        format: vendor/bin/pint
+        staticAnalysis: vendor/bin/phpstan analyse
+    - file: package.json
+      commands:
+        install: npm ci
+        run: npm run dev
+        build: npm run build
+    skills:
+    - create-use-case
+    - add-endpoint
+    - legacy-refactor
+    - review-sql
