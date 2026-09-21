@@ -1,0 +1,1371 @@
+<meta charset="utf-8">
+<title>De la petición al commit</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+  :root {
+    --ground: #F6F7F8;
+    --surface: #FFFFFF;
+    --surface-alt: #EDF0F2;
+    --ink: #15191D;
+    --muted: #5B6672;
+    --faint: #8A939D;
+    --line: #DCE1E5;
+    --accent: #2F5D8A;
+    --accent-soft: #E4EDF5;
+    --warn: #8A5A13;
+    --warn-soft: #F7EEDC;
+    --stop: #8C3A32;
+    --stop-soft: #F7E6E4;
+    --go: #2F6B4F;
+    --go-soft: #E2EFE8;
+    --spec: #5B4A8A;
+    --spec-soft: #EAE6F3;
+
+    --serif: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+    --sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #101418;
+      --surface: #171C21;
+      --surface-alt: #1E252B;
+      --ink: #E4E9ED;
+      --muted: #9AA5B0;
+      --faint: #737E89;
+      --line: #2A323A;
+      --accent: #7BA8D4;
+      --accent-soft: #1B2732;
+      --warn: #D2A45C;
+      --warn-soft: #2B2418;
+      --stop: #D18C84;
+      --stop-soft: #2D1E1C;
+      --go: #7FB89A;
+      --go-soft: #17251E;
+      --spec: #A99AD1;
+      --spec-soft: #211D2E;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #101418;
+    --surface: #171C21;
+    --surface-alt: #1E252B;
+    --ink: #E4E9ED;
+    --muted: #9AA5B0;
+    --faint: #737E89;
+    --line: #2A323A;
+    --accent: #7BA8D4;
+    --accent-soft: #1B2732;
+    --warn: #D2A45C;
+    --warn-soft: #2B2418;
+    --stop: #D18C84;
+    --stop-soft: #2D1E1C;
+    --go: #7FB89A;
+    --go-soft: #17251E;
+    --spec: #A99AD1;
+    --spec-soft: #211D2E;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .marco {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding-inline: 20px;
+    padding-block: 0 72px;
+  }
+
+  @media (min-width: 960px) {
+    .marco {
+      grid-template-columns: 220px minmax(0, 1fr);
+      gap: 56px;
+      padding-inline: 32px;
+    }
+  }
+
+  /* ---------- Cabecera ---------- */
+
+  .portada {
+    grid-column: 1 / -1;
+    border-bottom: 1px solid var(--line);
+    padding-block: 56px 36px;
+    margin-bottom: 44px;
+  }
+
+  .sello {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 18px;
+  }
+
+  h1 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(30px, 5.5vw, 46px);
+    line-height: 1.12;
+    letter-spacing: -0.015em;
+    margin: 0 0 18px;
+    text-wrap: balance;
+  }
+
+  .entradilla {
+    font-size: 18px;
+    color: var(--muted);
+    max-width: 64ch;
+    margin: 0 0 26px;
+  }
+
+  .entradilla strong { color: var(--ink); font-weight: 500; }
+
+  .actores {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .actores-rotulo {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-right: 4px;
+  }
+
+  /* ---------- Chips de actor ---------- */
+
+  .actor {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 3px;
+    border: 1px solid transparent;
+    white-space: nowrap;
+  }
+
+  .a-usuario  { background: var(--go-soft);     color: var(--go);     border-color: var(--go); }
+  .a-harness  { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+  .a-agente   { background: var(--surface-alt); color: var(--muted);  border-color: var(--line); }
+  .a-skill    { background: var(--warn-soft);   color: var(--warn);   border-color: var(--warn); }
+  .a-spec     { background: var(--spec-soft);   color: var(--spec);   border-color: var(--spec); }
+
+  /* ---------- Índice lateral ---------- */
+
+  .indice { display: none; }
+
+  @media (min-width: 960px) {
+    .indice {
+      display: block;
+      align-self: start;
+      position: sticky;
+      top: calc(env(safe-area-inset-top, 0px) + 24px);
+      font-size: 14px;
+    }
+  }
+
+  .indice h2 {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--faint);
+    font-weight: 500;
+    margin: 0 0 14px;
+  }
+
+  .indice ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .indice a {
+    display: block;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 5px 0 5px 12px;
+    border-left: 2px solid var(--line);
+    line-height: 1.4;
+  }
+
+  .indice a:hover,
+  .indice a:focus-visible {
+    color: var(--accent);
+    border-left-color: var(--accent);
+  }
+
+  /* ---------- Cuerpo ---------- */
+
+  main { min-width: 0; }
+
+  .fase { margin-bottom: 64px; scroll-margin-top: 24px; }
+
+  .fase-cab {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 12px;
+    margin-bottom: 28px;
+  }
+
+  .fase-ord {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+  }
+
+  .fase-cab h2 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 25px;
+    letter-spacing: -0.01em;
+    margin: 0;
+    flex: 1 1 auto;
+  }
+
+  .cadencia {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--faint);
+    letter-spacing: 0.05em;
+  }
+
+  .fase > p { max-width: 68ch; }
+
+  h3 {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 17px;
+    margin: 0 0 6px;
+    letter-spacing: -0.005em;
+  }
+
+  h4.sub {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--faint);
+    font-weight: 500;
+    margin: 34px 0 14px;
+  }
+
+  p { margin: 0 0 14px; max-width: 68ch; }
+
+  a { color: var(--accent); }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.86em;
+    background: var(--surface-alt);
+    padding: 1px 5px;
+    border-radius: 3px;
+    word-break: break-word;
+  }
+
+  /* ---------- Pasos ---------- */
+
+  .pasos {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .paso {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr);
+    gap: 16px;
+    padding: 20px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .paso:last-child { border-bottom: 1px solid var(--line); }
+
+  .paso-ord {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--faint);
+    padding-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .paso-cuerpo { min-width: 0; }
+
+  .paso-meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+
+  .paso p:last-child { margin-bottom: 0; }
+
+  .paso-hito { border-left: 3px solid var(--spec); padding-left: 16px; }
+
+  /* ---------- Bloques auxiliares ---------- */
+
+  .terminal {
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.6;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 14px 16px;
+    margin: 14px 0;
+    overflow-x: auto;
+    white-space: pre;
+    color: var(--ink);
+  }
+
+  .terminal .c { color: var(--faint); }
+  .terminal .k { color: var(--accent); }
+  .terminal .w { color: var(--warn); }
+  .terminal .s { color: var(--spec); }
+  .terminal .g { color: var(--go); }
+
+  .nota {
+    border-left: 3px solid var(--warn);
+    background: var(--warn-soft);
+    padding: 13px 16px;
+    margin: 16px 0;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .nota p { margin: 0; max-width: none; }
+  .nota p + p { margin-top: 8px; }
+
+  .nota-rotulo {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--warn);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .tabla-caja { overflow-x: auto; margin: 18px 0; }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 14.5px;
+    min-width: 460px;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 10px 14px 10px 0;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+
+  th {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--faint);
+    font-weight: 500;
+    border-bottom-color: var(--ink);
+  }
+
+  /* ---------- Medidor de contexto ---------- */
+
+  .contexto {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 18px 20px;
+    margin: 20px 0;
+  }
+
+  .contexto h4 {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--faint);
+    font-weight: 500;
+    margin: 0 0 14px;
+  }
+
+  .carga {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .fila-carga {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: center;
+    font-size: 14px;
+  }
+
+  .fila-carga code { background: none; padding: 0; font-size: 13px; }
+
+  .estado {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .e-si    { color: var(--go); }
+  .e-bajo  { color: var(--accent); }
+  .e-no    { color: var(--faint); }
+
+  /* ---------- Bifurcaciones ---------- */
+
+  .ramas {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  @media (min-width: 680px) {
+    .ramas { grid-template-columns: 1fr 1fr; }
+  }
+
+  .rama {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 18px 20px;
+  }
+
+  .rama h3 { margin-bottom: 10px; }
+  .rama p { font-size: 14.5px; margin-bottom: 0; color: var(--muted); }
+  .rama p + p { margin-top: 10px; }
+  .rama-sello {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .rama-si { color: var(--go); }
+  .rama-no { color: var(--stop); }
+  .rama-spec { color: var(--spec); }
+
+  .pie {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--line);
+    padding-top: 22px;
+    margin-top: 12px;
+    font-size: 13.5px;
+    color: var(--faint);
+  }
+
+  .pie p { max-width: 70ch; }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="marco">
+
+  <header class="portada">
+    <p class="sello">Plantilla de contexto para agentes · aiconventions</p>
+    <h1>De la petición al commit</h1>
+    <p class="entradilla">
+      El ciclo completo de la plantilla, seguido de principio a fin sobre una
+      petición real. Cada paso indica <strong>quién lo ejecuta</strong>, porque el
+      reparto entre el harness, el agente y quien desarrolla es lo que hace
+      predecible el resultado.
+    </p>
+    <div class="actores">
+      <span class="actores-rotulo">Actores</span>
+      <span class="actor a-usuario">Usuario</span>
+      <span class="actor a-harness">Harness</span>
+      <span class="actor a-agente">Agente</span>
+      <span class="actor a-skill">Skill</span>
+      <span class="actor a-spec">OpenSpec</span>
+    </div>
+  </header>
+
+  <nav class="indice" aria-label="Índice del flujo">
+    <h2>Fases</h2>
+    <ol>
+      <li><a href="#reparto">El reparto</a></li>
+      <li><a href="#adopcion">0 · Adopción</a></li>
+      <li><a href="#arranque">1 · Arranque</a></li>
+      <li><a href="#encuadre">2 · Encuadre</a></li>
+      <li><a href="#especificacion">3 · Especificación</a></li>
+      <li><a href="#implementacion">4 · Implementación</a></li>
+      <li><a href="#cierre">5 · Cierre</a></li>
+      <li><a href="#ramas">Variantes</a></li>
+      <li><a href="#limites">Dónde vive cada cosa</a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+    <!-- ============ REPARTO ============ -->
+    <section class="fase" id="reparto">
+      <div class="fase-cab">
+        <span class="fase-ord">§</span>
+        <h2>El reparto</h2>
+      </div>
+
+      <p>
+        Cinco actores intervienen en el ciclo y conviene no confundirlos, porque
+        cada uno falla de una manera distinta.
+      </p>
+
+      <div class="tabla-caja">
+        <table>
+          <thead>
+            <tr><th>Actor</th><th>Qué hace</th><th>Qué no puede hacer</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="actor a-harness">Harness</span></td>
+              <td>Carga <code>CLAUDE.md</code>, aplica permisos, arranca los servidores MCP, ejecuta los hooks</td>
+              <td>No interpreta la documentación: no sabe qué dice la ficha</td>
+            </tr>
+            <tr>
+              <td><span class="actor a-agente">Agente</span></td>
+              <td>Lee, decide qué documento abrir, llama a las herramientas, escribe el código</td>
+              <td>No puede saltarse un permiso ni aprobar un servidor</td>
+            </tr>
+            <tr>
+              <td><span class="actor a-skill">Skill</span></td>
+              <td>Aporta un procedimiento con pasos y límites cuando la tarea coincide</td>
+              <td>No se ejecuta sola: el agente o quien desarrolla la invoca</td>
+            </tr>
+            <tr>
+              <td><span class="actor a-spec">OpenSpec</span></td>
+              <td>Sostiene el comportamiento esperado y sus propios comandos de trabajo</td>
+              <td>No lo define la plantilla: su workflow se instala y manda sobre él</td>
+            </tr>
+            <tr>
+              <td><span class="actor a-usuario">Usuario</span></td>
+              <td>Pide, revisa la especificación, aprueba servidores y permisos</td>
+              <td>No debería tener que repetir contexto que ya está escrito</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        La plantilla no inventa ninguno de estos papeles: se limita a dejar escrito,
+        en el sitio donde cada actor ya mira, lo que necesita para no equivocarse.
+      </p>
+    </section>
+
+    <!-- ============ FASE 0 ============ -->
+    <section class="fase" id="adopcion">
+      <div class="fase-cab">
+        <span class="fase-ord">Fase 0</span>
+        <h2>Adopción del repositorio</h2>
+        <span class="cadencia">una vez</span>
+      </div>
+
+      <p>
+        Ocurre al incorporar la plantilla a un proyecto. Deja escrito lo que todas
+        las sesiones posteriores darán por sabido. Las dos decisiones que se toman
+        aquí —especificaciones y sistema de diseño— gobiernan el resto del ciclo.
+      </p>
+
+      <ol class="pasos">
+        <li class="paso">
+          <span class="paso-ord">01</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta"><span class="actor a-usuario">Usuario</span></div>
+            <h3>Elegir el stack</h3>
+            <p>
+              El plugin genera <code>docs/stack.yaml</code> a partir de una plantilla
+              de <code>templates/</code>. Para este recorrido, <code>react18</code>.
+              Ese archivo es la intención declarada del equipo, no la prueba de lo
+              implementado: por eso todo lo que salga de él se contrasta después con
+              el repositorio.
+            </p>
+          </div>
+        </li>
+
+        <li class="paso">
+          <span class="paso-ord">02</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta">
+              <span class="actor a-usuario">Usuario</span>
+              <span class="actor a-skill">setup-project-context</span>
+            </div>
+            <h3>Rellenar la ficha con evidencia</h3>
+            <p>
+              La skill analiza el repositorio y completa <code>AGENTS.md</code>:
+              propósito, tecnologías, ruta del código, comandos de arranque y pruebas.
+              Cada dato se clasifica antes de escribirlo —demostrable, decisión de
+              equipo, no aplicable o bloqueado— y lo que no puede demostrar lo deja en
+              <code>[POR DEFINIR]</code> en lugar de inventarlo.
+            </p>
+          </div>
+        </li>
+
+        <li class="paso">
+          <span class="paso-ord">03</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta">
+              <span class="actor a-usuario">Usuario</span>
+              <span class="actor a-skill">setup-openspec</span>
+            </div>
+            <h3>Decidir si habrá especificaciones</h3>
+            <p>
+              Esta pregunta es obligatoria y no se resuelve por omisión: usar OpenSpec
+              es una decisión de equipo, no un dato deducible del repositorio. Si el
+              usuario acepta, <code>setup-openspec</code> lo instala e inicializa —la
+              única excepción a la regla de no instalar dependencias, y solo con
+              confirmación en el momento—.
+            </p>
+            <p>
+              Si lo descarta, la fila queda en <code>No se usa</code> y nadie volverá a
+              proponerlo. Si no responde, el marcador se conserva y
+              <code>AGENTS.md</code> insistirá en la siguiente tarea no trivial.
+            </p>
+          </div>
+        </li>
+
+        <li class="paso">
+          <span class="paso-ord">04</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta"><span class="actor a-skill">setup-project-context</span></div>
+            <h3>Materializar lo que el stack declare</h3>
+            <p>
+              Aquí no hay nada que preguntar: lo que el stack declara ya lo decidió el
+              equipo al elegirlo. En <code>react18</code>, la clave
+              <code>context.mcp</code> hace que la skill fusione el fragmento
+              <code>templates/mcp/shadcn.json</code> en el <code>.mcp.json</code> de la
+              raíz, conservando cualquier servidor previo.
+            </p>
+            <p>
+              No instala ni arranca nada —lo tiene prohibido—, porque configurar un
+              servidor no es activarlo.
+            </p>
+          </div>
+        </li>
+
+        <li class="paso">
+          <span class="paso-ord">05</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta"><span class="actor a-skill">setup-project-context</span></div>
+            <h3>Cerrar la ficha</h3>
+            <p>
+              El resultado son unas pocas filas que el agente leerá en cada sesión
+              posterior. No son documentación: son interruptores.
+            </p>
+            <div class="terminal"><span class="c">| Dato                    | Valor                        |</span>
+| Código de aplicación    | src/                         |
+| Pruebas habituales      | npm test                     |
+| <span class="s">Especificaciones</span>        | <span class="s">OpenSpec 0.9.2</span>               |
+| <span class="k">Sistema de diseño</span>       | <span class="k">shadcn/ui, servido por shadcn</span></div>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ============ FASE 1 ============ -->
+    <section class="fase" id="arranque">
+      <div class="fase-cab">
+        <span class="fase-ord">Fase 1</span>
+        <h2>Arranque de la sesión</h2>
+        <span class="cadencia">cada sesión</span>
+      </div>
+
+      <p>
+        Antes de que nadie escriba nada, el harness decide qué entra en la ventana de
+        contexto. Esta fase explica por qué la plantilla reparte la información entre
+        varios documentos en lugar de concentrarla en uno.
+      </p>
+
+      <ol class="pasos">
+        <li class="paso">
+          <span class="paso-ord">01</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta"><span class="actor a-harness">Harness</span></div>
+            <h3>Cargar el punto de entrada</h3>
+            <p>
+              Lee <code>CLAUDE.md</code>, que importa <code>AGENTS.md</code>. Es una
+              carga mecánica: el harness no entiende el contenido, solo lo inyecta. Por
+              eso la ficha vive ahí y no en otro sitio —es el único archivo que todas
+              las herramientas cargan siempre—.
+            </p>
+          </div>
+        </li>
+
+        <li class="paso">
+          <span class="paso-ord">02</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta"><span class="actor a-harness">Harness</span></div>
+            <h3>Registrar herramientas, permisos y servidores</h3>
+            <p>
+              Aplica las reglas de <code>deny</code> y <code>ask</code> de
+              <code>.claude/settings.json</code>, detecta el <code>.mcp.json</code>
+              versionado y registra las skills disponibles, incluidas las que instaló
+              OpenSpec. Nada de esto se ejecuta todavía.
+            </p>
+            <p>
+              Un servidor de proyecto no se activa solo: queda como
+              <code>⏸ Pending approval</code> hasta que alguien lo apruebe, una vez.
+            </p>
+            <div class="nota">
+              <span class="nota-rotulo">Excepción importante</span>
+              <p>
+                En ejecuciones desatendidas —<code>claude -p</code>, Agent SDK,
+                sesiones en la nube— el harness no puede mostrar ese diálogo y
+                <strong>carga los servidores de proyecto sin preguntar</strong>. El
+                único apagado fiable es
+                <code>"disabledMcpjsonServers": ["shadcn"]</code>, que tiene
+                precedencia sobre cualquier activación.
+              </p>
+            </div>
+          </div>
+        </li>
+      </ol>
+
+      <div class="contexto">
+        <h4>Qué hay en la ventana al terminar la fase 1</h4>
+        <div class="carga">
+          <div class="fila-carga"><span><code>AGENTS.md</code> — ficha y reglas</span><span class="estado e-si">Cargado</span></div>
+          <div class="fila-carga"><span><code>.ai/project/development.md</code></span><span class="estado e-no">No leído</span></div>
+          <div class="fila-carga"><span><code>.ai/project/context.md</code></span><span class="estado e-no">No leído</span></div>
+          <div class="fila-carga"><span>Especificaciones de <code>openspec/</code></span><span class="estado e-no">No leídas</span></div>
+          <div class="fila-carga"><span>Catálogo de componentes</span><span class="estado e-no">No leído</span></div>
+          <div class="fila-carga"><span>Skills y herramientas MCP</span><span class="estado e-bajo">Declaradas</span></div>
+        </div>
+      </div>
+
+      <p>
+        La diferencia entre <em>declarado</em> y <em>cargado</em> es la idea central
+        de toda la plantilla. Ni el MCP ni las skills añaden contexto: añaden la
+        capacidad de ir a buscarlo cuando haga falta.
+      </p>
+    </section>
+
+    <!-- ============ FASE 2 ============ -->
+    <section class="fase" id="encuadre">
+      <div class="fase-cab">
+        <span class="fase-ord">Fase 2</span>
+        <h2>Encuadre de la petición</h2>
+        <span class="cadencia">cada tarea</span>
+      </div>
+
+      <p>
+        Llega la petición: <em>«añade un formulario de login a la aplicación»</em>. No
+        menciona el sistema de diseño, ni la ruta del código, ni si hay que escribir
+        una especificación. No debería tener que hacerlo.
+      </p>
+
+      <ol class="pasos">
+        <li class="paso">
+          <span class="paso-ord">01</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta"><span class="actor a-agente">Agente</span></div>
+            <h3>Leer la ficha, que ya está en contexto</h3>
+            <p>
+              Sin abrir ningún fichero, el agente ya sabe que el código vive en
+              <code>src/</code>, que las pruebas se lanzan con <code>npm test</code>,
+              que hay un catálogo de componentes servido por MCP y que el proyecto
+              trabaja con OpenSpec.
+            </p>
+          </div>
+        </li>
+
+        <li class="paso">
+          <span class="paso-ord">02</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta"><span class="actor a-agente">Agente</span></div>
+            <h3>Clasificar la tarea</h3>
+            <p>
+              Esta es la bifurcación que decide el resto del ciclo. Un formulario de
+              login introduce comportamiento nuevo: no es una tarea trivial. Con la
+              fila <code>Especificaciones</code> resuelta, el agente sabe que el
+              comportamiento esperado se acuerda antes de escribir código.
+            </p>
+            <p>
+              Una corrección de una errata en un texto, en cambio, salta directamente a
+              la fase 4. La plantilla no obliga a especificar lo que no lo necesita.
+            </p>
+          </div>
+        </li>
+
+        <li class="paso">
+          <span class="paso-ord">03</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta"><span class="actor a-agente">Agente</span></div>
+            <h3>Comprobar si ya existe un cambio relacionado</h3>
+            <p>
+              Si en <code>openspec/</code> hay un cambio inequívocamente relacionado
+              con la petición, el agente sigue su workflow y consulta únicamente sus
+              artefactos. No lee todas las especificaciones ni el histórico: esa es una
+              regla explícita de <code>AGENTS.md</code>.
+            </p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ============ FASE 3 ============ -->
+    <section class="fase" id="especificacion">
+      <div class="fase-cab">
+        <span class="fase-ord">Fase 3</span>
+        <h2>Especificación del cambio</h2>
+        <span class="cadencia">si la tarea no es trivial</span>
+      </div>
+
+      <p>
+        A partir de aquí manda OpenSpec, no la plantilla. Es una frontera deliberada:
+        <code>AGENTS.md</code> dice <em>cuándo</em> entrar en este flujo, y el workflow
+        que OpenSpec instaló dice <em>cómo</em> recorrerlo. La plantilla no duplica ni
+        un paso de lo que la herramienta ya define.
+      </p>
+
+      <ol class="pasos">
+        <li class="paso">
+          <span class="paso-ord">01</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta">
+              <span class="actor a-agente">Agente</span>
+              <span class="actor a-spec">OpenSpec</span>
+            </div>
+            <h3>Proponer el cambio</h3>
+            <p>
+              El agente abre una propuesta con los comandos que OpenSpec instaló. En
+              lugar de un único prompt largo, el trabajo se parte en artefactos
+              separados dentro de una carpeta de cambio.
+            </p>
+            <div class="terminal"><span class="s">/opsx:propose</span> formulario de login con validación
+
+<span class="c">crea</span>  openspec/changes/login-form/
+        ├─ proposal.md   <span class="c">qué se quiere y por qué</span>
+        ├─ specs/        <span class="c">comportamiento esperado</span>
+        ├─ design.md     <span class="c">decisiones de diseño técnico</span>
+        └─ tasks.md      <span class="c">plan de implementación</span></div>
+            <p>
+              Aquí empieza a notarse el reparto de la plantilla: el comportamiento
+              esperado vive en la especificación, mientras que el código y la
+              configuración siguen mostrando el comportamiento implementado. Son dos
+              fuentes distintas y la plantilla insiste en no mezclarlas.
+            </p>
+          </div>
+        </li>
+
+        <li class="paso paso-hito">
+          <span class="paso-ord">02</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta"><span class="actor a-usuario">Usuario</span></div>
+            <h3>Revisar la especificación — el punto de control real</h3>
+            <p>
+              Este es el momento que justifica toda la fase. Corregir aquí un
+              malentendido cuesta una frase; corregirlo después de implementar cuesta
+              una tarde. La revisión ocurre sobre texto legible, no sobre un diff.
+            </p>
+            <p>
+              Si la petición y la especificación discrepan, o si la especificación
+              contradice lo que el código ya hace, el agente debe señalar la diferencia
+              y resolverla con evidencia antes de continuar, no elegir en silencio.
+            </p>
+          </div>
+        </li>
+
+        <li class="paso">
+          <span class="paso-ord">03</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta">
+              <span class="actor a-agente">Agente</span>
+              <span class="actor a-spec">OpenSpec</span>
+            </div>
+            <h3>Aplicar el cambio</h3>
+            <p>
+              Con la especificación acordada, el agente pasa a implementar recorriendo
+              <code>tasks.md</code> y marcando cada tarea a medida que la completa. El
+              plan deja de ser una intención y se convierte en un estado consultable.
+            </p>
+            <div class="terminal"><span class="s">/opsx:apply</span> login-form
+
+<span class="c">tasks.md</span>
+  <span class="g">[x]</span> Definir el esquema de validación
+  <span class="g">[x]</span> Montar el formulario con los componentes del catálogo
+  <span class="w">[ ]</span> Conectar con el endpoint de autenticación
+  <span class="w">[ ]</span> Cubrir con pruebas los casos de error</div>
+          </div>
+        </li>
+      </ol>
+
+      <div class="nota">
+        <span class="nota-rotulo">Sobre estos comandos</span>
+        <p>
+          Los nombres de los comandos y la estructura de la carpeta los define la
+          versión de OpenSpec instalada, no este documento. Compruébalos en el workflow
+          que dejó en el repositorio antes de darlos por fijos: es la misma cautela que
+          la skill de instalación exige con los flags del instalador.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ FASE 4 ============ -->
+    <section class="fase" id="implementacion">
+      <div class="fase-cab">
+        <span class="fase-ord">Fase 4</span>
+        <h2>Implementación</h2>
+        <span class="cadencia">cada tarea</span>
+      </div>
+
+      <p>
+        Escribir el código es donde la plantilla vuelve a tomar el mando, porque las
+        convenciones de implementación son suyas. El agente abre ahora —y no antes—
+        el documento que le corresponde.
+      </p>
+
+      <ol class="pasos">
+        <li class="paso">
+          <span class="paso-ord">01</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta"><span class="actor a-agente">Agente</span></div>
+            <h3>Abrir solo el documento pertinente</h3>
+            <p>
+              La tabla «Contexto necesario» de <code>AGENTS.md</code> asigna un
+              documento a cada necesidad. Implementar corresponde a
+              <code>.ai/project/development.md</code>, así que abre ese y no los otros
+              dos. <code>context.md</code> solo entraría si la tarea tocase la
+              arquitectura o el dominio.
+            </p>
+          </div>
+        </li>
+
+        <li class="paso">
+          <span class="paso-ord">02</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta"><span class="actor a-agente">Agente</span></div>
+            <h3>Consultar el catálogo en lugar de la memoria</h3>
+            <p>
+              La sección <em>Sistema de diseño</em> de ese documento le obliga a
+              consultar el catálogo antes de crear un componente de interfaz, a no
+              reimplementar uno equivalente y a no deducir una API si el servidor no
+              responde. Así evita el fallo más común: escribir de memoria unas
+              propiedades que ya no existen.
+            </p>
+            <div class="terminal"><span class="c">→ mcp__shadcn__search_items_in_registries</span>
+  registries: ["@shadcn"], query: "form input button"
+
+<span class="c">← devuelve</span>  form · input · button · label · card
+
+<span class="c">→ mcp__shadcn__get_item_examples_from_registries</span>
+  query: "form with react-hook-form and zod"
+
+<span class="c">← devuelve</span>  el ejemplo vigente, con su API real</div>
+            <p>
+              Lo que el catálogo no puede responder está escrito en la tabla que sigue
+              a esa sección: componentes vetados, tokens propios y qué hacer cuando el
+              diseño pide algo que el sistema no cubre. Eso son decisiones del equipo.
+            </p>
+          </div>
+        </li>
+
+        <li class="paso">
+          <span class="paso-ord">03</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta">
+              <span class="actor a-harness">Harness</span>
+              <span class="actor a-usuario">Usuario</span>
+            </div>
+            <h3>Filtrar lo que escribe en disco</h3>
+            <p>
+              Instalar un componente toca ficheros. El harness intercepta esa llamada y
+              aplica <code>.claude/settings.json</code>: las consultas de lectura pueden
+              ir en <code>allow</code> y pasar sin ruido; lo que escribe o ejecuta
+              debería ir en <code>ask</code>. Si la operación rozara un
+              <code>.env</code> o una clave, la regla de <code>deny</code> la detiene
+              antes de que el agente la vea.
+            </p>
+          </div>
+        </li>
+
+        <li class="paso">
+          <span class="paso-ord">04</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta"><span class="actor a-agente">Agente</span></div>
+            <h3>Escribir siguiendo las convenciones</h3>
+            <p>
+              Cambios pequeños y completos, coherentes con los patrones del módulo. Sin
+              abstracciones especulativas. Errores expresados de forma útil, no
+              enterrados en capturas genéricas. Comentarios solo donde expliquen una
+              decisión que el código no muestra.
+            </p>
+          </div>
+        </li>
+
+        <li class="paso">
+          <span class="paso-ord">05</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta"><span class="actor a-agente">Agente</span></div>
+            <h3>Probar con los comandos registrados</h3>
+            <p>
+              Ejecuta los comandos que la ficha y <code>development.md</code> recogen
+              —comprobados durante la adopción, no adivinados—. Si una prueba falla,
+              distingue un problema introducido de uno previo o del entorno, y en el
+              informe separa lo que ejecutó de lo que solo observó.
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="contexto">
+        <h4>Qué hay en la ventana al terminar la fase 4</h4>
+        <div class="carga">
+          <div class="fila-carga"><span><code>AGENTS.md</code> — ficha y reglas</span><span class="estado e-si">Cargado</span></div>
+          <div class="fila-carga"><span><code>.ai/project/development.md</code></span><span class="estado e-si">Cargado</span></div>
+          <div class="fila-carga"><span>Artefactos del cambio <code>login-form</code></span><span class="estado e-si">Cargados</span></div>
+          <div class="fila-carga"><span>Resto de especificaciones e histórico</span><span class="estado e-no">Nunca hizo falta</span></div>
+          <div class="fila-carga"><span><code>.ai/project/context.md</code></span><span class="estado e-no">Nunca hizo falta</span></div>
+          <div class="fila-carga"><span>Componentes consultados del registro</span><span class="estado e-bajo">5 de ~50</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FASE 5 ============ -->
+    <section class="fase" id="cierre">
+      <div class="fase-cab">
+        <span class="fase-ord">Fase 5</span>
+        <h2>Cierre del ciclo</h2>
+        <span class="cadencia">cada tarea</span>
+      </div>
+
+      <p>
+        Quedan dos gestos, y ninguno ocurre por iniciativa del agente.
+      </p>
+
+      <ol class="pasos">
+        <li class="paso">
+          <span class="paso-ord">01</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta">
+              <span class="actor a-usuario">Usuario</span>
+              <span class="actor a-spec">OpenSpec</span>
+            </div>
+            <h3>Archivar el cambio</h3>
+            <p>
+              Con la implementación completa, el cambio se archiva y su carpeta pasa al
+              histórico. Lo que era comportamiento propuesto queda consolidado como
+              comportamiento vigente.
+            </p>
+            <div class="terminal"><span class="s">/opsx:archive</span> login-form
+
+<span class="c">mueve</span>  openspec/changes/login-form/
+  <span class="c">→</span>    openspec/changes/archive/login-form/</div>
+            <p>
+              Los detalles temporales del cambio se quedan ahí. No se copian a
+              <code>.ai/project/</code>, que documenta lo estable.
+            </p>
+          </div>
+        </li>
+
+        <li class="paso">
+          <span class="paso-ord">02</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta">
+              <span class="actor a-agente">Agente</span>
+            </div>
+            <h3>Rendir cuentas</h3>
+            <p>
+              Antes de proponer nada, el agente revisa el diff final, elimina restos y
+              repite las comprobaciones si el árbol cambió después de validarlo.
+              Informa de qué cambió, qué comprobó y qué queda pendiente. Hasta aquí,
+              nada se ha versionado.
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <h4 class="sub">El commit, paso a paso</h4>
+
+      <p>
+        La skill <code>commit</code> es un buen retrato de cómo funciona cualquier
+        procedimiento de la plantilla, así que merece verse entera. Solo se invoca
+        cuando el usuario lo pide de forma explícita: pedir un commit no autoriza a
+        hacer push, publicar ni desplegar.
+      </p>
+
+      <ol class="pasos">
+        <li class="paso">
+          <span class="paso-ord">01</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta">
+              <span class="actor a-usuario">Usuario</span>
+              <span class="actor a-skill">commit</span>
+            </div>
+            <h3>Preparación</h3>
+            <p>
+              Revisa el estado, el resumen de cambios y el historial reciente —para
+              adoptar las convenciones del repositorio, no las suyas—. Examina el diff
+              evitando volcar binarios completos.
+            </p>
+            <p>
+              Busca secretos, credenciales, datos personales y artefactos que no deban
+              versionarse. Si aparece alguno, detiene su inclusión e informa.
+            </p>
+          </div>
+        </li>
+
+        <li class="paso">
+          <span class="paso-ord">02</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta"><span class="actor a-skill">commit</span></div>
+            <h3>Staging explícito</h3>
+            <p>
+              Añade las rutas una a una. Nada de <code>git add .</code> ni
+              <code>-A</code> sin haber verificado antes todo su alcance: el objetivo es
+              que ningún cambio ajeno entre por arrastre.
+            </p>
+            <div class="terminal">git add .ai/skills/setup-project-context.md AGENTS.md ...
+git status --short          <span class="c">¿falta o sobra algo?</span>
+git diff --cached           <span class="c">¿es esto lo que creo?</span>
+git diff --cached --check   <span class="c">errores de whitespace</span></div>
+          </div>
+        </li>
+
+        <li class="paso">
+          <span class="paso-ord">03</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta"><span class="actor a-skill">commit</span></div>
+            <h3>El mensaje</h3>
+            <p>
+              Conventional Commits, salvo que el repositorio documente otra convención.
+              Tipo elegido por el propósito principal del cambio, resumen concreto sin
+              punto final y en el idioma del proyecto. Cuerpo cuando haya algo que
+              explicar: efectos, migraciones o relación con una especificación.
+            </p>
+            <p>
+              Sin trailers de autoría, modelo o herramienta, salvo que el repositorio los
+              exija. Si el mensaje lleva cuerpo o caracteres delicados para el shell, se
+              escribe en UTF-8 y se pasa con <code>git commit -F</code>.
+            </p>
+          </div>
+        </li>
+
+        <li class="paso">
+          <span class="paso-ord">04</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta"><span class="actor a-skill">commit</span></div>
+            <h3>Verificación y límites</h3>
+            <p>
+              Después del commit comprueba qué ha quedado pendiente, relee el mensaje
+              creado e informa de lo que se dejó fuera deliberadamente.
+            </p>
+            <p>
+              Lo que la skill no hace nunca: commits vacíos, <code>push</code>,
+              <code>--amend</code> o <code>--no-verify</code> sin petición explícita,
+              desactivar hooks para que el commit termine, o reescribir historial por
+              iniciativa propia. Si un hook falla, primero comprueba si el commit llegó
+              a crearse.
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <p>
+        El <code>ask</code> sobre <code>git push</code> en los permisos es la segunda
+        red: aunque el procedimiento se saltara su propio límite, el harness seguiría
+        preguntando.
+      </p>
+    </section>
+
+    <!-- ============ VARIANTES ============ -->
+    <section class="fase" id="ramas">
+      <div class="fase-cab">
+        <span class="fase-ord">§</span>
+        <h2>El mismo ciclo, otras decisiones</h2>
+      </div>
+
+      <p>
+        Las fases 3 y 4 dependen por completo de lo que se decidió en la fase 0. Dos
+        proyectos con la misma plantilla se comportan de forma distinta sin que nadie
+        apague nada a mano.
+      </p>
+
+      <h4 class="sub">Según la fila «Especificaciones»</h4>
+
+      <div class="ramas">
+        <div class="rama">
+          <span class="rama-sello rama-spec">OpenSpec instalado</span>
+          <h3>Con fase 3</h3>
+          <p>
+            Las tareas no triviales pasan por propuesta, revisión y archivado. El
+            comportamiento esperado se acuerda por escrito antes de tocar código.
+          </p>
+        </div>
+        <div class="rama">
+          <span class="rama-sello rama-no">No se usa</span>
+          <h3>Sin fase 3</h3>
+          <p>
+            El ciclo salta del encuadre a la implementación. Nadie propondrá OpenSpec
+            salvo que el usuario lo pida, y la petición hace de especificación.
+          </p>
+        </div>
+      </div>
+
+      <h4 class="sub">Según la fila «Sistema de diseño»</h4>
+
+      <div class="ramas">
+        <div class="rama">
+          <span class="rama-sello rama-si">react18 · laravel10</span>
+          <h3>Con catálogo</h3>
+          <p>
+            Ambos declaran <code>context.mcp</code>. En Laravel aplica a las vistas
+            React de <code>resources/js/</code>, que es donde vive la interfaz.
+          </p>
+        </div>
+        <div class="rama">
+          <span class="rama-sello rama-no">springboot3 · springboot4</span>
+          <h3>Sin catálogo</h3>
+          <p>
+            No declaran la clave, así que no se genera <code>.mcp.json</code>: no hay
+            servidor que aprobar ni configuración que apagar.
+          </p>
+        </div>
+      </div>
+
+      <p>
+        El apagado no depende de que nadie se olvide de una clave: depende de que la
+        clave no exista. Es la diferencia entre una protección y una convención.
+      </p>
+    </section>
+
+    <!-- ============ LÍMITES ============ -->
+    <section class="fase" id="limites">
+      <div class="fase-cab">
+        <span class="fase-ord">§</span>
+        <h2>Dónde vive cada cosa</h2>
+      </div>
+
+      <p>
+        Todo el reparto documental sigue una sola regla: <em>qué pasa si el agente no
+        lee este documento</em>. Lo que no puede perderse va donde siempre se carga;
+        lo demás se consulta cuando la tarea lo pide.
+      </p>
+
+      <div class="tabla-caja">
+        <table>
+          <thead>
+            <tr><th>Dato</th><th>Dónde</th><th>Por qué ahí</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Propósito, rutas y comandos</td>
+              <td><code>AGENTS.md</code></td>
+              <td>Es lo mínimo para trabajar y el único archivo siempre cargado</td>
+            </tr>
+            <tr>
+              <td>Si hay especificaciones y sistema de diseño</td>
+              <td><code>AGENTS.md</code></td>
+              <td>Son los interruptores que bifurcan el ciclo</td>
+            </tr>
+            <tr>
+              <td>Comportamiento esperado de un cambio</td>
+              <td><code>openspec/changes/</code></td>
+              <td>Lo sostiene OpenSpec; la plantilla no duplica su workflow</td>
+            </tr>
+            <tr>
+              <td>Convenciones de código, pruebas y entrega</td>
+              <td><code>development.md</code></td>
+              <td>Se lee al implementar, que es justo cuando importan</td>
+            </tr>
+            <tr>
+              <td>Componentes vetados y tokens propios</td>
+              <td><code>development.md</code></td>
+              <td>Son decisiones vuestras; el registro no las conoce</td>
+            </tr>
+            <tr>
+              <td>El catálogo de componentes</td>
+              <td>El servidor MCP</td>
+              <td>Copiarlo crearía una segunda verdad que envejece sola</td>
+            </tr>
+            <tr>
+              <td>Arquitectura, dominio y seguridad</td>
+              <td><code>context.md</code></td>
+              <td>Describe el sistema construido, no cómo se trabaja en él</td>
+            </tr>
+            <tr>
+              <td>Procedimientos repetibles</td>
+              <td><code>.ai/skills/</code></td>
+              <td>Contenido común, con adaptadores mínimos por herramienta</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="nota">
+        <span class="nota-rotulo">Pendiente de comprobar</span>
+        <p>
+          Tres puntos de este recorrido no están verificados contra las herramientas
+          reales: si Codex aplica una aprobación equivalente a los
+          <code>mcp_servers</code> de <code>.codex/config.toml</code>; el comportamiento
+          en monorepos, donde <code>.mcp.json</code> es de raíz y no admite alcance por
+          subdirectorio; y los nombres exactos de los comandos de OpenSpec, que dependen
+          de la versión instalada.
+        </p>
+        <p>
+          Además, el sandbox de Codex fija <code>network_access = false</code>, que
+          bloqueará tanto la instalación de OpenSpec como <code>npx shadcn</code>
+          mientras no se apruebe la salida.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="pie">
+    <p>
+      Documento interno de la plantilla <code>aiconventions</code>. Los comandos de
+      OpenSpec y los nombres de las herramientas MCP los publica cada herramienta:
+      compruébalos en el repositorio y con <code>/mcp</code> antes de darlos por fijos.
+    </p>
+  </footer>
+
+</div>
