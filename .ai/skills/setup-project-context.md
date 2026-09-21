@@ -111,10 +111,12 @@ que plantear: el equipo la tomó al elegir el stack. Materializar la
 configuración tampoco activa nada, porque la aprobación del servidor es del
 usuario y la pide su herramienta en la primera sesión interactiva.
 
-1. Por cada entrada, localiza el fragmento indicado en `fragment`. Si no
-   existe, informa y no inventes la configuración del servidor.
-2. Fusiona sus servidores en el `.mcp.json` de la raíz, creándolo si falta.
-   Conserva los que ya estuvieran declarados.
+1. Por cada entrada, lee su clave `server`: es el objeto que describe la
+   conexión. Si falta, el stack está mal formado; informa del error y no
+   inventes la configuración del servidor.
+2. Fusiona cada entrada en el `.mcp.json` de la raíz, creándolo si falta, bajo
+   `mcpServers` y con `name` como clave. Conserva los que ya estuvieran
+   declarados.
 3. Si ya existe un servidor con el mismo nombre y valores distintos, no lo
    sustituyas: informa de la diferencia y deja que el usuario decida.
 4. Si la entrada declara `requires`, comprueba si ese archivo existe. Informa

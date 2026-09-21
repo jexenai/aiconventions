@@ -17,9 +17,9 @@ define el workflow que él mismo instala. La plantilla solo aporta la decisión
 de adoptarlo, en `.ai/skills/setup-openspec.md`, y la fila `Especificaciones`
 de la ficha de `AGENTS.md`.
 
-Los servidores MCP tampoco se configuran a mano: `templates/mcp/` guarda un
-fragmento por servidor y cada plantilla de stack declara en `context.mcp` los
-que le corresponden. `setup-project-context` los fusiona en el `.mcp.json` del
+Los servidores MCP tampoco se configuran a mano: cada plantilla de stack
+declara en `context.mcp` los que le corresponden, con su configuración
+completa. `setup-project-context` los fusiona en el `.mcp.json` del
 proyecto solo cuando el stack los declara, de modo que un backend sin interfaz
 no arrastra la configuración de un catálogo de componentes.
 

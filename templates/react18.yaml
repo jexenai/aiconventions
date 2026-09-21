@@ -12,9 +12,11 @@ context:
     documentRoot: Directorio de compilación publicado en Apache 2.4
   mcp:
   - name: shadcn
-    fragment: templates/mcp/shadcn.json
     purpose: Catálogo de componentes de shadcn/ui para la interfaz React
     requires: components.json
+    server:
+      command: npx
+      args: ["shadcn@latest", "mcp"]
   conventions:
     paths:
       code: src/

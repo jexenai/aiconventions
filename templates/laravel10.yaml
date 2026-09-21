@@ -16,9 +16,11 @@ context:
     assets: Compilados con Vite antes del despliegue
   mcp:
   - name: shadcn
-    fragment: templates/mcp/shadcn.json
     purpose: Catálogo de componentes de shadcn/ui para las vistas React de resources/js/
     requires: components.json
+    server:
+      command: npx
+      args: ["shadcn@latest", "mcp"]
   conventions:
     paths:
       code: app/
