@@ -78,6 +78,19 @@ consúltalo en lugar de reproducirlo aquí.
 - Si una prueba falla, diferencia un problema introducido de uno previo o del
   entorno y aporta la evidencia disponible.
 
+### Pruebas primero con especificaciones
+
+Aplica solo si la ficha de [AGENTS.md](../../AGENTS.md) declara OpenSpec en
+`Especificaciones`. El recorrido del cambio lo define el workflow que instala
+OpenSpec; aquí solo se fija el orden respecto a las pruebas.
+
+- Escribe la prueba del escenario antes de implementar la tarea que cambia
+  comportamiento y comprueba que falla por el motivo esperado.
+- Indica qué escenario del delta cubre cada prueba.
+- Ejecuta primero la prueba del escenario y después las del área afectada.
+- Una tarea puede declarar otra forma de verificación distinta de una prueba
+  automática. Cuando así sea, dilo al informar en lugar de darlo por probado.
+
 ## Entrega
 
 - Revisa el diff final y elimina archivos temporales o cambios accidentales.

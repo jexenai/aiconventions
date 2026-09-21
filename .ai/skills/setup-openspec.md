@@ -49,8 +49,11 @@ que instala; esta plantilla no la duplica.
    modo interactivo puede bloquearse en un entorno sin terminal. Configura
    únicamente esas herramientas.
 4. Sustituye el contenido que genera la inicialización de `openspec/config.yaml`,
-   que suele ser una plantilla comentada, por un contexto breve. Un ejemplo
-   mínimo es:
+   que suele ser una plantilla comentada, por un contexto breve y la política de
+   pruebas. `rules` y `operations` son claves propias de OpenSpec: úsalas para
+   fijar el orden de las pruebas en lugar de describirlo aparte. El bloque
+   `context` es lo único que varía según el proyecto; `rules` y `operations` se
+   escriben tal cual:
 
    ```yaml
    schema: spec-driven
@@ -59,7 +62,24 @@ que instala; esta plantilla no la duplica.
      Las reglas comunes están en AGENTS.md.
      La documentación estable está en .ai/project/.
      Lee solo el contexto y los artefactos necesarios para el cambio.
+
+   rules:
+     specs:
+       - Cada escenario en Given/When/Then, verificable de forma automática.
+     tasks:
+       - Toda tarea que cambie comportamiento empieza por la prueba del
+         escenario que cubre, y esa prueba debe fallar antes de implementar.
+       - Indica en la tarea qué escenario del delta cubre.
+
+   operations:
+     apply:
+       guidance:
+         - Ejecuta la prueba del escenario antes que la suite completa.
    ```
+
+   Comprueba en la documentación vigente de OpenSpec que `rules` y `operations`
+   siguen admitiendo estas claves antes de escribirlas. Si el esquema elegido no
+   es `spec-driven`, ajusta los nombres de artefacto a los que declare.
 
 5. Revisa todos los archivos generados antes de versionarlos: `openspec/`, las
    skills y comandos de cada herramienta configurada y los marcadores internos
@@ -81,8 +101,10 @@ estos valores:
 
 1. Comprueba que `openspec/` y su configuración existen y que la versión
    registrada coincide con la instalada.
-2. Revisa que la ficha de `AGENTS.md` no contradiga el estado real.
-3. Revisa el diff para detectar archivos generados fuera de lo esperado.
+2. Comprueba que `openspec/config.yaml` es YAML válido y conserva `context`,
+   `rules` y `operations`.
+3. Revisa que la ficha de `AGENTS.md` no contradiga el estado real.
+4. Revisa el diff para detectar archivos generados fuera de lo esperado.
 
 Al terminar, informa de:
 
