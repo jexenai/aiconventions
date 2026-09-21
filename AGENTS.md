@@ -15,6 +15,7 @@ con evidencia del repositorio; no ejecutes literalmente los marcadores.
 | Código de aplicación | [POR DEFINIR] |
 | Arrancar en local | [POR DEFINIR] |
 | Pruebas habituales | [POR DEFINIR] |
+| Especificaciones | [POR DEFINIR] |
 
 ## Reglas generales
 
@@ -40,8 +41,16 @@ Lee únicamente el documento relacionado con la tarea:
 | Implementar, revisar calidad de código o ejecutar pruebas | [.ai/project/development.md](.ai/project/development.md) |
 | Usar un procedimiento reutilizable del proyecto | [.ai/skills/README.md](.ai/skills/README.md) |
 
-Extensión opcional: si el repositorio contiene `openspec/` o la tarea trata de
-OpenSpec, consulta [.ai/project/openspec.md](.ai/project/openspec.md).
+La fila `Especificaciones` de la ficha indica si el proyecto usa OpenSpec:
+
+- `[POR DEFINIR]`: la decisión está pendiente. Antes de empezar cualquier
+  tarea que no sea trivial, pregunta al usuario si quiere usar OpenSpec y
+  sigue [.ai/skills/setup-openspec.md](.ai/skills/setup-openspec.md). No
+  trabajes con especificaciones ni propongas cambios de OpenSpec hasta
+  resolverla.
+- `OpenSpec <versión>`: su forma de trabajo la define el workflow que él
+  mismo genera.
+- `No se usa`: no propongas OpenSpec salvo que el usuario lo pida.
 
 No leas toda `.ai/`, todas las especificaciones ni el histórico por defecto.
 Amplía el contexto solo cuando aparezca una dependencia, un riesgo o una

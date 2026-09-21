@@ -6,5 +6,6 @@ description: Analiza un repositorio y completa con evidencia la documentación e
 Lee completo el [procedimiento común](../../../.ai/skills/setup-project-context.md)
 y síguelo.
 
-Esta adaptación no añade reglas específicas de Claude Code. Las decisiones y
-restricciones compartidas se mantienen únicamente en el procedimiento común.
+Adaptación para Claude Code: plantea con `AskUserQuestion` las decisiones que
+no puedan deducirse con evidencia, incluida la de adoptar OpenSpec. Las demás
+decisiones y restricciones se mantienen únicamente en el procedimiento común.

@@ -7,6 +7,7 @@ procedimientos. No cargues todas las skills al comenzar.
 | ------------- | ----------------- | ------------ |
 | Crear un commit | Cuando el usuario solicita explícitamente crear un commit Git | [commit.md](commit.md) |
 | Preparar el contexto | Al adoptar la plantilla, completar campos pendientes o actualizar la estructura documentada | [setup-project-context.md](setup-project-context.md) |
+| Decidir sobre OpenSpec | Al adoptar la plantilla o cuando se plantee usar OpenSpec: decisión del usuario y, si procede, instalación e inicialización | [setup-openspec.md](setup-openspec.md) |
 
 ## Añadir un procedimiento
 

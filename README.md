@@ -12,8 +12,10 @@ la documentación en cada tarea. OpenSpec es opcional.
 | `.ai/project/development.md` | Comandos, calidad de código, pruebas y entrega         |
 | `.ai/skills/README.md`       | Catálogo de procedimientos reutilizables               |
 
-Extensión opcional: `.ai/project/openspec.md` para proyectos que usen
-OpenSpec.
+OpenSpec no tiene documento propio en la plantilla: su forma de trabajo la
+define el workflow que él mismo instala. La plantilla solo aporta la decisión
+de adoptarlo, en `.ai/skills/setup-openspec.md`, y la fila `Especificaciones`
+de la ficha de `AGENTS.md`.
 
 `CLAUDE.md` importa `AGENTS.md`. No añadas imports de todos los documentos:
 los detalles se consultan solo cuando la tarea los necesita.
@@ -63,7 +65,9 @@ casos, la protección definitiva está en no versionar secretos.
 2. Ejecuta `/setup-project-context` en Claude Code o
    `$setup-project-context` en Codex.
 3. Revisa las decisiones que la herramienta no pueda deducir con evidencia.
-4. Inicializa OpenSpec únicamente si el proyecto va a utilizarlo.
+4. Responde a la pregunta sobre OpenSpec que plantea la skill. Si lo adoptas,
+   ejecuta `/setup-openspec` o `$setup-openspec` para instalarlo e
+   inicializarlo; si no, la ficha lo registra como no usado.
 
 Los campos `[POR DEFINIR]` que no afecten al trabajo actual pueden mantenerse
 pendientes. No conviertas suposiciones en datos del proyecto.
@@ -78,6 +82,7 @@ proyecto, basta con completar la ficha de `AGENTS.md`:
 3. La ruta del código de aplicación.
 4. El comando para arrancarlo en local.
 5. El comando de pruebas más habitual.
+6. Si el proyecto usa OpenSpec o no.
 
 La ficha está en `AGENTS.md` porque es el único archivo que todas las
 herramientas cargan siempre. Completa el resto cuando una tarea necesite esa

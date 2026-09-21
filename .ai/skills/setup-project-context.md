@@ -13,8 +13,9 @@ equipo.
 
 - No instales dependencias, levantes servicios, conectes con bases de datos ni
   accedas a entornos externos para completar la documentación.
-- No inicialices, sincronices ni archives cambios de OpenSpec. Si el usuario lo
-  solicita, sigue después `.ai/project/openspec.md`.
+- No instales, inicialices, sincronices ni archives OpenSpec. Este
+  procedimiento solo plantea la decisión y la deriva a
+  [setup-openspec.md](setup-openspec.md).
 - No modifiques código de aplicación ni configuración funcional salvo que el
   usuario amplíe expresamente el alcance. En `AGENTS.md` edita solo su ficha.
 - No sobrescribas cambios ajenos ni sustituyas datos existentes sin comprobar
@@ -30,7 +31,7 @@ equipo.
 2. Lee `docs/stack.yaml` si existe y aplica la sección
    [Usar el stack declarado](#usar-el-stack-declarado).
 3. Comprueba si OpenSpec está inicializado buscando `openspec/config.yaml` o
-   el directorio `openspec/`. Lee `.ai/project/openspec.md` solo si existe.
+   el directorio `openspec/`.
 4. Revisa el estado de Git para distinguir el contenido existente de cambios
    locales que deban preservarse.
 5. Obtén un mapa acotado del repositorio, excluyendo dependencias descargadas,
@@ -90,20 +91,36 @@ detengas toda la adaptación por campos que no condicionen el resto del trabajo.
 
 - `AGENTS.md`: ficha del proyecto con propósito, tecnologías y versiones, ruta
   del código, comando de arranque y comando de pruebas habitual. Complétala
-  primero; es lo mínimo para trabajar.
+  primero; es lo mínimo para trabajar. La fila `Especificaciones` se resuelve
+  en el paso siguiente.
 - `context.md`: alcance, componentes, mapa, dominio, decisiones de
   arquitectura y seguridad del sistema.
 - `development.md`: comandos, convenciones de implementación, comentarios,
   pruebas y entrega.
-- `openspec.md`: solo si OpenSpec está inicializado, su versión, rutas y
-  estado. No lo inicialices.
 
 Mantén cada dato en una única fuente. Enlaza documentos relacionados en lugar
 de copiar reglas completas entre ellos.
 
+## Derivar la decisión sobre OpenSpec
+
+Este paso es obligatorio y no puede omitirse: la fila `Especificaciones` es una
+decisión de equipo, no un dato deducible del repositorio, y la ficha no puede
+cerrarse dejándola sin resolver por omisión.
+
+1. Si `openspec/` existe, registra la versión instalada y no preguntes nada.
+2. Si no existe y la fila sigue en `[POR DEFINIR]`, pregunta al usuario si el
+   proyecto va a usar OpenSpec. Plantéalo al final, junto con las demás
+   decisiones pendientes, para no interrumpir la adaptación documental.
+3. Si acepta, sigue [setup-openspec.md](setup-openspec.md). Si lo descarta,
+   registra `No se usa`. Si no responde, conserva el marcador y decláralo
+   como pendiente en el reporte. `AGENTS.md` volverá a pedir la decisión en la
+   siguiente tarea no trivial.
+
 ## Comprobación final
 
 1. Busca los marcadores `[POR DEFINIR]` restantes y clasifícalos en el reporte.
+   Confirma que la pregunta sobre OpenSpec se ha planteado o que la fila ya
+   estaba resuelta.
 2. Comprueba que los enlaces y rutas locales añadidos existen.
 3. Revisa que no se hayan documentado ejemplos como configuración activa.
 4. Contrasta los comandos registrados con scripts, manifiestos o CI.
@@ -113,7 +130,7 @@ de copiar reglas completas entre ellos.
 Al terminar, informa de:
 
 - Documentos y secciones completados.
-- Si OpenSpec está inicializado o no.
+- Si OpenSpec está inicializado o no, y qué decidió el usuario sobre su uso.
 - Fuentes utilizadas como evidencia.
 - Datos tomados de `docs/stack.yaml` y diferencias con el código.
 - Decisiones confirmadas por el usuario.
