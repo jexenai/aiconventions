@@ -63,8 +63,9 @@ reales son los de [.ai/skills/README.md](README.md).
 | `context.database` | Persistencia en `context.md` | Declara una sola base de datos. Documéntala tras contrastarla con la configuración; si la configuración apunta a otra, identifícala y, si no puedes, pregunta. Con el valor `N/A`, indica `No aplica` tras comprobar que el repositorio no contiene configuración de base de datos |
 | `context.dependencies` | Configuración y dependencias en `context.md` | Dependencias que el estándar exige para el stack. Comprueba si están en el manifiesto e informa de su ausencia sin instalarlas |
 | `context.deployment` | Entornos de ejecución y despliegue en `context.md` | Documenta el empaquetado y el destino declarados. Si el manifiesto o el CI producen otro artefacto, informa de la diferencia sin resolverla |
+| `context.ui` | Ficha de `AGENTS.md` (capa de vistas) y mapa del repositorio en `context.md` | Declara qué tecnología renderiza las vistas y dónde viven. Documenta la ruta de `entry` solo si existe. Si `bridge` está sin fijar, resuélvelo con evidencia del manifiesto; si no la hay, es decisión de equipo: plantea las alternativas de `bridgeOptions` y conserva el marcador hasta que el usuario elija. Sus `dependencies` son paquetes npm: comprueba si están en `package.json` e informa de su ausencia sin instalarlas. Si la clave no existe, las vistas son las propias del framework declarado: resuelve la fila con la evidencia del repositorio y reserva `No aplica` para los proyectos que no sirven interfaz |
 | `context.mcp` | `.mcp.json` de la raíz y ficha de `AGENTS.md` (sistema de diseño) | Servidores MCP que el estándar asocia al stack. Aplica la sección [Materializar los servidores MCP](#materializar-los-servidores-mcp). Si la clave no existe, el stack no usa ninguno |
-| `context.conventions.paths` | Ficha de `AGENTS.md` (código de aplicación) y mapa del repositorio en `context.md` | Documenta solo las rutas que existan |
+| `context.conventions.paths` | Ficha de `AGENTS.md` (código de aplicación) y mapa del repositorio en `context.md` | Documenta solo las rutas que existan. `views` es la carpeta de las vistas reales del proyecto, que puede no coincidir con la de plantillas del framework; contrástala con `context.ui` |
 | `context.conventions.generated` | Archivos generados en el mapa del repositorio | Documenta solo los que existan o estén declarados en `.gitignore` |
 | `context.conventions.buildTools` | Ficha de `AGENTS.md` (arranque y pruebas) y comandos de `development.md` | Usa la herramienta cuyo `file` exista. Las claves de `commands` son candidatas del estándar, no comandos garantizados: documenta cada una solo si la respaldan sus scripts, un wrapper del repositorio o el CI; si hay wrapper, prefiérelo. Omite las que no puedas respaldar |
 
@@ -93,9 +94,9 @@ detengas toda la adaptación por campos que no condicionen el resto del trabajo.
 ## Actualizar cada documento
 
 - `AGENTS.md`: ficha del proyecto con propósito, tecnologías y versiones, ruta
-  del código, comando de arranque y comando de pruebas habitual. Complétala
-  primero; es lo mínimo para trabajar. La fila `Especificaciones` se resuelve
-  en el paso siguiente.
+  del código, capa de vistas, comando de arranque y comando de pruebas
+  habitual. Complétala primero; es lo mínimo para trabajar. La fila
+  `Especificaciones` se resuelve en el paso siguiente.
 - `context.md`: alcance, componentes, mapa, dominio, decisiones de
   arquitectura y seguridad del sistema.
 - `development.md`: comandos, convenciones de implementación, comentarios,

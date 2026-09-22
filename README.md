@@ -88,8 +88,9 @@ proyecto, basta con completar la ficha de `AGENTS.md`:
 3. La ruta del código de aplicación.
 4. El comando para arrancarlo en local.
 5. El comando de pruebas más habitual.
-6. Si el proyecto usa OpenSpec o no.
-7. Si el proyecto usa un sistema de diseño servido por MCP o no.
+6. Qué tecnología renderiza sus vistas, si sirve interfaz propia.
+7. Si el proyecto usa OpenSpec o no.
+8. Si el proyecto usa un sistema de diseño servido por MCP o no.
 
 La ficha está en `AGENTS.md` porque es el único archivo que todas las
 herramientas cargan siempre. Completa el resto cuando una tarea necesite esa

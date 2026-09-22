@@ -16,6 +16,7 @@ con evidencia del repositorio; no ejecutes literalmente los marcadores.
 | Arrancar en local | [POR DEFINIR] |
 | Pruebas habituales | [POR DEFINIR] |
 | Especificaciones | [POR DEFINIR] |
+| Capa de vistas | [POR DEFINIR] |
 | Sistema de diseño | [POR DEFINIR] |
 
 ## Reglas generales
@@ -52,6 +53,12 @@ La fila `Especificaciones` de la ficha indica si el proyecto usa OpenSpec:
 - `OpenSpec <versión>`: su forma de trabajo la define el workflow que él
   mismo genera.
 - `No se usa`: no propongas OpenSpec salvo que el usuario lo pida.
+
+La fila `Capa de vistas` indica qué tecnología renderiza la interfaz y dónde
+vive, porque puede no ser la del framework. Con el valor `No aplica`, el
+proyecto no sirve interfaz propia. Antes de crear o modificar una vista,
+respeta la tecnología declarada: no introduzcas plantillas del framework en un
+proyecto cuyas vistas usen otra tecnología, ni al revés.
 
 La fila `Sistema de diseño` indica si el proyecto consume un catálogo de
 componentes por MCP. Cuando tenga valor, el catálogo lo sirve ese servidor y
