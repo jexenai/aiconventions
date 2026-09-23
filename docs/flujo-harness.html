@@ -640,11 +640,18 @@
             </div>
             <h3>Rellenar la ficha con evidencia</h3>
             <p>
-              La skill analiza el repositorio y completa <code>AGENTS.md</code>:
-              propósito, tecnologías, ruta del código, comandos de arranque y pruebas.
-              Cada dato se clasifica antes de escribirlo —demostrable, decisión de
-              equipo, no aplicable o bloqueado— y lo que no puede demostrar lo deja en
-              <code>[POR DEFINIR]</code> en lugar de inventarlo.
+              La skill solo arranca cuando el usuario la invoca, y sigue un flujo
+              fijo de seis fases. Primero analiza el repositorio sin tocar nada y
+              prepara una propuesta para cada dato de la ficha: propósito,
+              tecnologías, ruta del código, vistas, comandos de arranque y pruebas,
+              base de datos y sistema de diseño.
+            </p>
+            <p>
+              Después plantea siempre el mismo guion de nueve preguntas en tres
+              rondas —ficha, ejecución y OpenSpec—, también al repetir el setup.
+              La primera opción es el valor actual o el deducido, con su fuente;
+              lo que nadie confirma queda en <code>[POR DEFINIR]</code> en lugar de
+              inventarse.
             </p>
           </div>
         </li>
@@ -658,11 +665,12 @@
             </div>
             <h3>Decidir si habrá especificaciones</h3>
             <p>
-              Esta pregunta es obligatoria y no se resuelve por omisión: usar OpenSpec
-              es una decisión de equipo, no un dato deducible del repositorio. Si el
-              usuario acepta, <code>setup-openspec</code> lo instala e inicializa —la
-              única excepción a la regla de no instalar dependencias, y solo con
-              confirmación en el momento—.
+              Es la tercera ronda del guion, obligatoria y sin opción recomendada:
+              usar OpenSpec es una decisión de equipo, no un dato deducible del
+              repositorio. Si el usuario acepta, la misma ejecución continúa con
+              <code>setup-openspec</code>, que pregunta las herramientas y confirma
+              la instalación en una sola ronda antes de instalarlo e inicializarlo
+              —la única excepción a la regla de no instalar dependencias—.
             </p>
             <p>
               Si lo descarta, la fila queda en <code>No se usa</code> y nadie volverá a
@@ -678,8 +686,8 @@
             <div class="paso-meta"><span class="actor a-skill">setup-project-context</span></div>
             <h3>Materializar lo que el stack declare</h3>
             <p>
-              Aquí no hay nada que preguntar: lo que el stack declara ya lo decidió el
-              equipo al elegirlo. En <code>react18</code>, la clave
+              El guion solo pide confirmar el sistema de diseño: lo que el stack
+              declara ya lo decidió el equipo al elegirlo. En <code>react18</code>, la clave
               <code>context.mcp</code> declara el servidor <code>shadcn</code> con su
               configuración completa, y la skill lo fusiona en el <code>.mcp.json</code>
               de la raíz, conservando cualquier servidor previo.

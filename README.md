@@ -69,11 +69,18 @@ casos, la protección definitiva está en no versionar secretos.
    `templates/` como `docs/stack.yaml`. Las tecnologías y versiones solo se
    mantienen en cada plantilla.
 2. Ejecuta `/setup-project-context` en Claude Code o
-   `$setup-project-context` en Codex.
-3. Revisa las decisiones que la herramienta no pueda deducir con evidencia.
-4. Responde a la pregunta sobre OpenSpec que plantea la skill. Si lo adoptas,
-   ejecuta `/setup-openspec` o `$setup-openspec` para instalarlo e
-   inicializarlo; si no, la ficha lo registra como no usado.
+   `$setup-project-context` en Codex. Las skills de setup solo se ejecutan al
+   invocarlas: el agente no las lanza por su cuenta. En Claude Code lo fija
+   `disable-model-invocation` en su `SKILL.md`; en Codex, el archivo
+   `agents/openai.yaml` de cada skill.
+3. Responde a las tres rondas de preguntas del guion: ficha, ejecución y
+   OpenSpec. Son siempre las mismas nueve preguntas, también al repetir el
+   setup; cuando un dato ya está resuelto, la pregunta lo propone como
+   primera opción para confirmarlo.
+4. Si eliges instalar OpenSpec, la misma ejecución continúa con
+   `setup-openspec` y te pregunta las herramientas y la confirmación de la
+   instalación. Revisa al final la tabla del informe, con una fila por
+   pregunta y por fase.
 
 Los campos `[POR DEFINIR]` que no afecten al trabajo actual pueden mantenerse
 pendientes. No conviertas suposiciones en datos del proyecto.

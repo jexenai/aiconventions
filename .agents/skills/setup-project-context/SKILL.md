@@ -4,7 +4,8 @@ description: Analiza un repositorio y completa con evidencia la documentación e
 ---
 
 Lee completo el [procedimiento común](../../../.ai/skills/setup-project-context.md)
-y síguelo.
+y síguelo fase a fase, sin saltarte ninguna.
 
-Esta adaptación no añade reglas específicas de Codex. Las decisiones y
-restricciones compartidas se mantienen únicamente en el procedimiento común.
+Adaptación para Codex: plantea cada ronda del guion según la fila `Codex` de
+su tabla "Mecanismo de preguntas". Las demás decisiones y restricciones se
+mantienen únicamente en el procedimiento común.

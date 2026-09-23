@@ -1,0 +1,4 @@
+# Codex solo ejecuta esta skill al invocarla con $nombre; no la lanza por su
+# cuenta a partir del texto de la petición.
+policy:
+  allow_implicit_invocation: false
