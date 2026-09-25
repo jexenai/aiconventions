@@ -19,5 +19,4 @@ paths:
 - Al cliente, mensajes de error genéricos; el detalle va al log del servidor,
   sin secretos ni datos personales.
 
-> Aclaración: solo se carga con código de backend. El frontend tiene sus
-> propias pautas en `.claude/rules/react/seguridad.md`.
+> Aclaración: solo se carga con código de backend.
