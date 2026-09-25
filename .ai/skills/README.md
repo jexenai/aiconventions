@@ -8,6 +8,8 @@ procedimientos. No cargues todas las skills al comenzar.
 | Crear un commit | Cuando el usuario solicita explícitamente crear un commit Git | [commit.md](commit.md) |
 | Preparar el contexto | Al adoptar la plantilla, completar campos pendientes o actualizar la estructura documentada | [setup-project-context.md](setup-project-context.md) |
 | Decidir sobre OpenSpec | Al adoptar la plantilla o cuando se plantee usar OpenSpec: decisión del usuario y, si procede, instalación e inicialización | [setup-openspec.md](setup-openspec.md) |
+| Preparar las pruebas | Cuando a una parte del proyecto le faltan las herramientas para ejecutar sus pruebas o su análisis: instalación con confirmación, pruebas semilla y comandos | [setup-testing.md](setup-testing.md) |
+| Comprobar un despliegue de Laravel | Antes de desplegar un proyecto Laravel; solo comprueba, no despliega | [laravel-deploy.md](laravel-deploy.md) |
 
 ## Añadir un procedimiento
 
@@ -32,3 +34,8 @@ la tarea requiere aislamiento de contexto, herramientas especializadas o
 trabajo paralelo; documenta esa decisión en el adaptador nativo correspondiente.
 
 Las skills de OpenSpec las genera OpenSpec. No las copies ni las reimplementes.
+
+Las skills de código de `.claude/skills/` (seguridad, pruebas, JPA,
+accesibilidad y contratos por stack) no son procedimientos: son referencia
+técnica solo para Claude Code y no tienen fuente común aquí. Están descritas
+en [docs/diseno.md](../../docs/diseno.md).

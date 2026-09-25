@@ -3,35 +3,28 @@
 Esta plantilla comparte instrucciones entre Claude Code y Codex sin cargar toda
 la documentación en cada tarea. OpenSpec es opcional.
 
+Este documento explica cómo usarla. Por qué está organizada así y cómo
+ampliarla sin romperla está en [docs/diseno.md](docs/diseno.md).
+
 ## Archivos principales
 
 | Archivo                      | Para qué sirve                                       |
 | ---------------------------- | ---------------------------------------------------- |
 | `AGENTS.md`                  | Ficha del proyecto, reglas comunes y rutas de consulta |
-| `.ai/project/context.md`     | Reglas, alcance, mapa, dominio y seguridad             |
-| `.ai/project/development.md` | Comandos, calidad de código, pruebas y entrega         |
+| `.ai/project/architecture.md` | Reglas, alcance, mapa, dominio y seguridad             |
+| `.ai/project/development.md` | Comandos, base de datos de pruebas, convenciones propias, API, sistema de diseño y entrega |
+| `.claude/rules/`             | Pautas de código, seguridad y pruebas (solo Claude Code) |
 | `.ai/skills/README.md`       | Catálogo de procedimientos reutilizables               |
-
-OpenSpec no tiene documento propio en la plantilla: su forma de trabajo la
-define el workflow que él mismo instala. La plantilla solo aporta la decisión
-de adoptarlo, en `.ai/skills/setup-openspec.md`, y la fila `Especificaciones`
-de la ficha de `AGENTS.md`.
-
-Los servidores MCP tampoco se configuran a mano: cada plantilla de stack
-declara en `context.mcp` los que le corresponden, con su configuración
-completa. `setup-project-context` los fusiona en el `.mcp.json` del
-proyecto solo cuando el stack los declara, de modo que un backend sin interfaz
-no arrastra la configuración de un catálogo de componentes.
 
 `CLAUDE.md` importa `AGENTS.md`. No añadas imports de todos los documentos:
 los detalles se consultan solo cuando la tarea los necesita.
 
 ## Integraciones nativas
 
-| Herramienta | Skills            | Agentes           |
-| ----------- | ----------------- | ----------------- |
-| Claude Code | `.claude/skills/` | `.claude/agents/` |
-| Codex       | `.agents/skills/` | `.codex/agents/`  |
+| Herramienta | Skills            | Agentes           | Reglas de código |
+| ----------- | ----------------- | ----------------- | ---------------- |
+| Claude Code | `.claude/skills/` | `.claude/agents/` | `.claude/rules/` |
+| Codex       | `.agents/skills/` | `.codex/agents/`  | No disponible    |
 
 En Codex, `.agents/` y `.codex/` no son equivalentes: la primera contiene
 skills y la segunda configuración y agentes propios de Codex.
@@ -42,24 +35,28 @@ Estos archivos aplican controles que no dependen de que el modelo obedezca:
 
 | Herramienta | Archivo | Control |
 | ----------- | ------- | ------- |
-| Claude Code | `.claude/settings.json` | Bloquea leer y editar `.env` y `.env.prod*`, editar `.env.local` y `.env.*.local`, y leer claves y certificados; pide confirmación antes de `git push` |
+| Claude Code | `.claude/settings.json` | Bloquea leer y editar `.env` y `.env.prod*`, editar `.env.local` y `.env.*.local`, y leer claves y certificados; pide confirmación antes de `git push` y de las migraciones y los comandos `db:` de Artisan |
 | Codex | `.codex/config.toml` | Limita la escritura al repositorio, desactiva la red y pide aprobación para salir del sandbox |
 
 Codex no permite bloquear la lectura de archivos concretos. La regla de
 Claude Code no cubre la lectura desde la terminal (`cat .env`). En ambos
 casos, la protección definitiva está en no versionar secretos.
 
-### Skills y agentes
+### Memoria automática
 
-- Una **skill** define un procedimiento reutilizable y es la opción normal para
-  tareas como preparar contexto o crear un commit.
-- Un **agente** aporta un contexto aislado, herramientas o permisos propios.
-  Úsalo solo cuando ese aislamiento, especialización o paralelismo aporte valor.
-- La conversación principal invoca la skill o delega en el agente. Una skill
-  puede solicitar delegación cuando su procedimiento lo necesite, pero no debe
-  hacerlo por defecto para tareas breves y dependientes del contexto actual.
-- El commit se ejecuta directamente mediante su skill. No necesita un agente
-  intermedio y nunca debe lanzarse automáticamente sin petición del usuario.
+`.claude/settings.json` desactiva la memoria automática de Claude Code
+(`autoMemoryEnabled: false`). Así, Claude no guarda notas por su cuenta en la
+carpeta personal de cada desarrollador y todos trabajan con las mismas
+instrucciones. Si una corrección es una convención del equipo, va a
+`.ai/project/development.md` o a `.claude/rules/`, donde se revisa y llega a
+todos.
+
+Quien quiera la memoria para sí puede reactivarla en su
+`.claude/settings.local.json`, que no se versiona:
+
+```json
+{ "autoMemoryEnabled": true }
+```
 
 ## Adaptación inicial
 
@@ -70,9 +67,7 @@ casos, la protección definitiva está en no versionar secretos.
    mantienen en cada plantilla.
 2. Ejecuta `/setup-project-context` en Claude Code o
    `$setup-project-context` en Codex. Las skills de setup solo se ejecutan al
-   invocarlas: el agente no las lanza por su cuenta. En Claude Code lo fija
-   `disable-model-invocation` en su `SKILL.md`; en Codex, el archivo
-   `agents/openai.yaml` de cada skill.
+   invocarlas: el agente no las lanza por su cuenta.
 3. Responde a las tres rondas de preguntas del guion: ficha, ejecución y
    OpenSpec. Son siempre las mismas nueve preguntas, también al repetir el
    setup; cuando un dato ya está resuelto, la pregunta lo propone como
@@ -81,6 +76,18 @@ casos, la protección definitiva está en no versionar secretos.
    `setup-openspec` y te pregunta las herramientas y la confirmación de la
    instalación. Revisa al final la tabla del informe, con una fila por
    pregunta y por fase.
+5. Con las tecnologías, las vistas y la base de datos confirmadas, el setup
+   retira lo de los stacks que no uses. La sección "Stacks" del informe
+   indica qué se conservó y qué se retiró; lo que depende de una respuesta
+   pendiente no se borra.
+6. Si el stack declara servidores MCP (por ejemplo, el catálogo de shadcn/ui
+   para las vistas React), el setup los añade a `.mcp.json`. Apruébalos en
+   la primera sesión: añadirlos no los activa.
+7. Si el informe deja pendientes comandos de pruebas, lint o análisis porque
+   falta la herramienta (por ejemplo, Vitest o ESLint en un Laravel con vistas
+   React), ejecuta `/setup-testing`. Te pregunta qué preparar, instala solo
+   con tu confirmación, crea una prueba semilla por tipo y registra los
+   comandos.
 
 Los campos `[POR DEFINIR]` que no afecten al trabajo actual pueden mantenerse
 pendientes. No conviertas suposiciones en datos del proyecto.
@@ -93,16 +100,71 @@ proyecto, basta con completar la ficha de `AGENTS.md`:
 1. Su propósito principal.
 2. Las tecnologías y versiones utilizadas.
 3. La ruta del código de aplicación.
-4. El comando para arrancarlo en local.
-5. El comando de pruebas más habitual.
+4. Los comandos para arrancarlo en local, uno por parte si hay varias.
+5. Los comandos de pruebas habituales, uno por parte si hay varias.
 6. Qué tecnología renderiza sus vistas, si sirve interfaz propia.
 7. Si el proyecto usa OpenSpec o no.
 8. Si el proyecto usa un sistema de diseño servido por MCP o no.
 
-La ficha está en `AGENTS.md` porque es el único archivo que todas las
-herramientas cargan siempre. Completa el resto cuando una tarea necesite esa
-información o ejecuta la skill `setup-project-context` para obtenerla
-progresivamente.
+Si las pruebas usan base de datos, completa también la tabla "Base de datos
+de pruebas" de `development.md`: mientras esté pendiente, el agente no
+ejecutará las pruebas que la reinician.
 
 Actualiza cada dato en su fuente correspondiente. Los detalles temporales de
 un cambio pertenecen al cambio de OpenSpec, no a la documentación estable.
+
+## OpenSpec
+
+OpenSpec no tiene documento propio en la plantilla: su forma de trabajo la
+define el workflow que él mismo instala. La decisión de adoptarlo está en
+`.ai/skills/setup-openspec.md` y queda registrada en la fila
+`Especificaciones` de la ficha. Al instalarlo, `openspec/config.yaml` fija el
+orden de pruebas primero en cada cambio.
+
+## Revisores (solo Claude Code)
+
+| Agente | Revisa |
+| ------ | ------ |
+| `java-reviewer` | Java y Spring Boot |
+| `php-reviewer` | PHP y Laravel, también con Inertia |
+| `react-reviewer` | React con Vite, también las páginas de Inertia |
+| `security-reviewer` | Seguridad de cualquiera de los anteriores |
+
+Solo informan; las correcciones las hace la conversación principal. Claude
+te propone pasarlos en los momentos que fija la sección "Entrega" de
+[development.md](.ai/project/development.md), que es la única fuente de esa
+política. También puedes pedirlos directamente sobre un cambio de OpenSpec,
+ficheros, carpetas o commits: «revisa `app/Http/Controllers/Pedidos` con
+php-reviewer».
+
+## Skills de código (solo Claude Code)
+
+Referencia técnica que Claude no carga por su cuenta. La usan los revisores,
+las reglas indican cuándo leerla y tú puedes invocarla (`/laravel-tdd`).
+
+| Stack | Skills |
+| ----- | ------ |
+| Spring Boot | `springboot-security`, `jpa-patterns`, `springboot-tdd` |
+| Laravel | `laravel-security`, `laravel-tdd` y el procedimiento `laravel-deploy` |
+| Spring Boot y Laravel | `api-design` |
+| React | `react-testing`, `frontend-a11y`, `e2e-testing` |
+| API REST con SPA | `contract-first` (no aplica con Inertia) |
+
+`laravel-deploy` es un procedimiento con fuente común en `.ai/skills/`:
+comprueba que un proyecto Laravel está listo para desplegar, sin desplegar
+nada.
+
+## Reglas de código (solo Claude Code)
+
+`.claude/rules/` contiene pautas breves por lenguaje (`comun/`, `java/`,
+`php/`, `react/` e `inertia/`). Cada una se carga sola al leer un fichero que
+coincide con su `paths:`, así que no hace falta citarlas. Las convenciones
+propias del proyecto van en `development.md` y prevalecen sobre ellas.
+
+Dos consecuencias prácticas:
+
+- Usa una sesión por cambio: una regla cargada no se descarga hasta que
+  termina la sesión o se compacta la conversación. `/context` muestra las
+  que hay cargadas.
+- Para crear un fichero nuevo, el agente lee antes uno vecino del mismo tipo:
+  las reglas entran al leer, no al crear.

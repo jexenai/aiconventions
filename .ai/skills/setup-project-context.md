@@ -22,6 +22,8 @@ misma manera, se ejecute por primera vez o se repita.
   [setup-openspec.md](setup-openspec.md) en la fase 5.
 - No modifiques código de aplicación ni configuración funcional salvo que el
   usuario amplíe expresamente el alcance. En `AGENTS.md` edita solo su ficha.
+- No borres ficheros, salvo los artefactos que indique
+  [Retirar los stacks no usados](#retirar-los-stacks-no-usados).
 - No sobrescribas cambios ajenos ni sustituyas datos existentes sin comprobar
   que han quedado obsoletos.
 - No reproduzcas secretos ni datos personales encontrados durante la revisión.
@@ -36,7 +38,7 @@ misma manera, se ejecute por primera vez o se repita.
 
 Solo lectura. No edites nada en esta fase.
 
-1. Lee `AGENTS.md`, el `README` principal, `.ai/project/context.md` y
+1. Lee `AGENTS.md`, el `README` principal, `.ai/project/architecture.md` y
    `.ai/project/development.md`.
 2. Lee `docs/stack.yaml` si existe y aplica la sección
    [Usar el stack declarado](#usar-el-stack-declarado).
@@ -51,6 +53,11 @@ Solo lectura. No edites nada en esta fase.
    contenedores, despliegue y documentación vigente.
 7. Comprueba que las rutas y comandos citados existen. Distingue claramente
    entre comandos observados y comandos realmente ejecutados.
+8. Si existe `.claude/agents/`, comprueba la versión de Claude Code con
+   `claude --version`. Los revisores declaran `omitClaudeMd`, que requiere
+   Claude Code 2.1.271 o superior; con una versión anterior, el campo no tiene
+   efecto y cada revisor vuelve a cargar `AGENTS.md` al arrancar. No actualices
+   la herramienta: anota la versión para el informe.
 
 Solo ejecuta comprobaciones locales rápidas y sin efectos cuando aporten
 evidencia necesaria, como consultar la versión de una herramienta ya
@@ -76,7 +83,7 @@ la descripción de la primera opción. Si no hay ninguna propuesta con
 evidencia, la primera opción es `Sin evidencia: indícalo tú`, cuya
 descripción remite a escribir el valor propio.
 
-Clasifica también los demás `[POR DEFINIR]` de `context.md` y
+Clasifica también los demás `[POR DEFINIR]` de `architecture.md` y
 `development.md`, que no tienen pregunta propia:
 
 - **Demostrable:** se completa en la fase 4 con una fuente verificable.
@@ -116,8 +123,8 @@ la añade la herramienta como `Other`; en Codex, indícalo al final del mensaje.
 
 | Id | Cabecera | Pregunta | Opciones |
 | -- | -------- | -------- | -------- |
-| P5 | Arranque | ¿Con qué comando se arranca el proyecto en local? | Comando respaldado por scripts, wrapper o CI · Dejar pendiente |
-| P6 | Pruebas | ¿Cuál es el comando de pruebas habitual? | Comando respaldado por scripts, wrapper o CI · Dejar pendiente |
+| P5 | Arranque | ¿Con qué comandos se arranca el proyecto en local? | Comandos respaldados por scripts, wrapper o CI, uno por parte si hay varias · Dejar pendiente |
+| P6 | Pruebas | ¿Con qué comandos se ejecutan las pruebas habituales? | Comandos respaldados por scripts, wrapper o CI, uno por parte si hay varias · Dejar pendiente |
 | P7 | Base datos | ¿Qué base de datos usa el proyecto? | Declarada en `context.database` · La de la configuración, si difiere · No aplica · Dejar pendiente |
 | P8 | Diseño | ¿Qué sistema de diseño consume el proyecto por MCP? | Con `context.mcp`: una sola opción con todos sus servidores y su propósito · Dejar pendiente. Sin `context.mcp`: No se usa · Dejar pendiente |
 
@@ -153,12 +160,21 @@ Aplica las respuestas y la clasificación de la fase 2:
 
 - `AGENTS.md`: ficha del proyecto con las respuestas de P1 a P8. La fila
   `Especificaciones` se resuelve en la fase 5.
-- `context.md`: alcance, componentes, mapa, dominio, decisiones de
+- `architecture.md`: alcance, componentes, mapa, dominio, decisiones de
   arquitectura y seguridad del sistema, con la persistencia de P7.
-- `development.md`: comandos de P5 y P6, convenciones de implementación,
-  comentarios, pruebas y entrega.
+- `development.md`: comandos de P5 y P6, con una fila por parte si hay
+  varias; la base de datos de pruebas, solo con la evidencia de la
+  configuración de pruebas (`phpunit.xml`, `.env.testing`,
+  `application-test.*`) y sin leer el `.env`; convenciones propias del
+  proyecto y decisiones de la sección "API" con evidencia (endpoints
+  existentes, manejador de errores, contrato OpenAPI). No copies ahí las pautas generales
+  de código, seguridad ni pruebas: están en `.claude/rules/` y este
+  procedimiento no las edita.
 - `.mcp.json`: según P8, aplicando
   [Materializar los servidores MCP](#materializar-los-servidores-mcp).
+- `.claude/` y `development.md`: retira lo de los stacks que el proyecto no
+  usa, aplicando
+  [Retirar los stacks no usados](#retirar-los-stacks-no-usados).
 
 Mantén cada dato en una única fuente. Enlaza documentos relacionados en lugar
 de copiar reglas completas entre ellos.
@@ -182,7 +198,11 @@ Según la respuesta a P9:
    que conserva los servidores previos y que la ficha coincide con él.
 4. Revisa que no se hayan documentado ejemplos como configuración activa.
 5. Contrasta los comandos registrados con scripts, manifiestos o CI.
-6. Revisa el diff para detectar datos inventados, duplicaciones y cambios fuera
+6. Comprueba que no queda ningún artefacto de los componentes retirados y
+   que ningún fichero de `.claude/` ni `development.md` los cita sin la
+   salvedad «si existe». Busca por el nombre de cada carpeta, agente y skill
+   retirados.
+7. Revisa el diff para detectar datos inventados, duplicaciones y cambios fuera
    del alcance documental.
 
 Termina siempre con un informe con estas secciones, en este orden:
@@ -198,8 +218,15 @@ Termina siempre con un informe con estas secciones, en este orden:
    sus diferencias respecto al código.
 5. **MCP:** servidores añadidos a `.mcp.json` y aviso de que el usuario debe
    aprobarlos; en ejecuciones desatendidas se cargan sin preguntar.
-6. **Pendientes:** marcadores restantes con su motivo concreto.
-7. **Comprobaciones:** comprobaciones ejecutadas y limitaciones de la revisión.
+6. **Stacks:** una tabla con una fila por componente de
+   [Retirar los stacks no usados](#retirar-los-stacks-no-usados), con
+   `Conservado`, `Retirado` o `Pendiente` y el motivo. No omitas filas.
+7. **Pendientes:** marcadores restantes con su motivo concreto. Si algún
+   comando de pruebas, lint o análisis queda pendiente porque falta la
+   herramienta, recomienda ejecutar `setup-testing`.
+8. **Comprobaciones:** comprobaciones ejecutadas y limitaciones de la revisión,
+   incluida la versión de Claude Code de la fase 1. Si es anterior a 2.1.271
+   o no se pudo obtener, recomienda actualizarla antes de usar los revisores.
 
 ## Usar el stack declarado
 
@@ -212,15 +239,15 @@ reales son los de [.ai/skills/README.md](README.md).
 
 | Clave | Destino | Uso |
 | ----- | ------- | --- |
-| `context.declared` | Ficha de `AGENTS.md` (tecnologías y versiones) y entornos de ejecución en `context.md` | Propuesta de P2. Si los manifiestos o la configuración indican otra versión, ofrécela como alternativa |
-| `context.database` | Persistencia en `context.md` | Propuesta de P7. Declara una sola base de datos; contrástala con la configuración y, si apunta a otra, ofrécela como alternativa. Con el valor `N/A`, propón `No aplica` tras comprobar que el repositorio no contiene configuración de base de datos |
-| `context.dependencies` | Configuración y dependencias en `context.md` | Dependencias que el estándar exige para el stack. Comprueba si están en el manifiesto e informa de su ausencia sin instalarlas |
-| `context.deployment` | Entornos de ejecución y despliegue en `context.md` | Documenta el empaquetado y el destino declarados. Si el manifiesto o el CI producen otro artefacto, informa de la diferencia sin resolverla |
-| `context.ui` | Ficha de `AGENTS.md` (capa de vistas) y mapa del repositorio en `context.md` | Propuesta de P4. Documenta la ruta de `entry` solo si existe. Si `bridge` está fijado o el manifiesto lo demuestra, es la primera opción; si no, ofrece cada valor de `bridgeOptions` sin `(Recomendado)`. Sus `dependencies` son paquetes npm: comprueba si están en `package.json` e informa de su ausencia sin instalarlas. Si la clave no existe, propón las vistas del framework declarado con la evidencia del repositorio y reserva `No aplica` para los proyectos que no sirven interfaz |
+| `context.declared` | Ficha de `AGENTS.md` (tecnologías y versiones) y entornos de ejecución en `architecture.md` | Propuesta de P2. Si los manifiestos o la configuración indican otra versión, ofrécela como alternativa |
+| `context.database` | Persistencia en `architecture.md` | Propuesta de P7. Declara una sola base de datos; contrástala con la configuración y, si apunta a otra, ofrécela como alternativa. Con el valor `N/A`, propón `No aplica` tras comprobar que el repositorio no contiene configuración de base de datos |
+| `context.dependencies` | Configuración y dependencias en `architecture.md` | Dependencias que el estándar exige para el stack. Comprueba si están en el manifiesto e informa de su ausencia sin instalarlas |
+| `context.deployment` | Entornos de ejecución y despliegue en `architecture.md` | Documenta el empaquetado y el destino declarados. Si el manifiesto o el CI producen otro artefacto, informa de la diferencia sin resolverla |
+| `context.ui` | Ficha de `AGENTS.md` (capa de vistas) y mapa del repositorio en `architecture.md` | Propuesta de P4. Documenta la ruta de `entry` solo si existe. Si `bridge` está fijado o el manifiesto lo demuestra, es la primera opción; si no, ofrece cada valor de `bridgeOptions` sin `(Recomendado)`. Sus `dependencies` son paquetes npm: comprueba si están en `package.json` e informa de su ausencia sin instalarlas. Si la clave no existe, propón las vistas del framework declarado con la evidencia del repositorio y reserva `No aplica` para los proyectos que no sirven interfaz |
 | `context.mcp` | `.mcp.json` de la raíz y ficha de `AGENTS.md` (sistema de diseño) | Propuesta de P8. Si la clave no existe, el stack no usa ninguno y la primera opción es `No se usa` |
-| `context.conventions.paths` | Ficha de `AGENTS.md` (código de aplicación) y mapa del repositorio en `context.md` | Propuesta de P3. Documenta solo las rutas que existan. `views` es la carpeta de las vistas reales del proyecto, que puede no coincidir con la de plantillas del framework; contrástala con `context.ui` |
+| `context.conventions.paths` | Ficha de `AGENTS.md` (código de aplicación) y mapa del repositorio en `architecture.md` | Propuesta de P3. Documenta solo las rutas que existan. `views` es la carpeta de las vistas reales del proyecto, que puede no coincidir con la de plantillas del framework; contrástala con `context.ui` |
 | `context.conventions.generated` | Archivos generados en el mapa del repositorio | Documenta solo los que existan o estén declarados en `.gitignore` |
-| `context.conventions.buildTools` | Ficha de `AGENTS.md` (arranque y pruebas) y comandos de `development.md` | Propuestas de P5 y P6. Usa la herramienta cuyo `file` exista. Las claves de `commands` son candidatas del estándar, no comandos garantizados: propón cada una solo si la respaldan sus scripts, un wrapper del repositorio o el CI; si hay wrapper, prefiérelo |
+| `context.conventions.buildTools` | Ficha de `AGENTS.md` (arranque y pruebas) y comandos de `development.md` | Propuestas de P5 y P6. Usa todas las herramientas cuyo `file` exista. Si hay varias, como `composer.json` y `package.json` en Laravel con vistas React, la opción reúne un comando de cada una, etiquetado por parte (`Backend: …` · `Vistas: …`); si un único script arranca ambas partes, prefiérelo. Las claves de `commands` son candidatas del estándar, no comandos garantizados: propón cada una solo si la respaldan sus scripts, un wrapper del repositorio o el CI; si hay wrapper, prefiérelo |
 
 El archivo no aporta el propósito, los usuarios, el dominio, las decisiones de
 arquitectura ni la seguridad del proyecto. Complétalos con otra evidencia o
@@ -250,3 +277,40 @@ interactiva.
    procedimiento.
 5. Registra en la ficha de `AGENTS.md` el sistema de diseño y el servidor que
    sirve su catálogo, o `No se usa` si esa fue la respuesta a P8.
+
+## Retirar los stacks no usados
+
+La plantilla trae reglas, revisores y skills de Claude Code para Spring Boot,
+Laravel, React, Inertia y Oracle. Las reglas y las skills no consumen contexto
+si no se usan, pero la descripción de cada agente está siempre cargada y un
+revisor de otro stack puede acabar propuesto. Las reglas de Inertia, además,
+contradicen las de una API REST si se quedan en un proyecto que no lo usa. Aplica esta sección en la fase 4, también al
+repetir el procedimiento.
+
+1. Decide cada componente solo con las respuestas `Confirmada` de las
+   preguntas de las que depende según la tabla. Si alguna de ellas está
+   `Sin confirmar` o `Pendiente`, no borres ese componente y márcalo
+   `Pendiente`.
+2. Conserva o retira cada componente según esta tabla. Lo que no aparece
+   (`.claude/rules/comun/estilo-codigo.md`, `comun/pruebas.md`,
+   `security-reviewer`, las demás skills de procedimientos y las de OpenSpec)
+   se conserva siempre.
+
+   | Componente | Se conserva si | Artefactos |
+   | ---------- | -------------- | ---------- |
+   | Spring Boot | P2 incluye Java o Spring Boot | `.claude/rules/java/`, `.claude/agents/java-reviewer.md`, `.claude/skills/springboot-security/`, `springboot-tdd/`, `jpa-patterns/` |
+   | Laravel | P2 incluye PHP o Laravel | `.claude/rules/php/`, `.claude/agents/php-reviewer.md`, `.claude/skills/laravel-security/`, `laravel-tdd/`; el procedimiento `laravel-deploy` (`.ai/skills/laravel-deploy.md`, `.claude/skills/laravel-deploy/`, `.agents/skills/laravel-deploy/`), su fila en `.ai/skills/README.md` y su línea en la sección "Entrega" de `development.md` |
+   | Oracle | P7 es Oracle | `.claude/rules/java/oracle.md` y `.claude/rules/php/oracle.md` |
+   | React | P2 o P4 incluyen React | `.claude/rules/react/`, `.claude/agents/react-reviewer.md`, `.claude/skills/react-testing/`, `frontend-a11y/`, `e2e-testing/` |
+   | Backend | Se conserva Spring Boot o Laravel | `.claude/rules/comun/seguridad.md`, `.claude/skills/api-design/` y la sección "API" de `development.md` |
+   | Contrato con SPA | Se conserva React o el backend, y P4 no indica Inertia | `.claude/skills/contract-first/` |
+   | Inertia | Se conservan Laravel y React, y P4 indica Inertia | `.claude/rules/inertia/` |
+
+3. Antes de borrar un artefacto, comprueba en Git que no tiene cambios
+   locales. Si los tiene, consérvalo, márcalo `Pendiente` e indica el motivo.
+4. Borra solo los artefactos de la tabla, incluidas las filas y líneas que
+   cita. No edites otros ficheros para quitar referencias: las que quedan en
+   los revisores y en las reglas ya llevan la salvedad «si existe».
+
+Los artefactos retirados se recuperan copiándolos de nuevo desde la plantilla
+si el proyecto incorpora ese stack más adelante.

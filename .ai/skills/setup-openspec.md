@@ -13,8 +13,9 @@ que instala; esta plantilla no la duplica.
 ## Límites
 
 - Instala y ejecuta OpenSpec solo con confirmación explícita del usuario en el
-  momento. Es la única excepción a la regla general de no instalar
-  dependencias y no se extiende a ninguna otra herramienta.
+  momento. Es una excepción a la regla general de no instalar dependencias,
+  como la de `setup-testing` para las herramientas de pruebas, y no se
+  extiende a ninguna otra herramienta.
 - No sobrescribas una instalación existente. Si ya hay `openspec/`, limítate a
   registrar la decisión y la versión instalada.
 - No crees, modifiques ni archives especificaciones ni cambios durante la
@@ -50,7 +51,9 @@ Si una ronda no obtiene respuesta, no vuelvas a preguntar: conserva
 
 1. Comprueba si ya existe `openspec/` o `openspec/config.yaml`. Si existe, no
    inicialices ni preguntes: obtén la versión instalada, registra la decisión
-   y termina.
+   y termina. Si a su `config.yaml` le faltan las entradas de `rules` u
+   `operations` del paso 4 de [Instalar](#instalar), indícalas en el informe
+   como pendientes sin editarlo.
 2. Si no existe, plantea P9. La pregunta es obligatoria: no elijas por el
    usuario ni dejes la decisión implícita. Si la ficha dice `No se usa` y el
    usuario invoca este procedimiento, trátalo como una petición de
@@ -99,12 +102,36 @@ Si una ronda no obtiene respuesta, no vuelvas a preguntar: conserva
    operations:
      apply:
        guidance:
-         - Ejecuta la prueba del escenario antes que la suite completa.
+         - Antes de escribir una prueba nueva, lee una prueba existente del
+           mismo tipo; así se cargan las reglas de pruebas del proyecto.
+         - Por cada tarea, escribe primero la prueba del escenario que cubre,
+           con el nombre del escenario en su descripción visible
+           (`@DisplayName`, `it` o `test`, descripción de Pest o
+           `#[TestDox]`).
+         - Ejecútala y comprueba que falla por el motivo esperado; un error
+           de compilación o de configuración no cuenta.
+         - Implementa lo mínimo para que pase y refactoriza con las pruebas
+           en verde.
+         - Si una tarea declara otra verificación que no es una prueba
+           automática, dilo al informar en lugar de darla por probada.
+         - Antes de dar el cambio por aplicado, ejecuta las pruebas del área
+           afectada y conserva el resultado para la verificación.
+         - Al ejecutar pruebas, filtra al escenario o al área y muestra solo
+           el resumen y los fallos.
+     archive:
+       guidance:
+         - Antes de archivar, aplica la sección "Entrega" de
+           .ai/project/development.md; si tras verificar no se ofrecieron
+           los revisores, ofrécelos ahora.
    ```
 
-   Comprueba en la documentación vigente de OpenSpec que `rules` y `operations`
-   siguen admitiendo estas claves antes de escribirlas. Si el esquema elegido no
-   es `spec-driven`, ajusta los nombres de artefacto a los que declare.
+   Estas claves son la única fuente del orden de pruebas primero: OpenSpec
+   entrega `rules` al generar cada artefacto y `operations` al ejecutar apply
+   y archive. `verify` no admite guía propia; lo que se hace tras verificar
+   está en la sección "Entrega" de `.ai/project/development.md`. Comprueba en
+   la documentación vigente de OpenSpec que `rules` y `operations` siguen
+   admitiendo estas claves antes de escribirlas. Si el esquema elegido no es
+   `spec-driven`, ajusta los nombres de artefacto a los que declare.
 
 5. Revisa todos los archivos generados antes de versionarlos: `openspec/`, las
    skills y comandos de cada herramienta configurada y los marcadores internos
@@ -127,7 +154,7 @@ estos valores:
 1. Comprueba que `openspec/` y su configuración existen y que la versión
    registrada coincide con la instalada.
 2. Comprueba que `openspec/config.yaml` es YAML válido y conserva `context`,
-   `rules` y `operations`.
+   `rules` y `operations` con sus entradas `apply` y `archive`.
 3. Revisa que la ficha de `AGENTS.md` no contradiga el estado real.
 4. Revisa el diff para detectar archivos generados fuera de lo esperado.
 

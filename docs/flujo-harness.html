@@ -1,4 +1,7 @@
+<!doctype html>
+<html lang="es">
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>De la petición al commit</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
 <style>
@@ -80,13 +83,24 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  figure { margin: 0; }
+
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
   .marco {
     display: grid;
     grid-template-columns: 1fr;
     gap: 0;
     max-width: 1180px;
     margin: 0 auto;
-    padding-inline: 20px;
+    padding-inline: 16px;
     padding-block: 0 72px;
   }
 
@@ -171,6 +185,7 @@
   .a-agente   { background: var(--surface-alt); color: var(--muted);  border-color: var(--line); }
   .a-skill    { background: var(--warn-soft);   color: var(--warn);   border-color: var(--warn); }
   .a-spec     { background: var(--spec-soft);   color: var(--spec);   border-color: var(--spec); }
+  .a-revisor  { background: var(--stop-soft);   color: var(--stop);   border-color: var(--stop); }
 
   /* ---------- Índice lateral ---------- */
 
@@ -260,8 +275,6 @@
     letter-spacing: 0.05em;
   }
 
-  .fase > p { max-width: 68ch; }
-
   h3 {
     font-family: var(--sans);
     font-weight: 600;
@@ -281,6 +294,9 @@
   }
 
   p { margin: 0 0 14px; max-width: 68ch; }
+
+  ul.lista { margin: 0 0 14px; padding-left: 20px; max-width: 68ch; }
+  ul.lista li { margin-bottom: 6px; }
 
   a { color: var(--accent); }
 
@@ -337,7 +353,7 @@
 
   .paso-hito { border-left: 3px solid var(--spec); padding-left: 16px; }
 
-  /* ---------- Bloques auxiliares ---------- */
+  /* ---------- Bloques de código y terminal ---------- */
 
   .terminal {
     font-family: var(--mono);
@@ -358,6 +374,49 @@
   .terminal .w { color: var(--warn); }
   .terminal .s { color: var(--spec); }
   .terminal .g { color: var(--go); }
+  .terminal .r { color: var(--stop); }
+  .terminal .t { color: var(--faint); text-decoration: line-through; }
+
+  .terminal.rojo  { border-left: 3px solid var(--stop); }
+  .terminal.verde { border-left: 3px solid var(--go); }
+
+  .codigo { margin: 14px 0; }
+
+  .codigo figcaption {
+    display: flex;
+    align-items: center;
+    gap: 4px 6px;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--surface-alt);
+    border: 1px solid var(--line);
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    padding: 6px 12px;
+  }
+
+  .codigo .terminal { margin: 0; border-radius: 0 0 4px 4px; }
+
+  .etiqueta {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 3px;
+    border: 1px solid currentColor;
+    white-space: nowrap;
+    margin-left: auto;
+  }
+
+  .et-prueba  { color: var(--spec); }
+  .et-codigo  { color: var(--accent); }
+  .et-rojo    { color: var(--stop); }
+  .et-verde   { color: var(--go); }
+
+  /* ---------- Notas y tablas ---------- */
 
   .nota {
     border-left: 3px solid var(--warn);
@@ -366,6 +425,9 @@
     margin: 16px 0;
     border-radius: 0 4px 4px 0;
   }
+
+  .nota.idea { border-left-color: var(--accent); background: var(--accent-soft); }
+  .nota.idea .nota-rotulo { color: var(--accent); }
 
   .nota p { margin: 0; max-width: none; }
   .nota p + p { margin-top: 8px; }
@@ -406,7 +468,13 @@
     border-bottom-color: var(--ink);
   }
 
-  /* ---------- Medidor de contexto ---------- */
+  .matriz th:not(:first-child),
+  .matriz td:not(:first-child) { text-align: center; padding-right: 6px; padding-left: 6px; }
+  .matriz td.si { color: var(--go); font-weight: 600; }
+  .matriz td.no { color: var(--faint); }
+  .matriz td:first-child code { white-space: nowrap; }
+
+  /* ---------- Medidor de contexto (lista) ---------- */
 
   .contexto {
     background: var(--surface);
@@ -416,7 +484,8 @@
     margin: 20px 0;
   }
 
-  .contexto h4 {
+  .contexto h4,
+  .ventana h4 {
     font-family: var(--mono);
     font-size: 11px;
     letter-spacing: 0.1em;
@@ -440,7 +509,8 @@
     font-size: 14px;
   }
 
-  .fila-carga code { background: none; padding: 0; font-size: 13px; }
+  .fila-carga code,
+  .v-et code { background: none; padding: 0; font-size: 13px; }
 
   .estado {
     font-family: var(--mono);
@@ -453,6 +523,107 @@
   .e-si    { color: var(--go); }
   .e-bajo  { color: var(--accent); }
   .e-no    { color: var(--faint); }
+
+  /* ---------- Ventana de contexto con barras ---------- */
+
+  .ventana {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 18px 20px;
+    margin: 20px 0;
+  }
+
+  .v-leyenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    font-size: 12.5px;
+    color: var(--muted);
+    margin: 0 0 14px;
+  }
+
+  .v-leyenda span::before {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    margin-right: 6px;
+    vertical-align: -1px;
+    background: var(--c);
+  }
+
+  .v-filas { display: flex; flex-direction: column; gap: 8px; }
+
+  .v-fila {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 64px;
+    grid-template-areas: "et tok" "ba ba";
+    gap: 4px 12px;
+    align-items: center;
+    font-size: 14px;
+  }
+
+  @media (min-width: 640px) {
+    .v-fila {
+      grid-template-columns: minmax(0, 1fr) 34% 64px;
+      grid-template-areas: "et ba tok";
+    }
+  }
+
+  .v-et { grid-area: et; min-width: 0; }
+  .v-tok {
+    grid-area: tok;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .v-barra {
+    grid-area: ba;
+    height: 10px;
+    background: var(--surface-alt);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .v-barra span { display: block; height: 100%; width: var(--w); background: var(--c); }
+
+  .c-siempre { --c: var(--accent); }
+  .c-ruta    { --c: var(--go); }
+  .c-demanda { --c: var(--warn); }
+  .c-cambio  { --c: var(--spec); }
+
+  .v-fila.fuera .v-et { color: var(--faint); text-decoration: line-through; }
+  .v-fila.fuera .v-barra { background: transparent; border: 1px dashed var(--line); }
+  .v-fila.duda .v-barra { background: transparent; border: 1px dashed var(--c); }
+  .v-fila.duda .v-barra span { opacity: 0.35; }
+
+  .nueva {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--go);
+    border: 1px solid var(--go);
+    border-radius: 3px;
+    padding: 0 5px;
+    margin-left: 6px;
+    white-space: nowrap;
+  }
+
+  .v-total {
+    border-top: 1px solid var(--line);
+    padding-top: 10px;
+    margin-top: 12px;
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+
+  .v-total strong { color: var(--ink); font-weight: 600; }
 
   /* ---------- Bifurcaciones ---------- */
 
@@ -472,6 +643,7 @@
     border: 1px solid var(--line);
     border-radius: 4px;
     padding: 18px 20px;
+    min-width: 0;
   }
 
   .rama h3 { margin-bottom: 10px; }
@@ -488,6 +660,285 @@
   .rama-si { color: var(--go); }
   .rama-no { color: var(--stop); }
   .rama-spec { color: var(--spec); }
+
+  .rama.activa { border-color: var(--go); }
+  .rama.inactiva { border-style: dashed; }
+
+  /* ---------- Recorrido general ---------- */
+
+  .recorrido {
+    list-style: none;
+    margin: 20px 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 6px;
+    align-items: center;
+  }
+
+  .recorrido li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13.5px;
+  }
+
+  .recorrido li + li::before {
+    content: "→";
+    color: var(--faint);
+  }
+
+  .etapa {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .etapa.u { border-color: var(--go);    background: var(--go-soft); }
+  .etapa.s { border-color: var(--spec);  background: var(--spec-soft); }
+  .etapa.r { border-color: var(--stop);  background: var(--stop-soft); }
+  .etapa.v { border-color: var(--go); }
+
+  /* ---------- Glosario ---------- */
+
+  .glosario {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin: 20px 0;
+  }
+
+  @media (min-width: 720px) {
+    .glosario { grid-template-columns: 1fr 1fr; }
+  }
+
+  .glosario div {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 14px 16px;
+  }
+
+  .glosario dt { font-weight: 600; margin-bottom: 4px; }
+  .glosario dd { margin: 0; font-size: 14.5px; color: var(--muted); }
+
+  /* ---------- Ciclo TDD ---------- */
+
+  .ciclo {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin: 20px 0;
+  }
+
+  @media (min-width: 720px) {
+    .ciclo { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .ciclo div {
+    border-radius: 4px;
+    padding: 14px 16px;
+    border: 1px solid;
+  }
+
+  .ciclo .rojo    { border-color: var(--stop);   background: var(--stop-soft); }
+  .ciclo .verde   { border-color: var(--go);     background: var(--go-soft); }
+  .ciclo .ordenar { border-color: var(--accent); background: var(--accent-soft); }
+
+  .ciclo strong {
+    display: block;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .ciclo .rojo strong    { color: var(--stop); }
+  .ciclo .verde strong   { color: var(--go); }
+  .ciclo .ordenar strong { color: var(--accent); }
+  .ciclo p { font-size: 14px; margin: 0; }
+
+  /* ---------- Activación de reglas ---------- */
+
+  .activacion {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin: 20px 0;
+    align-items: stretch;
+  }
+
+  @media (min-width: 760px) {
+    .activacion { grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; }
+  }
+
+  .act-caja {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 12px 14px;
+    font-size: 14px;
+    min-width: 0;
+  }
+
+  .act-caja strong {
+    display: block;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--faint);
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  .act-flecha {
+    color: var(--faint);
+    text-align: center;
+    font-size: 18px;
+  }
+
+  @media (max-width: 759px) {
+    .act-flecha { transform: rotate(90deg); }
+  }
+
+  /* ---------- Prototipos ---------- */
+
+  .prototipo {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 18px 20px;
+    font-size: 14px;
+  }
+
+  .pr-titulo { font-weight: 600; font-size: 16px; margin-bottom: 14px; }
+  .pr-campo { margin-bottom: 12px; }
+  .pr-campo span { display: block; font-weight: 500; margin-bottom: 4px; }
+
+  .pr-input {
+    height: 36px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 7px 10px;
+    color: var(--ink);
+    background: var(--ground);
+    font-size: 14px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .pr-input.invalido { border-color: var(--stop); box-shadow: 0 0 0 1px var(--stop); }
+  .pr-error { color: var(--stop); font-size: 13px; margin-top: 4px; }
+
+  .pr-boton {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--ground);
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-weight: 500;
+    margin-top: 4px;
+  }
+
+  .pr-pie { font-family: var(--mono); font-size: 11px; color: var(--faint); margin-top: 14px; }
+
+  /* ---------- Diálogo y revisores ---------- */
+
+  .dialogo {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    padding: 16px 18px;
+    margin: 18px 0;
+    max-width: 640px;
+  }
+
+  .dialogo-cab {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .dialogo p { margin-bottom: 12px; }
+
+  .opciones { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+
+  .opciones li {
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 8px 12px 8px 36px;
+    position: relative;
+    font-size: 14px;
+  }
+
+  .opciones li::before {
+    content: "";
+    position: absolute;
+    left: 12px;
+    top: 12px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1.5px solid var(--faint);
+  }
+
+  .opciones li small { display: block; color: var(--muted); font-size: 13px; }
+
+  .revisores {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin: 18px 0;
+  }
+
+  @media (min-width: 820px) {
+    .revisores { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .rev {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 14px 16px;
+    font-size: 14px;
+    min-width: 0;
+  }
+
+  .rev ul { margin: 8px 0 10px; padding-left: 18px; color: var(--muted); }
+  .rev li { margin-bottom: 3px; }
+
+  .veredicto {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 3px;
+    border: 1px solid currentColor;
+  }
+
+  .vd-bloq  { color: var(--stop); background: var(--stop-soft); }
+  .vd-aviso { color: var(--warn); background: var(--warn-soft); }
+  .vd-ok    { color: var(--go);   background: var(--go-soft); }
+
+  .envio {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--muted);
+    background: var(--surface-alt);
+    border-radius: 4px;
+    padding: 10px 12px;
+    margin: 12px 0;
+  }
 
   .pie {
     grid-column: 1 / -1;
@@ -516,37 +967,122 @@
     <p class="sello">Plantilla de contexto para agentes · aiconventions</p>
     <h1>De la petición al commit</h1>
     <p class="entradilla">
-      El ciclo completo de la plantilla, seguido de principio a fin sobre una
-      petición real. Cada paso indica <strong>quién lo ejecuta</strong>, porque el
-      reparto entre el harness, el agente y quien desarrolla es lo que hace
-      predecible el resultado.
+      El ciclo completo de la plantilla, seguido de principio a fin sobre un caso
+      real: <strong>un formulario de alta de clientes</strong> en un proyecto
+      Laravel con vistas React. Cada paso indica <strong>quién lo ejecuta</strong> y
+      <strong>qué tiene el agente principal delante</strong> en ese momento, porque eso es lo
+      que hace predecible el resultado.
     </p>
     <div class="actores">
       <span class="actores-rotulo">Actores</span>
       <span class="actor a-usuario">Usuario</span>
       <span class="actor a-harness">Harness</span>
-      <span class="actor a-agente">Agente</span>
+      <span class="actor a-agente">Agente principal</span>
       <span class="actor a-skill">Skill</span>
       <span class="actor a-spec">OpenSpec</span>
+      <span class="actor a-revisor">Subagente revisor</span>
     </div>
   </header>
 
   <nav class="indice" aria-label="Índice del flujo">
-    <h2>Fases</h2>
+    <h2>Recorrido</h2>
     <ol>
+      <li><a href="#empezar">Para empezar</a></li>
       <li><a href="#reparto">El reparto</a></li>
       <li><a href="#adopcion">0 · Adopción</a></li>
       <li><a href="#arranque">1 · Arranque</a></li>
       <li><a href="#encuadre">2 · Encuadre</a></li>
       <li><a href="#especificacion">3 · Especificación</a></li>
-      <li><a href="#implementacion">4 · Implementación</a></li>
-      <li><a href="#cierre">5 · Cierre</a></li>
+      <li><a href="#reglas">4 · Reglas por lenguaje</a></li>
+      <li><a href="#backend">4 · Backend con TDD</a></li>
+      <li><a href="#frontend">4 · Frontend</a></li>
+      <li><a href="#cierre">5 · Cierre y revisión</a></li>
       <li><a href="#ramas">Variantes</a></li>
       <li><a href="#limites">Dónde vive cada cosa</a></li>
     </ol>
   </nav>
 
   <main>
+
+    <!-- ============ PARA EMPEZAR ============ -->
+    <section class="fase" id="empezar">
+      <div class="fase-cab">
+        <span class="fase-ord">§</span>
+        <h2>Para empezar: siete ideas</h2>
+      </div>
+
+      <p>
+        Si nunca has programado con un agente de IA, estas siete ideas bastan para
+        seguir el resto del documento. Todo lo demás son detalles de cómo la
+        plantilla las aplica.
+      </p>
+
+      <dl class="glosario">
+        <div>
+          <dt>Agente principal</dt>
+          <dd>El asistente de IA con el que conversas y que trabaja en tu repositorio:
+          lee ficheros, escribe código y ejecuta comandos como las pruebas. Aquí,
+          Claude Code. En esta guía, «agente principal» es siempre esa
+          conversación.</dd>
+        </div>
+        <div>
+          <dt>Subagente revisor</dt>
+          <dd>Otro agente que el agente principal lanza solo si tú lo pides o lo
+          confirmas. Trabaja con su propia ventana, sin ver la conversación: lee el
+          cambio terminado, informa de lo que encuentra y no modifica código.</dd>
+        </div>
+        <div>
+          <dt>Ventana de contexto</dt>
+          <dd>Todo lo que el agente principal tiene delante en este momento. Lo que no está en la
+          ventana, no lo sabe. Es limitada: cuanto más relleno inútil, peor se
+          concentra. Por eso la plantilla carga cada cosa solo cuando hace falta.</dd>
+        </div>
+        <div>
+          <dt>Regla</dt>
+          <dd>Una hoja corta de pautas de un lenguaje (PHP, React…). Entra sola en la
+          ventana cuando el agente principal abre un fichero de ese lenguaje. Nadie tiene que
+          acordarse de pedirla.</dd>
+        </div>
+        <div>
+          <dt>Skill</dt>
+          <dd>Un procedimiento o guía más larga que solo se carga cuando se invoca
+          (<code>/commit</code>) o cuando una regla dice «léela antes de…».</dd>
+        </div>
+        <div>
+          <dt>Escenario</dt>
+          <dd>Un caso concreto del comportamiento esperado, escrito en lenguaje natural
+          con la forma <em>Dado… Cuando… Entonces…</em>. Es lo que el usuario revisa
+          y aprueba antes de programar.</dd>
+        </div>
+        <div>
+          <dt>Pruebas primero (TDD)</dt>
+          <dd>Por cada escenario, el agente principal escribe primero una prueba automática, la ve
+          fallar y solo entonces escribe el código que la hace pasar. Así cada
+          escenario queda demostrado, no supuesto.</dd>
+        </div>
+      </dl>
+
+      <h4 class="sub">El recorrido de un cambio, de un vistazo</h4>
+
+      <ol class="recorrido" aria-label="Etapas de un cambio">
+        <li><span class="etapa u">Petición</span></li>
+        <li><span class="etapa s">Escenarios</span></li>
+        <li><span class="etapa u">Revisas y apruebas</span></li>
+        <li><span class="etapa r">Prueba en rojo</span></li>
+        <li><span class="etapa v">Código en verde</span></li>
+        <li><span class="etapa">Ordenar</span></li>
+        <li><span class="etapa s">Verificar</span></li>
+        <li><span class="etapa u">¿Subagentes revisores?</span></li>
+        <li><span class="etapa s">Archivar</span></li>
+        <li><span class="etapa u">Commit</span></li>
+      </ol>
+
+      <p>
+        Las etapas en verde claro son decisiones tuyas: el agente principal propone, pero no
+        avanza sin ti. Las moradas las conduce OpenSpec, la herramienta de
+        especificaciones. El trío rojo, verde y ordenar se repite por cada escenario.
+      </p>
+    </section>
 
     <!-- ============ REPARTO ============ -->
     <section class="fase" id="reparto">
@@ -556,7 +1092,7 @@
       </div>
 
       <p>
-        Cinco actores intervienen en el ciclo y conviene no confundirlos, porque
+        Seis actores intervienen en el ciclo y conviene no confundirlos, porque
         cada uno falla de una manera distinta.
       </p>
 
@@ -568,27 +1104,32 @@
           <tbody>
             <tr>
               <td><span class="actor a-harness">Harness</span></td>
-              <td>Carga <code>CLAUDE.md</code>, aplica permisos, arranca los servidores MCP, ejecuta los hooks</td>
+              <td>El programa que envuelve al modelo (Claude Code). Carga <code>CLAUDE.md</code> y las reglas por ruta, aplica permisos y arranca los servidores MCP</td>
               <td>No interpreta la documentación: no sabe qué dice la ficha</td>
             </tr>
             <tr>
-              <td><span class="actor a-agente">Agente</span></td>
-              <td>Lee, decide qué documento abrir, llama a las herramientas, escribe el código</td>
+              <td><span class="actor a-agente">Agente principal</span></td>
+              <td>La conversación con la que trabajas: lee, decide qué documento abrir, llama a las herramientas, escribe el código y las pruebas, y lanza los subagentes cuando se lo confirmas</td>
               <td>No puede saltarse un permiso ni aprobar un servidor</td>
             </tr>
             <tr>
               <td><span class="actor a-skill">Skill</span></td>
-              <td>Aporta un procedimiento con pasos y límites cuando la tarea coincide</td>
-              <td>No se ejecuta sola: el agente o quien desarrolla la invoca</td>
+              <td>Aporta un procedimiento o una guía cuando la tarea coincide</td>
+              <td>No se ejecuta sola: el agente principal o quien desarrolla la invoca</td>
             </tr>
             <tr>
               <td><span class="actor a-spec">OpenSpec</span></td>
-              <td>Sostiene el comportamiento esperado y sus propios comandos de trabajo</td>
+              <td>Guarda el comportamiento esperado y entrega al agente principal la guía de pruebas primero</td>
               <td>No lo define la plantilla: su workflow se instala y manda sobre él</td>
             </tr>
             <tr>
+              <td><span class="actor a-revisor">Subagente revisor</span></td>
+              <td>Un subagente que lanza el agente principal: otro agente, con su propia ventana limpia, que lee el cambio terminado y devuelve un informe</td>
+              <td>No modifica código y no se lanza si el usuario no lo pide o lo confirma</td>
+            </tr>
+            <tr>
               <td><span class="actor a-usuario">Usuario</span></td>
-              <td>Pide, revisa la especificación, aprueba servidores y permisos</td>
+              <td>Pide, revisa los escenarios, decide si pasar subagentes revisores, aprueba servidores y permisos</td>
               <td>No debería tener que repetir contexto que ya está escrito</td>
             </tr>
           </tbody>
@@ -611,8 +1152,8 @@
 
       <p>
         Ocurre al incorporar la plantilla a un proyecto. Deja escrito lo que todas
-        las sesiones posteriores darán por sabido. Las dos decisiones que se toman
-        aquí —especificaciones y sistema de diseño— gobiernan el resto del ciclo.
+        las sesiones posteriores darán por sabido. Las decisiones que se toman aquí
+        —especificaciones, vistas y sistema de diseño— gobiernan el resto del ciclo.
       </p>
 
       <ol class="pasos">
@@ -623,10 +1164,11 @@
             <h3>Elegir el stack</h3>
             <p>
               El plugin genera <code>docs/stack.yaml</code> a partir de una plantilla
-              de <code>templates/</code>. Para este recorrido, <code>react18</code>.
-              Ese archivo es la intención declarada del equipo, no la prueba de lo
-              implementado: por eso todo lo que salga de él se contrasta después con
-              el repositorio.
+              de <code>templates/</code>. Para este recorrido, <code>laravel10</code>:
+              PHP 8.4 con Laravel en el backend, vistas React 18 en
+              <code>resources/js/</code> y Oracle 19c como base de datos. Ese archivo
+              es la intención declarada del equipo, no la prueba de lo implementado:
+              todo lo que salga de él se contrasta después con el repositorio.
             </p>
           </div>
         </li>
@@ -649,9 +1191,12 @@
             <p>
               Después plantea siempre el mismo guion de nueve preguntas en tres
               rondas —ficha, ejecución y OpenSpec—, también al repetir el setup.
-              La primera opción es el valor actual o el deducido, con su fuente;
-              lo que nadie confirma queda en <code>[POR DEFINIR]</code> en lugar de
-              inventarse.
+              En <code>laravel10</code>, la pregunta de las vistas ofrece las dos formas
+              de unir Laravel y React que declara el stack: <em>Inertia.js</em> o
+              <em>API REST + SPA</em>. En este recorrido se elige
+              <strong>API REST + SPA</strong>: Laravel expone endpoints JSON y React los
+              consume. Lo que nadie confirma queda en <code>[POR DEFINIR]</code> en
+              lugar de inventarse.
             </p>
           </div>
         </li>
@@ -669,14 +1214,24 @@
               usar OpenSpec es una decisión de equipo, no un dato deducible del
               repositorio. Si el usuario acepta, la misma ejecución continúa con
               <code>setup-openspec</code>, que pregunta las herramientas y confirma
-              la instalación en una sola ronda antes de instalarlo e inicializarlo
-              —la única excepción a la regla de no instalar dependencias—.
+              la instalación antes de instalarlo —una de las dos excepciones a la
+              regla de no instalar dependencias; la otra es <code>setup-testing</code>—.
             </p>
             <p>
-              Si lo descarta, la fila queda en <code>No se usa</code> y nadie volverá a
-              proponerlo. Si no responde, el marcador se conserva y
-              <code>AGENTS.md</code> insistirá en la siguiente tarea no trivial.
+              Al inicializarlo escribe en <code>openspec/config.yaml</code> la política
+              de pruebas primero. Es lo que, más adelante, hará que cada tarea empiece
+              por la prueba de su escenario sin que nadie tenga que recordarlo.
             </p>
+            <div class="terminal"><span class="c"># openspec/config.yaml (extracto)</span>
+<span class="k">rules</span>:
+  <span class="k">tasks</span>:
+    - Toda tarea que cambie comportamiento empieza por la prueba del
+      escenario que cubre, y esa prueba debe fallar antes de implementar.
+<span class="k">operations</span>:
+  <span class="k">apply</span>:     <span class="c"># se entrega al agente principal al programar</span>
+    guidance: [prueba en rojo, mínimo para verde, ordenar, suite del área]
+  <span class="k">archive</span>:   <span class="c"># se entrega al agente principal al archivar</span>
+    guidance: [ofrecer los subagentes revisores si nadie lo hizo tras verificar]</div>
           </div>
         </li>
 
@@ -684,17 +1239,38 @@
           <span class="paso-ord">04</span>
           <div class="paso-cuerpo">
             <div class="paso-meta"><span class="actor a-skill">setup-project-context</span></div>
-            <h3>Materializar lo que el stack declare</h3>
+            <h3>Materializar lo que el stack declare y retirar lo que sobra</h3>
             <p>
-              El guion solo pide confirmar el sistema de diseño: lo que el stack
-              declara ya lo decidió el equipo al elegirlo. En <code>react18</code>, la clave
-              <code>context.mcp</code> declara el servidor <code>shadcn</code> con su
-              configuración completa, y la skill lo fusiona en el <code>.mcp.json</code>
-              de la raíz, conservando cualquier servidor previo.
+              <code>laravel10</code> declara el servidor MCP <code>shadcn</code>, un
+              catálogo de componentes de interfaz. La skill lo añade a
+              <code>.mcp.json</code> sin arrancarlo: configurar un servidor no es
+              activarlo.
             </p>
             <p>
-              No instala ni arranca nada —lo tiene prohibido—, porque configurar un
-              servidor no es activarlo.
+              Después retira de <code>.claude/</code> lo de los stacks que el proyecto no
+              usa. Lo hace con una tabla fija, no con el criterio del agente principal, y al final
+              comprueba que no queda nada. Si la respuesta sobre tecnologías o vistas
+              quedó pendiente, no borra nada.
+            </p>
+            <figure class="codigo">
+              <figcaption><code>.claude/</code> tras la adopción<span class="etiqueta et-verde">Laravel + React</span></figcaption>
+              <div class="terminal">rules/comun/            <span class="g">✓ se queda</span>   <span class="c">pautas de cualquier lenguaje</span>
+rules/php/              <span class="g">✓ se queda</span>   <span class="c">backend Laravel</span>
+rules/react/            <span class="g">✓ se queda</span>   <span class="c">vistas React</span>
+<span class="t">rules/java/</span>             <span class="r">✗ retirada</span>   <span class="c">no hay Spring Boot</span>
+<span class="t">rules/inertia/</span>          <span class="r">✗ retirada</span>   <span class="c">se eligió API REST + SPA</span>
+agents/php-reviewer     <span class="g">✓</span>
+agents/react-reviewer   <span class="g">✓</span>
+agents/security-reviewer<span class="g">✓</span>            <span class="c">siempre</span>
+<span class="t">agents/java-reviewer</span>    <span class="r">✗</span>
+skills/laravel-*        <span class="g">✓</span>
+skills/react-testing, frontend-a11y, e2e-testing <span class="g">✓</span>
+skills/api-design, contract-first <span class="g">✓</span>   <span class="c">hay API REST + SPA</span>
+<span class="t">skills/springboot-*, jpa-patterns</span> <span class="r">✗</span></div>
+            </figure>
+            <p>
+              El informe del setup lo resume en su sección «Stacks», con una fila por
+              componente: conservado, retirado o pendiente.
             </p>
           </div>
         </li>
@@ -705,14 +1281,68 @@
             <div class="paso-meta"><span class="actor a-skill">setup-project-context</span></div>
             <h3>Cerrar la ficha</h3>
             <p>
-              El resultado son unas pocas filas que el agente leerá en cada sesión
+              El resultado son unas pocas filas que el agente principal leerá en cada sesión
               posterior. No son documentación: son interruptores.
             </p>
-            <div class="terminal"><span class="c">| Dato                    | Valor                        |</span>
-| Código de aplicación    | src/                         |
-| Pruebas habituales      | npm test                     |
-| <span class="s">Especificaciones</span>        | <span class="s">OpenSpec 0.9.2</span>               |
-| <span class="k">Sistema de diseño</span>       | <span class="k">shadcn/ui, servido por shadcn</span></div>
+            <div class="terminal"><span class="c">| Dato                 | Valor                                                  |</span>
+| Código de aplicación | app/                                                   |
+| Arrancar en local    | Backend: php artisan serve · Vistas: npm run dev       |
+| Pruebas habituales   | Backend: php artisan test · Vistas: <span class="r">[POR DEFINIR]</span>      |
+| Capa de vistas       | React 18 en resources/js/, API REST + SPA              |
+| <span class="s">Especificaciones</span>     | <span class="s">OpenSpec 0.9.2</span>                                         |
+| <span class="k">Sistema de diseño</span>    | <span class="k">shadcn/ui, servido por shadcn</span></div>
+            <p>
+              Cuando el proyecto tiene dos partes, arranque y pruebas llevan un comando
+              por parte. Las pruebas de las vistas quedan pendientes: el
+              <code>package.json</code> de Laravel solo trae <code>dev</code> y
+              <code>build</code>, y el setup no inventa un <code>npm test</code> que no
+              existe. Su informe recomienda el paso siguiente.
+            </p>
+          </div>
+        </li>
+
+        <li class="paso">
+          <span class="paso-ord">06</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta">
+              <span class="actor a-usuario">Usuario</span>
+              <span class="actor a-skill">setup-testing</span>
+            </div>
+            <h3>Preparar las pruebas que faltan</h3>
+            <p>
+              Sin un ejecutor de pruebas en las vistas, el ciclo de pruebas primero se
+              rompe en el frontend: no hay forma de ver fallar la prueba del escenario.
+              <code>setup-testing</code> lo resuelve. Como el resto de los setups, solo
+              arranca cuando el usuario lo invoca.
+            </p>
+            <p>
+              Primero anota qué tiene cada parte y qué le falta. Después pregunta en dos
+              rondas qué preparar —vistas, backend, extremo a extremo y la base de datos
+              de pruebas— y ofrece solo lo que falta. Antes de instalar, confirma los
+              comandos exactos y las versiones, que toma de la documentación oficial
+              compatibles con el manifiesto. Instala solo dependencias de desarrollo, no
+              toca <code>.env</code> ni el código de la aplicación, y deja el job de CI
+              como fragmento en el informe.
+            </p>
+            <figure class="codigo">
+              <figcaption>Estado antes y después<span class="etiqueta et-verde">Laravel + React</span></figcaption>
+              <div class="terminal">Backend  · pruebas       <span class="g">✓ preparado</span>      <span class="c">PHPUnit viene con Laravel</span>
+Backend  · análisis      <span class="r">✗ falta</span> → <span class="g">Larastan</span>
+Backend  · Oracle        <span class="r">✗ falta oci8</span>    <span class="c">software del sistema: solo se informa</span>
+Vistas   · componentes   <span class="r">✗ falta</span> → <span class="g">Vitest + Testing Library</span>
+Vistas   · lint          <span class="r">✗ falta</span> → <span class="g">ESLint + react-hooks + jsx-a11y</span>
+Vistas   · tipos         <span class="r">✗ falta</span> → <span class="g">tsc --noEmit</span>
+<span class="c">Extremo  · Playwright    — no por ahora</span></div>
+            </figure>
+            <p>
+              Por último crea <strong>una prueba semilla por tipo</strong> sobre código que
+              ya existe, la ejecuta y registra los comandos en la ficha y en
+              <code>development.md</code>. La semilla no está solo para comprobar la
+              instalación. Las reglas de pruebas entran al <em>leer</em> un fichero de
+              prueba, y en un proyecto nuevo no había ninguno de React: a partir de ahora,
+              la primera prueba del escenario tiene un vecino que leer.
+            </p>
+            <div class="terminal"><span class="c">| Pruebas habituales | Backend: php artisan test · Vistas: npm test |</span></div>
           </div>
         </li>
       </ol>
@@ -741,8 +1371,8 @@
             <p>
               Lee <code>CLAUDE.md</code>, que importa <code>AGENTS.md</code>. Es una
               carga mecánica: el harness no entiende el contenido, solo lo inyecta. Por
-              eso la ficha vive ahí y no en otro sitio —es el único archivo que todas
-              las herramientas cargan siempre—.
+              eso la ficha vive ahí —es el único archivo que todas las herramientas
+              cargan siempre—.
             </p>
           </div>
         </li>
@@ -751,15 +1381,18 @@
           <span class="paso-ord">02</span>
           <div class="paso-cuerpo">
             <div class="paso-meta"><span class="actor a-harness">Harness</span></div>
-            <h3>Registrar herramientas, permisos y servidores</h3>
+            <h3>Registrar herramientas, permisos, reglas y servidores</h3>
             <p>
               Aplica las reglas de <code>deny</code> y <code>ask</code> de
               <code>.claude/settings.json</code>, detecta el <code>.mcp.json</code>
-              versionado y registra las skills disponibles, incluidas las que instaló
-              OpenSpec. Nada de esto se ejecuta todavía.
+              versionado y registra las skills y los subagentes revisores disponibles. De los
+              subagentes revisores solo carga una descripción de unas treinta palabras, para
+              saber que existen. Las reglas de <code>.claude/rules/</code> quedan a la
+              espera: cada una indica en su cabecera <code>paths:</code> qué ficheros la
+              activan, y ninguno se ha abierto todavía.
             </p>
             <p>
-              Un servidor de proyecto no se activa solo: queda como
+              Un servidor MCP de proyecto no se activa solo: queda como
               <code>⏸ Pending approval</code> hasta que alguien lo apruebe, una vez.
             </p>
             <div class="nota">
@@ -780,19 +1413,20 @@
       <div class="contexto">
         <h4>Qué hay en la ventana al terminar la fase 1</h4>
         <div class="carga">
-          <div class="fila-carga"><span><code>AGENTS.md</code> — ficha y reglas</span><span class="estado e-si">Cargado</span></div>
+          <div class="fila-carga"><span><code>AGENTS.md</code> — ficha y reglas generales</span><span class="estado e-si">Cargado</span></div>
+          <div class="fila-carga"><span>Descripción de skills y subagentes revisores</span><span class="estado e-bajo">Declaradas</span></div>
+          <div class="fila-carga"><span>Reglas de <code>.claude/rules/</code></span><span class="estado e-bajo">A la espera de un fichero</span></div>
           <div class="fila-carga"><span><code>.ai/project/development.md</code></span><span class="estado e-no">No leído</span></div>
-          <div class="fila-carga"><span><code>.ai/project/context.md</code></span><span class="estado e-no">No leído</span></div>
+          <div class="fila-carga"><span><code>.ai/project/architecture.md</code></span><span class="estado e-no">No leído</span></div>
           <div class="fila-carga"><span>Especificaciones de <code>openspec/</code></span><span class="estado e-no">No leídas</span></div>
-          <div class="fila-carga"><span>Catálogo de componentes</span><span class="estado e-no">No leído</span></div>
-          <div class="fila-carga"><span>Skills y herramientas MCP</span><span class="estado e-bajo">Declaradas</span></div>
+          <div class="fila-carga"><span>Catálogo de componentes</span><span class="estado e-no">No consultado</span></div>
         </div>
       </div>
 
       <p>
         La diferencia entre <em>declarado</em> y <em>cargado</em> es la idea central
-        de toda la plantilla. Ni el MCP ni las skills añaden contexto: añaden la
-        capacidad de ir a buscarlo cuando haga falta.
+        de toda la plantilla. Ni el MCP, ni las skills, ni las reglas añaden contexto
+        al arrancar: añaden la capacidad de ir a buscarlo cuando haga falta.
       </p>
     </section>
 
@@ -805,22 +1439,24 @@
       </div>
 
       <p>
-        Llega la petición: <em>«añade un formulario de login a la aplicación»</em>. No
-        menciona el sistema de diseño, ni la ruta del código, ni si hay que escribir
-        una especificación. No debería tener que hacerlo.
+        Llega la petición: <em>«añade un formulario de alta de clientes: nombre y
+        email, solo para gestores»</em>. No menciona dónde va el código, cómo se
+        prueba, ni si hay que escribir una especificación. No debería tener que
+        hacerlo.
       </p>
 
       <ol class="pasos">
         <li class="paso">
           <span class="paso-ord">01</span>
           <div class="paso-cuerpo">
-            <div class="paso-meta"><span class="actor a-agente">Agente</span></div>
+            <div class="paso-meta"><span class="actor a-agente">Agente principal</span></div>
             <h3>Leer la ficha, que ya está en contexto</h3>
             <p>
-              Sin abrir ningún fichero, el agente ya sabe que el código vive en
-              <code>src/</code>, que las pruebas se lanzan con <code>npm test</code>,
-              que hay un catálogo de componentes servido por MCP y que el proyecto
-              trabaja con OpenSpec.
+              Sin abrir ningún fichero, el agente principal ya sabe que el backend vive en
+              <code>app/</code> y las vistas en <code>resources/js/</code>, que se unen
+              por una API REST, que las pruebas se lanzan con
+              <code>php artisan test</code> y <code>npm test</code>, que hay un
+              catálogo de componentes y que el proyecto trabaja con OpenSpec.
             </p>
           </div>
         </li>
@@ -828,17 +1464,18 @@
         <li class="paso">
           <span class="paso-ord">02</span>
           <div class="paso-cuerpo">
-            <div class="paso-meta"><span class="actor a-agente">Agente</span></div>
+            <div class="paso-meta"><span class="actor a-agente">Agente principal</span></div>
             <h3>Clasificar la tarea</h3>
             <p>
-              Esta es la bifurcación que decide el resto del ciclo. Un formulario de
-              login introduce comportamiento nuevo: no es una tarea trivial. Con la
-              fila <code>Especificaciones</code> resuelta, el agente sabe que el
+              Un alta de clientes introduce comportamiento nuevo en las dos capas: un
+              endpoint que guarda datos y una pantalla que lo usa. No es trivial. Con
+              la fila <code>Especificaciones</code> resuelta, el agente principal sabe que el
               comportamiento esperado se acuerda antes de escribir código.
             </p>
             <p>
-              Una corrección de una errata en un texto, en cambio, salta directamente a
-              la fase 4. La plantilla no obliga a especificar lo que no lo necesita.
+              Corregir una errata en un texto, en cambio, saltaría directamente a la
+              implementación. La plantilla no obliga a especificar lo que no lo
+              necesita.
             </p>
           </div>
         </li>
@@ -846,13 +1483,12 @@
         <li class="paso">
           <span class="paso-ord">03</span>
           <div class="paso-cuerpo">
-            <div class="paso-meta"><span class="actor a-agente">Agente</span></div>
+            <div class="paso-meta"><span class="actor a-agente">Agente principal</span></div>
             <h3>Comprobar si ya existe un cambio relacionado</h3>
             <p>
-              Si en <code>openspec/</code> hay un cambio inequívocamente relacionado
-              con la petición, el agente sigue su workflow y consulta únicamente sus
-              artefactos. No lee todas las especificaciones ni el histórico: esa es una
-              regla explícita de <code>AGENTS.md</code>.
+              Si en <code>openspec/</code> hubiera un cambio inequívocamente relacionado,
+              el agente principal seguiría ese. No lee todas las especificaciones ni el
+              histórico: es una regla explícita de <code>AGENTS.md</code>.
             </p>
           </div>
         </li>
@@ -868,10 +1504,9 @@
       </div>
 
       <p>
-        A partir de aquí manda OpenSpec, no la plantilla. Es una frontera deliberada:
-        <code>AGENTS.md</code> dice <em>cuándo</em> entrar en este flujo, y el workflow
-        que OpenSpec instaló dice <em>cómo</em> recorrerlo. La plantilla no duplica ni
-        un paso de lo que la herramienta ya define.
+        A partir de aquí manda OpenSpec. <code>AGENTS.md</code> dice <em>cuándo</em>
+        entrar en este flujo y el workflow que OpenSpec instaló dice <em>cómo</em>
+        recorrerlo. La plantilla solo añade una cosa: el orden de las pruebas.
       </p>
 
       <ol class="pasos">
@@ -879,28 +1514,54 @@
           <span class="paso-ord">01</span>
           <div class="paso-cuerpo">
             <div class="paso-meta">
-              <span class="actor a-agente">Agente</span>
+              <span class="actor a-agente">Agente principal</span>
               <span class="actor a-spec">OpenSpec</span>
             </div>
             <h3>Proponer el cambio</h3>
             <p>
-              El agente abre una propuesta con los comandos que OpenSpec instaló. En
-              lugar de un único prompt largo, el trabajo se parte en artefactos
-              separados dentro de una carpeta de cambio.
+              El agente principal abre una propuesta con los comandos que OpenSpec instaló. El
+              trabajo se parte en documentos separados dentro de una carpeta de cambio.
             </p>
-            <div class="terminal"><span class="s">/opsx:propose</span> formulario de login con validación
+            <div class="terminal"><span class="s">/opsx:propose</span> alta de clientes con nombre y email, solo gestores
 
-<span class="c">crea</span>  openspec/changes/login-form/
+<span class="c">crea</span>  openspec/changes/alta-cliente/
         ├─ proposal.md   <span class="c">qué se quiere y por qué</span>
-        ├─ specs/        <span class="c">comportamiento esperado</span>
-        ├─ design.md     <span class="c">decisiones de diseño técnico</span>
-        └─ tasks.md      <span class="c">plan de implementación</span></div>
+        ├─ specs/        <span class="c">comportamiento esperado: los escenarios</span>
+        ├─ design.md     <span class="c">decisiones técnicas: endpoint, tabla, pantalla</span>
+        └─ tasks.md      <span class="c">plan de trabajo, una tarea por escenario</span></div>
             <p>
-              Aquí empieza a notarse el reparto de la plantilla: el comportamiento
-              esperado vive en la especificación, mientras que el código y la
-              configuración siguen mostrando el comportamiento implementado. Son dos
-              fuentes distintas y la plantilla insiste en no mezclarlas.
+              Los escenarios son el corazón del cambio. Cada uno describe un caso que
+              cualquiera del equipo puede leer, sin saber programar:
             </p>
+            <figure class="codigo">
+              <figcaption><code>specs/clientes/spec.md</code> (extracto)<span class="etiqueta et-prueba">Escenarios</span></figcaption>
+              <div class="terminal"><span class="k">### Requirement:</span> Alta de cliente
+Un gestor puede dar de alta un cliente con nombre y email.
+
+<span class="s">#### Scenario: Alta correcta</span>
+- <span class="k">GIVEN</span> un usuario con rol gestor
+- <span class="k">WHEN</span> envía el alta con nombre y email válidos
+- <span class="k">THEN</span> se crea el cliente y la respuesta es 201 con sus datos
+
+<span class="s">#### Scenario: Email duplicado</span>
+- <span class="k">GIVEN</span> un cliente existente con email cliente@ejemplo.test
+- <span class="k">WHEN</span> un gestor da de alta otro con el mismo email
+- <span class="k">THEN</span> la respuesta es 422 con el error en el campo email
+- <span class="k">AND</span> no se crea ningún cliente nuevo
+
+<span class="s">#### Scenario: Usuario sin permiso</span>
+- <span class="k">GIVEN</span> un usuario sin rol gestor
+- <span class="k">WHEN</span> envía el alta
+- <span class="k">THEN</span> la respuesta es 403 y no se crea ningún cliente
+
+<span class="k">### Requirement:</span> Formulario de alta
+
+<span class="s">#### Scenario: Error del servidor junto al campo</span>
+- <span class="k">GIVEN</span> el servidor rechaza el email por duplicado
+- <span class="k">WHEN</span> el usuario envía el formulario
+- <span class="k">THEN</span> el error aparece bajo el campo Email
+- <span class="k">AND</span> el campo queda marcado como no válido</div>
+            </figure>
           </div>
         </li>
 
@@ -912,11 +1573,12 @@
             <p>
               Este es el momento que justifica toda la fase. Corregir aquí un
               malentendido cuesta una frase; corregirlo después de implementar cuesta
-              una tarde. La revisión ocurre sobre texto legible, no sobre un diff.
+              una tarde. ¿Falta el teléfono? ¿Un email con mayúsculas cuenta como
+              duplicado? Se decide ahora, sobre texto legible, no sobre un diff.
             </p>
             <p>
               Si la petición y la especificación discrepan, o si la especificación
-              contradice lo que el código ya hace, el agente debe señalar la diferencia
+              contradice lo que el código ya hace, el agente principal debe señalar la diferencia
               y resolverla con evidencia antes de continuar, no elegir en silencio.
             </p>
           </div>
@@ -926,22 +1588,26 @@
           <span class="paso-ord">03</span>
           <div class="paso-cuerpo">
             <div class="paso-meta">
-              <span class="actor a-agente">Agente</span>
+              <span class="actor a-agente">Agente principal</span>
               <span class="actor a-spec">OpenSpec</span>
             </div>
-            <h3>Aplicar el cambio</h3>
+            <h3>El plan: una tarea por escenario, prueba primero</h3>
             <p>
-              Con la especificación acordada, el agente pasa a implementar recorriendo
-              <code>tasks.md</code> y marcando cada tarea a medida que la completa. El
-              plan deja de ser una intención y se convierte en un estado consultable.
+              Al generar <code>tasks.md</code>, OpenSpec entrega al agente principal las
+              <code>rules</code> de <code>config.yaml</code>. Por eso cada tarea
+              nombra su escenario y empieza por su prueba.
             </p>
-            <div class="terminal"><span class="s">/opsx:apply</span> login-form
-
-<span class="c">tasks.md</span>
-  <span class="g">[x]</span> Definir el esquema de validación
-  <span class="g">[x]</span> Montar el formulario con los componentes del catálogo
-  <span class="w">[ ]</span> Conectar con el endpoint de autenticación
-  <span class="w">[ ]</span> Cubrir con pruebas los casos de error</div>
+            <figure class="codigo">
+              <figcaption><code>tasks.md</code><span class="etiqueta et-prueba">Plan</span></figcaption>
+              <div class="terminal"><span class="k">## 1. Backend (Laravel)</span>
+- [ ] 1.1 Prueba «Alta correcta» en rojo; ruta, tabla, modelo, validación y respuesta
+- [ ] 1.2 Prueba «Email duplicado» en rojo; regla de email único
+- [ ] 1.3 Prueba «Usuario sin permiso» en rojo; política de acceso
+<span class="k">## 2. Frontend (React)</span>
+- [ ] 2.1 Prueba «Error del servidor junto al campo» en rojo; formulario del catálogo
+<span class="k">## 3. Cierre</span>
+- [ ] 3.1 Pruebas del área afectada en verde: php artisan test · npm test</div>
+            </figure>
           </div>
         </li>
       </ol>
@@ -951,67 +1617,294 @@
         <p>
           Los nombres de los comandos y la estructura de la carpeta los define la
           versión de OpenSpec instalada, no este documento. Compruébalos en el workflow
-          que dejó en el repositorio antes de darlos por fijos: es la misma cautela que
-          la skill de instalación exige con los flags del instalador.
+          que dejó en el repositorio antes de darlos por fijos.
         </p>
       </div>
     </section>
 
-    <!-- ============ FASE 4 ============ -->
-    <section class="fase" id="implementacion">
+    <!-- ============ FASE 4 · REGLAS ============ -->
+    <section class="fase" id="reglas">
       <div class="fase-cab">
         <span class="fase-ord">Fase 4</span>
-        <h2>Implementación</h2>
-        <span class="cadencia">cada tarea</span>
+        <h2>Implementación: las reglas de cada lenguaje</h2>
+        <span class="cadencia">cada fichero</span>
       </div>
 
       <p>
-        Escribir el código es donde la plantilla vuelve a tomar el mando, porque las
-        convenciones de implementación son suyas. El agente abre ahora —y no antes—
-        el documento que le corresponde.
+        Con <code>/opsx:apply alta-cliente</code> empieza la implementación. Antes de
+        ver el código conviene entender una pieza que actúa en segundo plano todo el
+        tiempo: las reglas de <code>.claude/rules/</code>.
+      </p>
+
+      <h4 class="sub">Cómo entra una regla en la ventana</h4>
+
+      <div class="activacion" role="group" aria-label="Activación de una regla">
+        <div class="act-caja">
+          <strong>1 · El agente principal lee un fichero</strong>
+          <code>app/Http/Controllers/ClienteController.php</code>
+        </div>
+        <div class="act-flecha" aria-hidden="true">→</div>
+        <div class="act-caja">
+          <strong>2 · El harness compara</strong>
+          la ruta con el <code>paths:</code> de cada regla: <code>**/*.php</code> coincide;
+          <code>**/*.{js,jsx,ts,tsx}</code> no.
+        </div>
+        <div class="act-flecha" aria-hidden="true">→</div>
+        <div class="act-caja">
+          <strong>3 · Carga las que coinciden</strong>
+          las comunes y las de PHP. Las de React siguen fuera. Nadie tuvo que
+          pedirlas.
+        </div>
+      </div>
+
+      <p>
+        Cada regla es una hoja corta, de uno o dos kilobytes, con la cabecera que
+        dice cuándo entra. Por ejemplo, la de seguridad de PHP:
+      </p>
+
+      <figure class="codigo">
+        <figcaption><code>.claude/rules/php/seguridad.md</code> (extracto)<span class="etiqueta et-codigo">Regla</span></figcaption>
+        <div class="terminal"><span class="k">---
+paths:
+  - "**/*.php"</span>             <span class="c">← entra al abrir cualquier .php</span>
+<span class="k">---</span>
+# PHP: seguridad
+
+- `$fillable` en cada modelo y nunca `$guarded = []` junto con
+  `$request-&gt;all()`. Crea y actualiza con `$request-&gt;validated()`.
+- Autoriza con Policies o Gates (`$this-&gt;authorize()`, `can()`).
+- …</div>
+      </figure>
+
+      <h4 class="sub">Qué reglas carga cada fichero de este cambio</h4>
+
+      <div class="tabla-caja">
+        <table>
+          <caption class="sr">Reglas cargadas según el fichero abierto</caption>
+          <thead>
+            <tr><th>Fichero que abre el agente principal</th><th>Reglas que entran</th><th>Por qué</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>app/Http/Controllers/ClienteController.php</code></td>
+              <td><code>comun/estilo-codigo</code> <code>comun/seguridad</code> <code>php/estilo-codigo</code> <code>php/patrones</code> <code>php/seguridad</code> <code>php/oracle</code></td>
+              <td>Código PHP de producción: todo menos pruebas. <code>php/oracle</code> entra con cualquier <code>.php</code> porque el proyecto usa Oracle; en otro proyecto, el setup la habría retirado</td>
+            </tr>
+            <tr>
+              <td><code>tests/Feature/AltaClienteTest.php</code></td>
+              <td>Las anteriores más <code>comun/pruebas</code> <code>php/pruebas</code></td>
+              <td>Está en <code>tests/</code>: es una prueba</td>
+            </tr>
+            <tr>
+              <td><code>phpunit.xml</code></td>
+              <td><code>comun/pruebas</code> <code>php/pruebas</code></td>
+              <td>Configura las pruebas; no es código</td>
+            </tr>
+            <tr>
+              <td><code>resources/js/clientes/AltaClienteForm.tsx</code></td>
+              <td><code>comun/estilo-codigo</code> <code>react/estilo-codigo</code> <code>react/patrones</code> <code>react/seguridad</code></td>
+              <td>Componente React; la seguridad común es de backend</td>
+            </tr>
+            <tr>
+              <td><code>resources/js/clientes/AltaClienteForm.test.tsx</code></td>
+              <td>Las anteriores más <code>comun/pruebas</code> <code>react/pruebas</code></td>
+              <td>Termina en <code>.test.tsx</code></td>
+            </tr>
+            <tr>
+              <td><code>vite.config.js</code></td>
+              <td><code>comun/estilo-codigo</code> y las tres de React que no son de pruebas</td>
+              <td>Es un <code>.js</code>, aunque sea configuración</td>
+            </tr>
+            <tr>
+              <td><code>openspec/changes/…/spec.md</code></td>
+              <td>Ninguna</td>
+              <td>No es código</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ul class="lista">
+        <li>
+          <strong>Cada regla entra solo cuando hace falta.</strong> Las de pruebas,
+          con ficheros de prueba; la seguridad común, solo con backend; las de
+          Oracle, solo en proyectos con Oracle. Corregir un controlador no carga
+          nada de pruebas.
+        </li>
+        <li>
+          <strong>Entran al leer, no al crear.</strong> Si el agente principal
+          escribiera un fichero nuevo sin haber leído antes ninguno de su tipo, sus
+          reglas no entrarían. Por eso <code>development.md</code> le pide leer un
+          fichero vecino del mismo tipo antes de crear uno.
+        </li>
+        <li>
+          <strong>Las reglas de React entran con cualquier <code>.js</code> o
+          <code>.ts</code></strong>, también con ficheros de configuración como
+          <code>vite.config.js</code>. El coste es pequeño y las rutas no permiten
+          excluir carpetas.
+        </li>
+        <li>
+          <strong>Lo que depende de una acción, y no de un fichero, va en skills.</strong>
+          Crear un endpoint, cambiar la seguridad o desplegar no se deduce del
+          nombre de un fichero. Por eso la regla lleva una línea del tipo «al crear
+          un endpoint, lee antes <code>api-design</code>», y la guía larga solo entra
+          en ese momento.
+        </li>
+        <li>
+          <strong>Leer un documento no activa nada.</strong> Abrir la especificación o
+          <code>development.md</code> no carga reglas de código.
+        </li>
+        <li>
+          <strong>Una vez dentro, se quedan hasta compactar.</strong> Las reglas no
+          se descargan al cambiar de fichero: si en la misma sesión el agente
+          principal pasa de PHP a React, la ventana acaba con las dos. Solo salen al
+          terminar la sesión o al compactar la conversación con <code>/compact</code>,
+          y vuelven a entrar al leer otro fichero que coincida. Si backend y
+          frontend se hacen en sesiones distintas, cada una carga solo lo suyo.
+          <code>/context</code> muestra qué reglas hay cargadas en cada momento.
+        </li>
+      </ul>
+
+      <div class="nota idea">
+        <span class="nota-rotulo">Por qué no cargarlo todo siempre</span>
+        <p>
+          Las reglas de la plantilla juntas ocupan unos 5.800 tokens. Sin
+          <code>paths:</code>, estarían en todas las sesiones, incluidas las de Java
+          en un proyecto que no tiene Java, o una conversación que solo pregunta por
+          la arquitectura. Con <code>paths:</code>, corregir un controlador PHP carga
+          unos 2.100; si además se tocan pruebas, unos 2.800; y una sesión que no
+          toca código, cero.
+        </p>
+      </div>
+
+      <div class="nota">
+        <span class="nota-rotulo">Solo en Claude Code</span>
+        <p>
+          Codex no tiene reglas por ruta. Allí el agente principal solo recibe lo que queda en
+          <code>development.md</code>: comandos y convenciones propias del proyecto.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ FASE 4 · BACKEND ============ -->
+    <section class="fase" id="backend">
+      <div class="fase-cab">
+        <span class="fase-ord">Fase 4</span>
+        <h2>Backend: Laravel con pruebas primero</h2>
+        <span class="cadencia">tareas 1.1 a 1.3</span>
+      </div>
+
+      <p>
+        El backend recibe el formulario, lo valida, comprueba que quien lo envía es
+        gestor y guarda el cliente en la base de datos. Cada una de esas
+        responsabilidades nace de un escenario, y cada escenario pasa por el mismo
+        ciclo de tres tiempos:
+      </p>
+
+      <div class="ciclo">
+        <div class="rojo">
+          <strong>1 · Rojo</strong>
+          <p>Se escribe la prueba del escenario y se ejecuta. Tiene que fallar, y por
+          el motivo esperado: lo que falta es el comportamiento, no una coma.</p>
+        </div>
+        <div class="verde">
+          <strong>2 · Verde</strong>
+          <p>Se escribe el mínimo código que hace pasar esa prueba. Nada de adelantar
+          escenarios que aún no tienen prueba.</p>
+        </div>
+        <div class="ordenar">
+          <strong>3 · Ordenar</strong>
+          <p>Con todo en verde, se limpia el código o la prueba sin cambiar lo que
+          hacen, y se vuelve a ejecutar para confirmarlo.</p>
+        </div>
+      </div>
+
+      <p>
+        Este orden lo impone <code>operations.apply</code> de
+        <code>openspec/config.yaml</code>: OpenSpec se lo entrega al agente principal al
+        empezar el apply, así que no depende de que alguien se acuerde de pedirlo.
       </p>
 
       <ol class="pasos">
         <li class="paso">
           <span class="paso-ord">01</span>
           <div class="paso-cuerpo">
-            <div class="paso-meta"><span class="actor a-agente">Agente</span></div>
-            <h3>Abrir solo el documento pertinente</h3>
+            <div class="paso-meta"><span class="actor a-agente">Agente principal</span></div>
+            <h3>Abrir solo lo pertinente</h3>
             <p>
-              La tabla «Contexto necesario» de <code>AGENTS.md</code> asigna un
-              documento a cada necesidad. Implementar corresponde a
-              <code>.ai/project/development.md</code>, así que abre ese y no los otros
-              dos. <code>context.md</code> solo entraría si la tarea tocase la
-              arquitectura o el dominio.
+              La tabla «Contexto necesario» de <code>AGENTS.md</code> envía a
+              <code>.ai/project/development.md</code> para implementar: comandos, el
+              formato de la API del proyecto y sus convenciones propias.
+              <code>architecture.md</code> no se abre porque la tarea no toca la
+              arquitectura.
+            </p>
+            <p>
+              Después lee el código vecino: <code>routes/api.php</code> y un
+              controlador existente. La regla común lo pide («lee el código afectado
+              antes de cambiarlo»), y es justo esa lectura la que hace entrar las
+              reglas de PHP. Como va a crear un endpoint, la regla
+              <code>php/patrones.md</code> le indica leer antes la skill
+              <code>api-design</code>: así sabe que un alta responde 201 y un error de
+              validación, 422.
+            </p>
+            <p>
+              Antes de escribir la primera prueba, la guía de apply le pide leer una
+              prueba existente del mismo tipo. Es la lectura que hace entrar las
+              reglas de pruebas, que ya no vienen con cualquier fichero PHP.
             </p>
           </div>
         </li>
 
-        <li class="paso">
+        <li class="paso paso-hito">
           <span class="paso-ord">02</span>
           <div class="paso-cuerpo">
-            <div class="paso-meta"><span class="actor a-agente">Agente</span></div>
-            <h3>Consultar el catálogo en lugar de la memoria</h3>
+            <div class="paso-meta"><span class="actor a-agente">Agente principal</span></div>
+            <h3>Escenario «Alta correcta»: rojo</h3>
             <p>
-              La sección <em>Sistema de diseño</em> de ese documento le obliga a
-              consultar el catálogo antes de crear un componente de interfaz, a no
-              reimplementar uno equivalente y a no deducir una API si el servidor no
-              responde. Así evita el fallo más común: escribir de memoria unas
-              propiedades que ya no existen.
+              La prueba traduce el escenario a código. El nombre del escenario va en
+              <code>#[TestDox]</code>: así cualquiera, y más tarde el subagente revisor, puede
+              emparejar escenario y prueba con una búsqueda.
             </p>
-            <div class="terminal"><span class="c">→ mcp__shadcn__search_items_in_registries</span>
-  registries: ["@shadcn"], query: "form input button"
+            <figure class="codigo">
+              <figcaption><code>tests/Feature/AltaClienteTest.php</code><span class="etiqueta et-prueba">Prueba</span></figcaption>
+              <div class="terminal">class AltaClienteTest extends TestCase
+{
+    use RefreshDatabase;                         <span class="c">← php/pruebas: base de datos limpia</span>
 
-<span class="c">← devuelve</span>  form · input · button · label · card
+    #[TestDox('Alta correcta')]                  <span class="c">← nombre del escenario</span>
+    public function test_alta_con_datos_validos_crea_el_cliente(): void
+    {
+        <span class="c">// GIVEN un usuario con rol gestor</span>
+        $gestor = User::factory()-&gt;create(['rol' =&gt; 'gestor']);
 
-<span class="c">→ mcp__shadcn__get_item_examples_from_registries</span>
-  query: "form with react-hook-form and zod"
+        <span class="c">// WHEN envía el alta con nombre y email válidos</span>
+        $this-&gt;actingAs($gestor)
+            -&gt;postJson('/api/v1/clientes', [     <span class="c">← php/pruebas: postJson en la API</span>
+                'nombre' =&gt; 'Cliente Ejemplo',
+                'email' =&gt; 'cliente@ejemplo.test',
+            ])
+            <span class="c">// THEN se crea el cliente y la respuesta es 201 con sus datos</span>
+            -&gt;assertCreated()
+            -&gt;assertJsonPath('data.email', 'cliente@ejemplo.test');
 
-<span class="c">← devuelve</span>  el ejemplo vigente, con su API real</div>
+        $this-&gt;assertDatabaseHas('clientes', ['email' =&gt; 'cliente@ejemplo.test']);
+    }
+}</div>
+            </figure>
+            <p>El agente principal la ejecuta sola, antes de escribir nada más:</p>
+            <div class="terminal rojo">$ php artisan test --filter=AltaClienteTest
+
+   <span class="r">FAIL</span>  Tests\Feature\AltaClienteTest
+  <span class="r">⨯</span> Alta correcta
+  Expected response status code [201] but received 404.
+
+  Tests:  <span class="r">1 failed</span></div>
             <p>
-              Lo que el catálogo no puede responder está escrito en la tabla que sigue
-              a esa sección: componentes vetados, tokens propios y qué hacer cuando el
-              diseño pide algo que el sistema no cubre. Eso son decisiones del equipo.
+              Un 404 significa «esa dirección no existe»: es exactamente lo que falta.
+              Es un fallo <strong>por el motivo esperado</strong>. Si hubiera fallado
+              por un error de sintaxis o porque falta una clase de la prueba, no
+              valdría: habría que arreglarlo hasta que el único motivo del fallo sea
+              el comportamiento pendiente.
             </p>
           </div>
         </li>
@@ -1019,18 +1912,286 @@
         <li class="paso">
           <span class="paso-ord">03</span>
           <div class="paso-cuerpo">
-            <div class="paso-meta">
-              <span class="actor a-harness">Harness</span>
-              <span class="actor a-usuario">Usuario</span>
-            </div>
-            <h3>Filtrar lo que escribe en disco</h3>
+            <div class="paso-meta"><span class="actor a-agente">Agente principal</span></div>
+            <h3>Escenario «Alta correcta»: verde</h3>
             <p>
-              Instalar un componente toca ficheros. El harness intercepta esa llamada y
-              aplica <code>.claude/settings.json</code>: las consultas de lectura pueden
-              ir en <code>allow</code> y pasar sin ruido; lo que escribe o ejecuta
-              debería ir en <code>ask</code>. Si la operación rozara un
-              <code>.env</code> o una clave, la regla de <code>deny</code> la detiene
-              antes de que el agente la vea.
+              Ahora sí, el mínimo código para que pase. Las reglas de PHP ya están en
+              la ventana y marcan cómo escribirlo:
+            </p>
+            <figure class="codigo">
+              <figcaption><code>app/Http/Controllers/ClienteController.php</code><span class="etiqueta et-codigo">Código</span></figcaption>
+              <div class="terminal">class ClienteController extends Controller
+{
+    public function store(StoreClienteRequest $request): JsonResponse
+    {
+        $cliente = Cliente::create($request-&gt;validated());
+
+        return (new ClienteResource($cliente))
+            -&gt;response()
+            -&gt;setStatusCode(201);
+    }
+}</div>
+            </figure>
+            <figure class="codigo">
+              <figcaption><code>app/Http/Requests/StoreClienteRequest.php</code><span class="etiqueta et-codigo">Código</span></figcaption>
+              <div class="terminal">public function rules(): array
+{
+    return [
+        'nombre' =&gt; ['required', 'string', 'max:200'],
+        'email' =&gt; ['required', 'email', 'max:200'],   <span class="c">← aún sin «único»: es otro escenario</span>
+    ];
+}</div>
+            </figure>
+            <p>
+              Completan el verde la ruta en <code>routes/api.php</code> (protegida con
+              <code>auth:sanctum</code>), la migración de la tabla
+              <code>clientes</code> con índice único en el email, el modelo
+              <code>Cliente</code> con su <code>$fillable</code> y el recurso
+              <code>ClienteResource</code>.
+            </p>
+            <div class="tabla-caja">
+              <table>
+                <thead>
+                  <tr><th>Lo que hace el código</th><th>Quién lo pidió</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Controlador de tres líneas que delega la validación, sin servicio ni acción</td><td><code>php/patrones.md</code>: controladores delgados con <code>FormRequest</code>; un alta sin reglas de negocio puede quedarse en el controlador. Si el alta tuviera reglas propias, irían en una acción <code>AltaCliente</code></td></tr>
+                  <tr><td>Responde con <code>ClienteResource</code>, no con el modelo</td><td><code>php/patrones.md</code>: respuestas con <code>JsonResource</code></td></tr>
+                  <tr><td>Crea con <code>validated()</code> y el modelo declara <code>$fillable</code></td><td><code>php/seguridad.md</code>: evitar la asignación masiva</td></tr>
+                  <tr><td>Responde 201 en <code>/api/v1/clientes</code></td><td>Skill <code>api-design</code> y sección «API» de <code>development.md</code></td></tr>
+                  <tr><td>Nombres en español y en <code>PascalCase</code>, sin <code>dd()</code></td><td><code>php/estilo-codigo.md</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="terminal verde">$ php artisan test --filter=AltaClienteTest
+
+   <span class="g">PASS</span>  Tests\Feature\AltaClienteTest
+  <span class="g">✓</span> Alta correcta                                   0.18s
+
+  Tests:  <span class="g">1 passed</span></div>
+          </div>
+        </li>
+
+        <li class="paso">
+          <span class="paso-ord">04</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta"><span class="actor a-agente">Agente principal</span></div>
+            <h3>Ordenar</h3>
+            <p>
+              Los siguientes escenarios van a repetir los mismos datos de ejemplo, así
+              que el agente principal los saca a un método de la prueba. No cambia lo que se
+              comprueba; solo cómo se escribe. Vuelve a ejecutar: sigue en verde.
+            </p>
+            <figure class="codigo">
+              <figcaption><code>tests/Feature/AltaClienteTest.php</code><span class="etiqueta et-verde">Sigue en verde</span></figcaption>
+              <div class="terminal">private function datosValidos(array $cambios = []): array
+{
+    return array_merge([
+        'nombre' =&gt; 'Cliente Ejemplo',
+        'email' =&gt; 'cliente@ejemplo.test',
+    ], $cambios);
+}</div>
+            </figure>
+          </div>
+        </li>
+
+        <li class="paso">
+          <span class="paso-ord">05</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta"><span class="actor a-agente">Agente principal</span></div>
+            <h3>Los otros dos escenarios, con el mismo ciclo</h3>
+            <div class="tabla-caja">
+              <table>
+                <thead>
+                  <tr><th>Escenario</th><th>Rojo: la prueba falla con…</th><th>Verde: el mínimo cambio</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Email duplicado</td>
+                    <td><code>Expected 422 but received 500</code>. El índice único de la base de datos rechaza el duplicado, pero con un error interno en lugar de un aviso al usuario.</td>
+                    <td>Añadir <code>unique:clientes,email</code> a la validación. Ahora responde 422 con el error en el campo.</td>
+                  </tr>
+                  <tr>
+                    <td>Usuario sin permiso</td>
+                    <td><code>Expected 403 but received 201</code>. Cualquiera autenticado puede dar de alta.</td>
+                    <td><code>ClientePolicy::create</code> que exige el rol gestor, y <code>authorize()</code> en el <code>FormRequest</code> que la usa.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              Fíjate en el primer rojo: sin la prueba, el duplicado habría llegado a
+              producción como un error 500. El escenario lo destapó antes de escribir
+              la solución.
+            </p>
+            <div class="terminal verde">$ php artisan test --filter=AltaClienteTest
+
+   <span class="g">PASS</span>  Tests\Feature\AltaClienteTest
+  <span class="g">✓</span> Alta correcta                                   0.18s
+  <span class="g">✓</span> Email duplicado                                 0.07s
+  <span class="g">✓</span> Usuario sin permiso                             0.06s
+
+  Tests:  <span class="g">3 passed</span></div>
+          </div>
+        </li>
+      </ol>
+
+      <div class="ventana">
+        <h4>Qué hay en la ventana mientras escribe PHP</h4>
+        <div class="v-leyenda">
+          <span class="c-siempre">Siempre cargado</span>
+          <span class="c-ruta">Entra por ruta al abrir un fichero</span>
+          <span class="c-demanda">Leído bajo demanda</span>
+          <span class="c-cambio">Del cambio de OpenSpec</span>
+        </div>
+        <div class="v-filas">
+          <div class="v-fila c-siempre"><span class="v-et"><code>AGENTS.md</code> — ficha y reglas generales</span><span class="v-barra"><span style="--w:67%"></span></span><span class="v-tok">≈1.000</span></div>
+          <div class="v-fila c-demanda"><span class="v-et"><code>development.md</code> — comandos, API, convenciones</span><span class="v-barra"><span style="--w:100%"></span></span><span class="v-tok">≈1.500</span></div>
+          <div class="v-fila c-cambio"><span class="v-et">Propuesta, escenarios y tareas de <code>alta-cliente</code></span><span class="v-barra"><span style="--w:100%"></span></span><span class="v-tok">≈1.500</span></div>
+          <div class="v-fila c-cambio"><span class="v-et">Guía de apply de <code>config.yaml</code></span><span class="v-barra"><span style="--w:17%"></span></span><span class="v-tok">≈250</span></div>
+          <div class="v-fila c-ruta"><span class="v-et"><code>comun/</code> estilo y seguridad — al abrir el controlador</span><span class="v-barra"><span style="--w:77%"></span></span><span class="v-tok">≈1.150</span></div>
+          <div class="v-fila c-ruta"><span class="v-et"><code>php/</code> estilo, patrones, seguridad y oracle — al abrir el controlador</span><span class="v-barra"><span style="--w:63%"></span></span><span class="v-tok">≈950</span></div>
+          <div class="v-fila c-ruta"><span class="v-et"><code>comun/</code> y <code>php/</code> pruebas — al abrir una prueba</span><span class="v-barra"><span style="--w:47%"></span></span><span class="v-tok">≈700</span></div>
+          <div class="v-fila c-demanda"><span class="v-et">Skill <code>api-design</code> — la pidió la regla al crear el endpoint</span><span class="v-barra"><span style="--w:97%"></span></span><span class="v-tok">≈1.450</span></div>
+          <div class="v-fila fuera"><span class="v-et">Reglas <code>react/</code></span><span class="v-barra"></span><span class="v-tok">0</span></div>
+          <div class="v-fila fuera"><span class="v-et">Procedimiento <code>laravel-deploy</code> — solo al desplegar</span><span class="v-barra"></span><span class="v-tok">0</span></div>
+          <div class="v-fila fuera"><span class="v-et">Reglas y skills de Java</span><span class="v-barra"></span><span class="v-tok">retiradas</span></div>
+          <div class="v-fila fuera"><span class="v-et"><code>architecture.md</code> y otras especificaciones</span><span class="v-barra"></span><span class="v-tok">0</span></div>
+        </div>
+        <p class="v-total">
+          Instrucciones y guías: <strong>≈ 8.500 tokens</strong>. Si la tarea hubiera
+          sido corregir un controlador, sin tocar pruebas, las reglas se quedarían
+          en ≈ 2.100 en lugar de ≈ 2.800. El resto de la ventana lo ocupan la
+          conversación, el código y las salidas de las pruebas; por eso el agente
+          principal filtra las pruebas y solo muestra el resumen y los fallos.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ FASE 4 · FRONTEND ============ -->
+    <section class="fase" id="frontend">
+      <div class="fase-cab">
+        <span class="fase-ord">Fase 4</span>
+        <h2>Frontend: el formulario en React</h2>
+        <span class="cadencia">tarea 2.1</span>
+      </div>
+
+      <p>
+        El frontend es la pantalla que ve el gestor. No guarda nada por sí mismo:
+        envía los datos al endpoint que acabamos de construir y muestra lo que
+        responde. Así debe quedar:
+      </p>
+
+      <div class="ramas">
+        <figure>
+          <div class="prototipo" aria-hidden="true">
+            <div class="pr-titulo">Alta de cliente</div>
+            <div class="pr-campo"><span>Nombre</span><div class="pr-input">&nbsp;</div></div>
+            <div class="pr-campo"><span>Email</span><div class="pr-input">&nbsp;</div></div>
+            <div class="pr-boton">Dar de alta</div>
+            <div class="pr-pie">Estado inicial</div>
+          </div>
+          <figcaption class="sr">Prototipo del formulario vacío con los campos Nombre y Email y el botón Dar de alta.</figcaption>
+        </figure>
+        <figure>
+          <div class="prototipo" aria-hidden="true">
+            <div class="pr-titulo">Alta de cliente</div>
+            <div class="pr-campo"><span>Nombre</span><div class="pr-input">Cliente Ejemplo</div></div>
+            <div class="pr-campo"><span>Email</span><div class="pr-input invalido">cliente@ejemplo.test</div><div class="pr-error">Ya existe un cliente con ese email.</div></div>
+            <div class="pr-boton">Dar de alta</div>
+            <div class="pr-pie">Escenario «Error del servidor junto al campo»</div>
+          </div>
+          <figcaption class="sr">Prototipo tras enviar un email duplicado: el campo Email aparece marcado en rojo y debajo el mensaje «Ya existe un cliente con ese email».</figcaption>
+        </figure>
+      </div>
+
+      <ol class="pasos">
+        <li class="paso">
+          <span class="paso-ord">01</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta">
+              <span class="actor a-agente">Agente principal</span>
+              <span class="actor a-harness">Harness</span>
+            </div>
+            <h3>Abrir un fichero de React: entran sus reglas</h3>
+            <p>
+              El agente principal lee un formulario existente en <code>resources/js/</code>. Es un
+              <code>.tsx</code>, así que el harness añade las cuatro reglas de
+              <code>react/</code>. Las de PHP no se van: siguen ahí de la parte
+              anterior.
+            </p>
+          </div>
+        </li>
+
+        <li class="paso">
+          <span class="paso-ord">02</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta"><span class="actor a-agente">Agente principal</span></div>
+            <h3>Consultar el catálogo en lugar de la memoria</h3>
+            <p>
+              La sección «Sistema de diseño» de <code>development.md</code> le obliga
+              a buscar en el catálogo antes de crear un componente, a no reimplementar
+              uno que ya existe y a no deducir su uso si el servidor no responde.
+              Así evita el fallo más común: escribir de memoria propiedades que ya no
+              existen.
+            </p>
+            <div class="terminal"><span class="c">→ mcp__shadcn__search_items_in_registries</span>
+  registries: ["@shadcn"], query: "form input label button"
+
+<span class="c">← devuelve</span>  form · input · label · button
+
+<span class="c">→ mcp__shadcn__get_item_examples_from_registries</span>
+  query: "form field with error message"
+
+<span class="c">← devuelve</span>  el ejemplo vigente, con su uso real</div>
+          </div>
+        </li>
+
+        <li class="paso paso-hito">
+          <span class="paso-ord">03</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta"><span class="actor a-agente">Agente principal</span></div>
+            <h3>Rojo: la prueba del escenario, antes que el formulario</h3>
+            <p>
+              Primero lee la prueba de otro formulario, lo que hace entrar
+              <code>react/pruebas</code>. Luego crea un componente vacío que solo pinta
+              los campos, para que la prueba pueda arrancar: si fallara porque el
+              componente no existe, el motivo no sería el esperado. Después escribe la
+              prueba, que simula la respuesta del servidor sin llamar a nada real:
+            </p>
+            <figure class="codigo">
+              <figcaption><code>resources/js/clientes/AltaClienteForm.test.tsx</code><span class="etiqueta et-prueba">Prueba</span></figcaption>
+              <div class="terminal">it("Error del servidor junto al campo", async () =&gt; {   <span class="c">← nombre del escenario</span>
+  servidor.use(                                          <span class="c">← react/pruebas: red simulada con MSW</span>
+    http.post("/api/v1/clientes", () =&gt;
+      HttpResponse.json(
+        { message: "Datos no válidos",
+          errors: { email: ["Ya existe un cliente con ese email."] } },
+        { status: 422 },
+      ),
+    ),
+  );
+  const user = userEvent.setup();                        <span class="c">← react/pruebas: userEvent</span>
+  render(&lt;AltaClienteForm /&gt;);
+
+  await user.type(screen.getByLabelText("Nombre"), "Cliente Ejemplo");
+  await user.type(screen.getByLabelText("Email"), "cliente@ejemplo.test");
+  await user.click(screen.getByRole("button", { name: "Dar de alta" }));
+
+  expect(await screen.findByText("Ya existe un cliente con ese email.")).toBeVisible();
+  expect(screen.getByLabelText("Email")).toHaveAttribute("aria-invalid", "true");
+});</div>
+            </figure>
+            <div class="terminal rojo">$ npx vitest run resources/js/clientes/AltaClienteForm.test.tsx
+
+ <span class="r">FAIL</span>  AltaClienteForm &gt; Error del servidor junto al campo
+ Unable to find an element with the text: Ya existe un cliente con ese email.
+
+ Tests  <span class="r">1 failed</span></div>
+            <p>
+              Falla porque el formulario aún no muestra errores: el motivo esperado.
+              La prueba busca los elementos como lo haría una persona —por su
+              etiqueta y su texto—, no por detalles internos del código.
             </p>
           </div>
         </li>
@@ -1038,60 +2199,367 @@
         <li class="paso">
           <span class="paso-ord">04</span>
           <div class="paso-cuerpo">
-            <div class="paso-meta"><span class="actor a-agente">Agente</span></div>
-            <h3>Escribir siguiendo las convenciones</h3>
-            <p>
-              Cambios pequeños y completos, coherentes con los patrones del módulo. Sin
-              abstracciones especulativas. Errores expresados de forma útil, no
-              enterrados en capturas genéricas. Comentarios solo donde expliquen una
-              decisión que el código no muestra.
-            </p>
+            <div class="paso-meta"><span class="actor a-agente">Agente principal</span></div>
+            <h3>Verde: el formulario con los componentes del catálogo</h3>
+            <figure class="codigo">
+              <figcaption><code>resources/js/clientes/AltaClienteForm.tsx</code> (extracto)<span class="etiqueta et-codigo">Código</span></figcaption>
+              <div class="terminal">export function AltaClienteForm() {
+  const [errores, setErrores] = useState&lt;ErroresCampo&gt;({});
+  const emailId = useId();
+
+  async function enviar(evento: FormEvent&lt;HTMLFormElement&gt;) {
+    evento.preventDefault();
+    const resultado = await crearCliente(new FormData(evento.currentTarget));  <span class="c">← módulo de API</span>
+    if (!resultado.ok) {
+      setErrores(resultado.errores);
+      return;
+    }
+    …
+  }
+
+  return (
+    &lt;form onSubmit={enviar} noValidate&gt;
+      …
+      &lt;Label htmlFor={emailId}&gt;Email&lt;/Label&gt;                                   <span class="c">← del catálogo</span>
+      &lt;Input id={emailId} name="email" type="email"
+        aria-invalid={Boolean(errores.email)}
+        aria-describedby={errores.email ? `${emailId}-error` : undefined} /&gt;
+      {errores.email &amp;&amp; &lt;p id={`${emailId}-error`} role="alert"&gt;{errores.email[0]}&lt;/p&gt;}
+      &lt;Button type="submit"&gt;Dar de alta&lt;/Button&gt;
+    &lt;/form&gt;
+  );
+}</div>
+            </figure>
+            <div class="tabla-caja">
+              <table>
+                <thead>
+                  <tr><th>Lo que hace el código</th><th>Quién lo pidió</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>La llamada HTTP vive en <code>crearCliente</code>, no dentro del componente</td><td><code>react/patrones.md</code>: llamadas en un módulo de API</td></tr>
+                  <tr><td><code>Label</code>, <code>Input</code> y <code>Button</code> del catálogo</td><td>Sistema de diseño de <code>development.md</code> y el servidor MCP</td></tr>
+                  <tr><td>Cada campo con su etiqueta, botón real para enviar</td><td><code>react/patrones.md</code>: accesibilidad básica</td></tr>
+                  <tr><td>El estado de errores se sustituye, no se modifica</td><td><code>react/estilo-codigo.md</code>: no mutar el estado</td></tr>
+                  <tr><td>Ninguna clave en variables <code>VITE_</code></td><td><code>react/seguridad.md</code>: todo el bundle es público</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="terminal verde">$ npx vitest run resources/js/clientes/AltaClienteForm.test.tsx
+
+ <span class="g">✓</span> AltaClienteForm &gt; Error del servidor junto al campo
+
+ Tests  <span class="g">1 passed</span></div>
           </div>
         </li>
 
         <li class="paso">
           <span class="paso-ord">05</span>
           <div class="paso-cuerpo">
-            <div class="paso-meta"><span class="actor a-agente">Agente</span></div>
-            <h3>Probar con los comandos registrados</h3>
+            <div class="paso-meta">
+              <span class="actor a-harness">Harness</span>
+              <span class="actor a-usuario">Usuario</span>
+            </div>
+            <h3>Filtrar lo que escribe en disco</h3>
             <p>
-              Ejecuta los comandos que la ficha y <code>development.md</code> recogen
-              —comprobados durante la adopción, no adivinados—. Si una prueba falla,
-              distingue un problema introducido de uno previo o del entorno, y en el
-              informe separa lo que ejecutó de lo que solo observó.
+              Instalar un componente del catálogo toca ficheros. El harness aplica
+              <code>.claude/settings.json</code>: lo que escribe o ejecuta puede pedir
+              confirmación, y si la operación rozara un <code>.env</code> o una clave,
+              la regla de <code>deny</code> la detiene antes de que el agente principal la vea.
             </p>
+          </div>
+        </li>
+
+        <li class="paso">
+          <span class="paso-ord">06</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta"><span class="actor a-agente">Agente principal</span></div>
+            <h3>Cerrar el apply con las pruebas del área</h3>
+            <p>
+              Última tarea del plan: ejecutar las pruebas de las dos partes con los
+              comandos de la ficha, no con unos adivinados. El resultado se guarda
+              para la verificación y para los subagentes revisores, que así no tendrán que
+              repetirlas.
+            </p>
+            <div class="terminal verde">$ php artisan test
+  Tests:  <span class="g">24 passed</span>   <span class="c">(3 nuevas)</span>
+$ npm test
+  Tests  <span class="g">41 passed</span>   <span class="c">(1 nueva)</span></div>
           </div>
         </li>
       </ol>
 
-      <div class="contexto">
-        <h4>Qué hay en la ventana al terminar la fase 4</h4>
-        <div class="carga">
-          <div class="fila-carga"><span><code>AGENTS.md</code> — ficha y reglas</span><span class="estado e-si">Cargado</span></div>
-          <div class="fila-carga"><span><code>.ai/project/development.md</code></span><span class="estado e-si">Cargado</span></div>
-          <div class="fila-carga"><span>Artefactos del cambio <code>login-form</code></span><span class="estado e-si">Cargados</span></div>
-          <div class="fila-carga"><span>Resto de especificaciones e histórico</span><span class="estado e-no">Nunca hizo falta</span></div>
-          <div class="fila-carga"><span><code>.ai/project/context.md</code></span><span class="estado e-no">Nunca hizo falta</span></div>
-          <div class="fila-carga"><span>Componentes consultados del registro</span><span class="estado e-bajo">5 de ~50</span></div>
+      <div class="ventana">
+        <h4>Qué hay en la ventana al pasar de PHP a React, en la misma sesión</h4>
+        <div class="v-leyenda">
+          <span class="c-siempre">Siempre cargado</span>
+          <span class="c-ruta">Entra por ruta al abrir un fichero</span>
+          <span class="c-demanda">Leído bajo demanda</span>
+          <span class="c-cambio">Del cambio de OpenSpec</span>
         </div>
+        <div class="v-filas">
+          <div class="v-fila c-siempre"><span class="v-et"><code>AGENTS.md</code></span><span class="v-barra"><span style="--w:57%"></span></span><span class="v-tok">≈1.000</span></div>
+          <div class="v-fila c-demanda"><span class="v-et"><code>development.md</code></span><span class="v-barra"><span style="--w:86%"></span></span><span class="v-tok">≈1.500</span></div>
+          <div class="v-fila c-cambio"><span class="v-et">Artefactos de <code>alta-cliente</code> y guía de apply</span><span class="v-barra"><span style="--w:100%"></span></span><span class="v-tok">≈1.750</span></div>
+          <div class="v-fila c-ruta"><span class="v-et">Reglas <code>comun/</code> — de la parte PHP</span><span class="v-barra"><span style="--w:89%"></span></span><span class="v-tok">≈1.550</span></div>
+          <div class="v-fila c-ruta"><span class="v-et">Reglas <code>php/</code>, incluida <code>oracle</code> — siguen dentro</span><span class="v-barra"><span style="--w:71%"></span></span><span class="v-tok">≈1.250</span></div>
+          <div class="v-fila c-demanda"><span class="v-et">Skill <code>api-design</code> — sigue dentro</span><span class="v-barra"><span style="--w:83%"></span></span><span class="v-tok">≈1.450</span></div>
+          <div class="v-fila c-ruta"><span class="v-et"><code>react/</code> estilo, patrones y seguridad — al abrir el formulario<span class="nueva">nueva</span></span><span class="v-barra"><span style="--w:63%"></span></span><span class="v-tok">≈1.100</span></div>
+          <div class="v-fila c-ruta"><span class="v-et"><code>react/pruebas</code> — al abrir una prueba<span class="nueva">nueva</span></span><span class="v-barra"><span style="--w:20%"></span></span><span class="v-tok">≈350</span></div>
+          <div class="v-fila c-demanda"><span class="v-et">Resultados del catálogo MCP — solo 4 componentes<span class="nueva">nueva</span></span><span class="v-barra"><span style="--w:46%"></span></span><span class="v-tok">≈800</span></div>
+          <div class="v-fila fuera"><span class="v-et">Catálogo completo de componentes</span><span class="v-barra"></span><span class="v-tok">0</span></div>
+        </div>
+        <p class="v-total">
+          Instrucciones y guías: <strong>≈ 10.750 tokens</strong>. Si el frontend se
+          hubiera hecho en una sesión nueva, las reglas de PHP y la skill
+          <code>api-design</code> no estarían: ≈ 7.700.
+        </p>
       </div>
+
+      <p>
+        Las cifras son estimaciones a unos 3,5 caracteres por token a partir del
+        tamaño real de los ficheros de la plantilla. Sirven para comparar, no como
+        medida exacta.
+      </p>
     </section>
 
     <!-- ============ FASE 5 ============ -->
     <section class="fase" id="cierre">
       <div class="fase-cab">
         <span class="fase-ord">Fase 5</span>
-        <h2>Cierre del ciclo</h2>
-        <span class="cadencia">cada tarea</span>
+        <h2>Cierre del ciclo y revisión</h2>
+        <span class="cadencia">cada cambio</span>
       </div>
 
       <p>
-        Quedan dos gestos, y ninguno ocurre por iniciativa del agente.
+        Quedan seis pasos, y ninguno ocurre por iniciativa del agente principal: los
+        comandos los lanza el usuario, y los subagentes revisores solo se ejecutan si el
+        usuario dice que sí.
       </p>
 
       <ol class="pasos">
         <li class="paso">
           <span class="paso-ord">01</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta">
+              <span class="actor a-usuario">Usuario</span>
+              <span class="actor a-spec">OpenSpec</span>
+            </div>
+            <h3>Verificar el cambio</h3>
+            <p>
+              OpenSpec contrasta la implementación con el cambio: tareas completas,
+              requisitos cubiertos y escenarios con prueba. Solo informa; no corrige
+              nada ni impide archivar.
+            </p>
+            <div class="terminal"><span class="s">/opsx:verify</span> alta-cliente
+
+<span class="g">✓</span> 5/5 tareas completas
+<span class="g">✓</span> 4/4 escenarios con prueba asociada
+<span class="g">✓</span> Diseño reflejado en el código</div>
+          </div>
+        </li>
+
+        <li class="paso paso-hito">
+          <span class="paso-ord">02</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta">
+              <span class="actor a-agente">Agente principal</span>
+              <span class="actor a-usuario">Usuario</span>
+            </div>
+            <h3>La pregunta: ¿pasamos subagentes revisores?</h3>
+            <p>
+              Tras verificar, el agente principal no lanza nada por su cuenta. Propone los
+              subagentes revisores que encajan con lo que se ha tocado y pregunta:
+            </p>
+
+            <div class="dialogo" role="group" aria-label="Ejemplo de pregunta del agente principal">
+              <div class="dialogo-cab">Pregunta del agente principal</div>
+              <p>El cambio <code>alta-cliente</code> está verificado. ¿Quieres pasar algún subagente revisor antes de archivar?</p>
+              <ul class="opciones">
+                <li>php-reviewer, react-reviewer y security-reviewer
+                  <small>El cambio toca Laravel, React y un endpoint que recibe datos del usuario</small></li>
+                <li>Solo algunos, o sobre otra parte
+                  <small>Por ejemplo, solo el backend, o solo <code>app/Http/</code></small></li>
+                <li>No, seguir sin revisar
+                  <small>No se lanza ningún subagente revisor</small></li>
+              </ul>
+            </div>
+
+            <div class="ramas">
+              <div class="rama activa">
+                <span class="rama-sello rama-si">Si lo activas</span>
+                <h3>Se lanzan en paralelo, cada uno con su ventana</h3>
+                <p>
+                  Cada subagente revisor es otro agente que empieza de cero: no ve la conversación
+                  ni el razonamiento del agente principal, solo el resultado. Por eso
+                  sirve de segunda opinión.
+                </p>
+                <p>
+                  Solo leen e informan. No cambian ni una línea: las correcciones las
+                  hace la conversación principal cuando tú lo decides.
+                </p>
+              </div>
+              <div class="rama inactiva">
+                <span class="rama-sello rama-no">Si no lo activas</span>
+                <h3>No se ejecuta nada</h3>
+                <p>
+                  Ningún subagente revisor lee el código ni consume tiempo. El agente principal no los lanza
+                  por su cuenta aunque crea que convendría.
+                </p>
+                <p>
+                  Al archivar, la guía de archive de <code>config.yaml</code> lo recuerda
+                  una vez si nadie los ofreció tras verificar. Si vuelves a decir que no,
+                  se archiva sin revisión. También puedes pedirlos en cualquier momento:
+                  <em>«revisa <code>app/Http</code> con php-reviewer»</em>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <li class="paso">
+          <span class="paso-ord">03</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta">
+              <span class="actor a-revisor">Subagente php-reviewer</span>
+              <span class="actor a-revisor">Subagente react-reviewer</span>
+              <span class="actor a-revisor">Subagente security-reviewer</span>
+            </div>
+            <h3>Qué pasa si respondes que sí</h3>
+            <p>
+              El agente principal lanza los tres a la vez y a cada uno le pasa lo mismo:
+            </p>
+            <div class="envio">
+              Alcance: cambio de OpenSpec alta-cliente.<br>
+              Pruebas sobre este mismo árbol: php artisan test, 24 pasan; npm test, 41 pasan. No las repitas.
+            </div>
+
+            <div class="revisores">
+              <div class="rev">
+                <span class="actor a-revisor">Subagente php-reviewer</span>
+                <ul>
+                  <li>Lee la propuesta, las tareas y los <strong>escenarios</strong> de <code>specs/</code></li>
+                  <li>Usa <code>comun/</code> y <code>php/</code> como lista de comprobación</li>
+                  <li>Lee <code>api-design</code> porque hay un controlador</li>
+                  <li>Ejecuta Pint y PHPStan; las pruebas, no</li>
+                </ul>
+                <span class="veredicto vd-bloq">Bloqueado · 1 alto</span>
+              </div>
+              <div class="rev">
+                <span class="actor a-revisor">Subagente react-reviewer</span>
+                <ul>
+                  <li>Lee los mismos artefactos del cambio</li>
+                  <li>Usa <code>comun/</code> y <code>react/</code></li>
+                  <li>Lee <code>frontend-a11y</code> porque hay un formulario</li>
+                  <li>Ejecuta el lint y la comprobación de tipos</li>
+                </ul>
+                <span class="veredicto vd-aviso">Con avisos · 1 medio</span>
+              </div>
+              <div class="rev">
+                <span class="actor a-revisor">Subagente security-reviewer</span>
+                <ul>
+                  <li>Sigue los datos desde el formulario hasta la tabla</li>
+                  <li>Usa las reglas de seguridad y la skill <code>laravel-security</code></li>
+                  <li>Comprueba que el escenario «Usuario sin permiso» tiene prueba del caso denegado</li>
+                </ul>
+                <span class="veredicto vd-aviso">Con avisos · 1 medio</span>
+              </div>
+            </div>
+
+            <p>Este es el informe que devuelve <code>php-reviewer</code>:</p>
+            <figure class="codigo">
+              <figcaption>Informe de <code>php-reviewer</code><span class="etiqueta et-rojo">Bloqueado</span></figcaption>
+              <div class="terminal"><span class="r">[ALTO]</span> La prueba de «Email duplicado» no comprueba todo su THEN
+Fichero: tests/Feature/AltaClienteTest.php:41
+Problema: el escenario exige además que «no se crea ningún cliente
+nuevo», pero la prueba solo comprueba el 422. Si un cambio futuro
+guardara el duplicado antes de validar, la prueba seguiría en verde.
+Corrección: añadir assertDatabaseCount('clientes', 1) tras la petición.
+
+<span class="w">[MEDIO]</span> El email no se normaliza antes de validar
+Fichero: app/Http/Requests/StoreClienteRequest.php:14
+Problema: «Cliente@Ejemplo.test» y «cliente@ejemplo.test» se tratan
+como distintos y pasan la regla de email único.
+Corrección: pasarlo a minúsculas en prepareForValidation(), o
+confirmarlo como decisión en la especificación.
+
+Comprobaciones: pint --test OK · phpstan OK · pruebas recibidas
+(24 pasan), no repetidas.
+Veredicto: <span class="r">Bloqueado</span> (1 ALTO)</div>
+            </figure>
+            <p>
+              El hallazgo alto es justo el que busca el criterio nuevo de los
+              subagentes revisores: <strong>una prueba que existe pero no comprueba todo lo que
+              promete su escenario</strong>. <code>/opsx:verify</code> no lo vio, porque
+              para él el escenario ya tenía prueba.
+            </p>
+            <p>
+              Los otros dos informan de un aviso medio cada uno: el botón no se
+              desactiva mientras se envía, lo que permite un doble clic, y el endpoint
+              de alta no tiene límite de frecuencia.
+            </p>
+          </div>
+        </li>
+
+        <li class="paso">
+          <span class="paso-ord">04</span>
+          <div class="paso-cuerpo">
+            <div class="paso-meta">
+              <span class="actor a-agente">Agente principal</span>
+              <span class="actor a-usuario">Usuario</span>
+            </div>
+            <h3>Corregir lo que bloquea y decidir el resto</h3>
+            <p>
+              La conversación principal corrige el alto: añade la comprobación que
+              faltaba y ejecuta la prueba, que sigue en verde. Los medios se te
+              presentan para que decidas: el doble clic se corrige ahora; el límite de
+              frecuencia se deja anotado como pendiente. Puedes volver a pasar el
+              subagente revisor sobre la corrección si quieres confirmarla.
+            </p>
+            <p>
+              La regla es la de <code>development.md</code>: los hallazgos críticos y
+              altos se corrigen antes de entregar, o se explica por qué no.
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="ventana">
+        <h4>La ventana de un subagente revisor, comparada con la principal</h4>
+        <div class="v-leyenda">
+          <span class="c-siempre">Cargado al arrancar</span>
+          <span class="c-ruta">Reglas leídas como lista de comprobación</span>
+          <span class="c-demanda">Documentos y skills</span>
+          <span class="c-cambio">El cambio a revisar</span>
+        </div>
+        <div class="v-filas">
+          <div class="v-fila c-siempre"><span class="v-et">Instrucciones de <code>php-reviewer</code></span><span class="v-barra"><span style="--w:43%"></span></span><span class="v-tok">≈1.300</span></div>
+          <div class="v-fila c-siempre"><span class="v-et">Estado de Git — instantánea al lanzarlo</span><span class="v-barra"><span style="--w:10%"></span></span><span class="v-tok">≈300</span></div>
+          <div class="v-fila c-ruta"><span class="v-et">Reglas <code>comun/</code> y <code>php/</code></span><span class="v-barra"><span style="--w:93%"></span></span><span class="v-tok">≈2.800</span></div>
+          <div class="v-fila c-demanda"><span class="v-et"><code>development.md</code> y skill <code>api-design</code></span><span class="v-barra"><span style="--w:98%"></span></span><span class="v-tok">≈2.950</span></div>
+          <div class="v-fila c-cambio"><span class="v-et">Propuesta, escenarios y tareas</span><span class="v-barra"><span style="--w:50%"></span></span><span class="v-tok">≈1.500</span></div>
+          <div class="v-fila c-cambio"><span class="v-et">Diff y ficheros PHP tocados</span><span class="v-barra"><span style="--w:100%"></span></span><span class="v-tok">≈3.000</span></div>
+          <div class="v-fila c-ruta duda"><span class="v-et">Las mismas reglas otra vez, por ruta al abrir los PHP — sin confirmar</span><span class="v-barra"><span style="--w:93%"></span></span><span class="v-tok">0–2.800</span></div>
+          <div class="v-fila fuera"><span class="v-et"><code>AGENTS.md</code> — lo evita <code>omitClaudeMd</code></span><span class="v-barra"></span><span class="v-tok">0</span></div>
+          <div class="v-fila fuera"><span class="v-et">La conversación del agente principal</span><span class="v-barra"></span><span class="v-tok">0</span></div>
+          <div class="v-fila fuera"><span class="v-et">Reglas de React y código del formulario</span><span class="v-barra"></span><span class="v-tok">0</span></div>
+        </div>
+        <p class="v-total">
+          Entre <strong>11.850 y 14.650 tokens</strong>, casi todos sobre lo que revisa.
+          Los revisores declaran <code>omitClaudeMd</code> (Claude Code 2.1.271 o
+          superior): no cargan <code>AGENTS.md</code> y llevan en su prompt las reglas
+          generales que necesitan. Las reglas tienen <code>paths:</code> y ninguna entra al
+          arrancar; el revisor las lee a propósito, porque el diff llega por
+          <code>git diff</code> y eso no dispara ninguna. Falta comprobar si, además, se
+          reinyectan al abrir los PHP. La ventana principal, a estas alturas, lleva la
+          conversación entera, dos lenguajes de reglas y todas las salidas de pruebas. Al
+          terminar, el subagente revisor solo devuelve su informe: su lectura no ocupa sitio
+          en la ventana principal.
+        </p>
+      </div>
+
+      <ol class="pasos">
+        <li class="paso">
+          <span class="paso-ord">05</span>
           <div class="paso-cuerpo">
             <div class="paso-meta">
               <span class="actor a-usuario">Usuario</span>
@@ -1103,29 +2571,31 @@
               histórico. Lo que era comportamiento propuesto queda consolidado como
               comportamiento vigente.
             </p>
-            <div class="terminal"><span class="s">/opsx:archive</span> login-form
+            <div class="terminal"><span class="s">/opsx:archive</span> alta-cliente
 
-<span class="c">mueve</span>  openspec/changes/login-form/
-  <span class="c">→</span>    openspec/changes/archive/login-form/</div>
+<span class="c">mueve</span>  openspec/changes/alta-cliente/
+  <span class="c">→</span>    openspec/changes/archive/alta-cliente/</div>
             <p>
-              Los detalles temporales del cambio se quedan ahí. No se copian a
-              <code>.ai/project/</code>, que documenta lo estable.
+              Antes de mover la carpeta, OpenSpec entrega al agente principal la guía de archive
+              de <code>config.yaml</code>: si nadie ofreció los subagentes revisores, pregunta una
+              vez; y no se archiva con hallazgos críticos o altos abiertos salvo que el
+              usuario lo acepte de forma explícita. Los detalles temporales del cambio
+              se quedan en el histórico; no se copian a <code>.ai/project/</code>, que
+              documenta lo estable.
             </p>
           </div>
         </li>
 
         <li class="paso">
-          <span class="paso-ord">02</span>
+          <span class="paso-ord">06</span>
           <div class="paso-cuerpo">
-            <div class="paso-meta">
-              <span class="actor a-agente">Agente</span>
-            </div>
+            <div class="paso-meta"><span class="actor a-agente">Agente principal</span></div>
             <h3>Rendir cuentas</h3>
             <p>
-              Antes de proponer nada, el agente revisa el diff final, elimina restos y
+              Antes de proponer nada, el agente principal revisa el diff final, elimina restos y
               repite las comprobaciones si el árbol cambió después de validarlo.
-              Informa de qué cambió, qué comprobó y qué queda pendiente. Hasta aquí,
-              nada se ha versionado.
+              Informa de qué cambió, qué comprobó y qué queda pendiente —aquí, el
+              límite de frecuencia—. Hasta aquí, nada se ha versionado.
             </p>
           </div>
         </li>
@@ -1171,10 +2641,10 @@
               <code>-A</code> sin haber verificado antes todo su alcance: el objetivo es
               que ningún cambio ajeno entre por arrastre.
             </p>
-            <div class="terminal">git add .ai/skills/setup-project-context.md AGENTS.md ...
+            <div class="terminal">git add app/Http/Controllers/ClienteController.php tests/Feature/AltaClienteTest.php ...
 git status --short          <span class="c">¿falta o sobra algo?</span>
 git diff --cached           <span class="c">¿es esto lo que creo?</span>
-git diff --cached --check   <span class="c">errores de whitespace</span></div>
+git diff --cached --check   <span class="c">errores de espacios en blanco</span></div>
           </div>
         </li>
 
@@ -1186,8 +2656,9 @@ git diff --cached --check   <span class="c">errores de whitespace</span></div>
             <p>
               Conventional Commits, salvo que el repositorio documente otra convención.
               Tipo elegido por el propósito principal del cambio, resumen concreto sin
-              punto final y en el idioma del proyecto. Cuerpo cuando haya algo que
-              explicar: efectos, migraciones o relación con una especificación.
+              punto final y en el idioma del proyecto: por ejemplo,
+              <code>feat(clientes): añade el alta de clientes</code>. Cuerpo cuando haya
+              algo que explicar: efectos, migraciones o relación con una especificación.
             </p>
             <p>
               Sin trailers de autoría, modelo o herramienta, salvo que el repositorio los
@@ -1232,7 +2703,7 @@ git diff --cached --check   <span class="c">errores de whitespace</span></div>
       </div>
 
       <p>
-        Las fases 3 y 4 dependen por completo de lo que se decidió en la fase 0. Dos
+        Buena parte del recorrido depende de lo que se decidió en la fase 0. Dos
         proyectos con la misma plantilla se comportan de forma distinta sin que nadie
         apague nada a mano.
       </p>
@@ -1242,18 +2713,44 @@ git diff --cached --check   <span class="c">errores de whitespace</span></div>
       <div class="ramas">
         <div class="rama">
           <span class="rama-sello rama-spec">OpenSpec instalado</span>
-          <h3>Con fase 3</h3>
+          <h3>Con escenarios y pruebas primero</h3>
           <p>
-            Las tareas no triviales pasan por propuesta, revisión y archivado. El
-            comportamiento esperado se acuerda por escrito antes de tocar código.
+            Las tareas no triviales pasan por propuesta, revisión, apply con pruebas
+            primero, verificación y archivado. El comportamiento esperado se acuerda por
+            escrito antes de tocar código.
           </p>
         </div>
         <div class="rama">
           <span class="rama-sello rama-no">No se usa</span>
           <h3>Sin fase 3</h3>
           <p>
-            El ciclo salta del encuadre a la implementación. Nadie propondrá OpenSpec
-            salvo que el usuario lo pida, y la petición hace de especificación.
+            El ciclo salta del encuadre a la implementación y la petición hace de
+            especificación. Las reglas por lenguaje siguen actuando igual, y los
+            subagentes revisores se ofrecen tras un cambio grande o en una parte crítica.
+          </p>
+        </div>
+      </div>
+
+      <h4 class="sub">Según cómo se unen Laravel y React</h4>
+
+      <div class="ramas">
+        <div class="rama">
+          <span class="rama-sello rama-si">API REST + SPA</span>
+          <h3>El recorrido de este documento</h3>
+          <p>
+            Laravel expone endpoints JSON y React los consume. Hay un contrato que
+            mantener entre las dos partes, así que se conservan las skills
+            <code>api-design</code> y <code>contract-first</code>.
+          </p>
+        </div>
+        <div class="rama">
+          <span class="rama-sello rama-spec">Inertia.js</span>
+          <h3>Sin API intermedia</h3>
+          <p>
+            El controlador pasa los datos directamente a la página React, sin endpoint
+            JSON. Las pruebas del backend comprueban la página que se renderiza, y la
+            skill <code>contract-first</code> se retira en la adopción porque no hay
+            contrato que versionar.
           </p>
         </div>
       </div>
@@ -1266,8 +2763,8 @@ git diff --cached --check   <span class="c">errores de whitespace</span></div>
           <h3>Con catálogo</h3>
           <p>
             Ambos declaran <code>context.mcp</code>. En Laravel el catálogo aplica a las
-            vistas React que declara <code>context.ui</code>, en
-            <code>resources/js/</code>; Blade queda solo como plantilla raíz.
+            vistas React de <code>resources/js/</code>; Blade queda solo como plantilla
+            raíz.
           </p>
         </div>
         <div class="rama">
@@ -1294,7 +2791,7 @@ git diff --cached --check   <span class="c">errores de whitespace</span></div>
       </div>
 
       <p>
-        Todo el reparto documental sigue una sola regla: <em>qué pasa si el agente no
+        Todo el reparto documental sigue una sola regla: <em>qué pasa si el agente principal no
         lee este documento</em>. Lo que no puede perderse va donde siempre se carga;
         lo demás se consulta cuando la tarea lo pide.
       </p>
@@ -1308,10 +2805,10 @@ git diff --cached --check   <span class="c">errores de whitespace</span></div>
             <tr>
               <td>Propósito, rutas y comandos</td>
               <td><code>AGENTS.md</code></td>
-              <td>Es lo mínimo para trabajar y el único archivo siempre cargado</td>
+              <td>Es lo mínimo para trabajar y el único archivo del proyecto siempre cargado; la memoria automática está desactivada</td>
             </tr>
             <tr>
-              <td>Si hay especificaciones y sistema de diseño</td>
+              <td>Si hay especificaciones, qué vistas y qué sistema de diseño</td>
               <td><code>AGENTS.md</code></td>
               <td>Son los interruptores que bifurcan el ciclo</td>
             </tr>
@@ -1321,9 +2818,29 @@ git diff --cached --check   <span class="c">errores de whitespace</span></div>
               <td>Lo sostiene OpenSpec; la plantilla no duplica su workflow</td>
             </tr>
             <tr>
-              <td>Convenciones de código, pruebas y entrega</td>
+              <td>Orden de pruebas primero en un cambio</td>
+              <td><code>openspec/config.yaml</code></td>
+              <td>OpenSpec lo entrega al generar las tareas y al aplicar, en cualquier herramienta</td>
+            </tr>
+            <tr>
+              <td>Pautas de código, seguridad y pruebas</td>
+              <td><code>.claude/rules/</code></td>
+              <td>Se cargan solas al tocar un fichero de su lenguaje, y solo entonces</td>
+            </tr>
+            <tr>
+              <td>Comandos, convenciones propias, API y entrega</td>
               <td><code>development.md</code></td>
               <td>Se lee al implementar, que es justo cuando importan</td>
+            </tr>
+            <tr>
+              <td>Guías largas: API, seguridad, pruebas por stack</td>
+              <td><code>.claude/skills/</code></td>
+              <td>Solo se leen cuando una regla o un subagente revisor las pide, o al invocarlas</td>
+            </tr>
+            <tr>
+              <td>Revisión de un cambio terminado</td>
+              <td><code>.claude/agents/</code></td>
+              <td>Contexto limpio y solo lectura; se lanza cuando el usuario lo decide</td>
             </tr>
             <tr>
               <td>Componentes vetados y tokens propios</td>
@@ -1337,13 +2854,18 @@ git diff --cached --check   <span class="c">errores de whitespace</span></div>
             </tr>
             <tr>
               <td>Arquitectura, dominio y seguridad</td>
-              <td><code>context.md</code></td>
+              <td><code>architecture.md</code></td>
               <td>Describe el sistema construido, no cómo se trabaja en él</td>
             </tr>
             <tr>
               <td>Procedimientos repetibles</td>
               <td><code>.ai/skills/</code></td>
               <td>Contenido común, con adaptadores mínimos por herramienta</td>
+            </tr>
+            <tr>
+              <td>Qué herramientas de prueba se instalan</td>
+              <td><code>setup-testing</code></td>
+              <td>Solo con confirmación; los comandos resultantes pasan a <code>development.md</code></td>
             </tr>
           </tbody>
         </table>
@@ -1352,12 +2874,20 @@ git diff --cached --check   <span class="c">errores de whitespace</span></div>
       <div class="nota">
         <span class="nota-rotulo">Pendiente de comprobar</span>
         <p>
-          Tres puntos de este recorrido no están verificados contra las herramientas
+          Algunos puntos de este recorrido no están verificados contra las herramientas
           reales: si Codex aplica una aprobación equivalente a los
           <code>mcp_servers</code> de <code>.codex/config.toml</code>; el comportamiento
           en monorepos, donde <code>.mcp.json</code> es de raíz y no admite alcance por
-          subdirectorio; y los nombres exactos de los comandos de OpenSpec, que dependen
-          de la versión instalada.
+          subdirectorio; y los nombres exactos de los comandos de OpenSpec, que
+          dependen de la versión instalada.
+        </p>
+        <p>
+          Sí está comprobado en la documentación de Claude Code que las reglas por
+          ruta entran al leer un fichero y no al crearlo, que salen de la ventana al
+          compactar y que <code>paths:</code> admite llaves también en carpetas.
+          Para confirmarlo en un proyecto concreto, <code>/context</code> muestra las
+          reglas cargadas y el hook <code>InstructionsLoaded</code> registra cuándo
+          entra cada una.
         </p>
         <p>
           Además, el sandbox de Codex fija <code>network_access = false</code>, que
@@ -1371,10 +2901,12 @@ git diff --cached --check   <span class="c">errores de whitespace</span></div>
 
   <footer class="pie">
     <p>
-      Documento interno de la plantilla <code>aiconventions</code>. Los comandos de
-      OpenSpec y los nombres de las herramientas MCP los publica cada herramienta:
-      compruébalos en el repositorio y con <code>/mcp</code> antes de darlos por fijos.
+      Documento interno de la plantilla <code>aiconventions</code>. El ejemplo de
+      código es ilustrativo y está abreviado. Los comandos de OpenSpec y los nombres
+      de las herramientas MCP los publica cada herramienta: compruébalos en el
+      repositorio y con <code>/mcp</code> antes de darlos por fijos.
     </p>
   </footer>
 
 </div>
+</html>

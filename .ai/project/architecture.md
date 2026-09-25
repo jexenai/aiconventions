@@ -1,4 +1,4 @@
-# Contexto del proyecto
+# Arquitectura del proyecto
 
 Consulta este documento para entender qué hace el sistema, dónde está cada
 parte y qué restricciones generales deben respetarse.

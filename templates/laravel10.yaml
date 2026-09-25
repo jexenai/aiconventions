@@ -68,8 +68,3 @@ context:
         build: npm run build
         test: npm test
         staticAnalysis: npm run lint
-    skills:
-    - create-use-case
-    - add-endpoint
-    - legacy-refactor
-    - review-sql

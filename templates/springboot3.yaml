@@ -45,8 +45,3 @@ context:
         testIntegration: ./gradlew integrationTest
         format: ./gradlew spotlessApply
         staticAnalysis: ./gradlew checkstyleMain
-    skills:
-    - create-use-case
-    - add-endpoint
-    - legacy-refactor
-    - review-sql

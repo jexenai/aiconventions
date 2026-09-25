@@ -39,8 +39,3 @@ context:
         testE2e: npm run test:e2e
         format: npm run format
         staticAnalysis: npm run lint
-    skills:
-    - create-use-case
-    - add-endpoint
-    - legacy-refactor
-    - review-sql

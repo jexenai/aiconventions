@@ -1,13 +1,20 @@
 # Desarrollo y validación
 
 Consulta este documento antes de implementar, corregir, refactorizar o revisar
-código y pruebas.
+código y pruebas. Recoge los datos y las decisiones propios del proyecto; las
+pautas generales de código están en `.claude/rules/` y no se repiten aquí.
+
+Antes de crear un fichero de código o de pruebas, lee uno existente del mismo
+tipo y capa: las reglas de `.claude/rules/` entran al leer un fichero, no al
+crearlo.
 
 ## Comandos
 
-Registra únicamente comandos comprobados y su directorio de ejecución. Los de
-arranque y pruebas habituales se resumen también en la ficha de
-[AGENTS.md](../../AGENTS.md); mantén ambos coherentes.
+Registra únicamente comandos comprobados y su directorio de ejecución. Si el
+proyecto tiene varias partes (por ejemplo, backend y vistas), usa una fila
+por parte en cada operación. Los de arranque y pruebas habituales se resumen
+también en la ficha de [AGENTS.md](../../AGENTS.md); mantén ambos
+coherentes.
 
 | Operación | Comando | Directorio o requisito |
 | --------- | ------- | ---------------------- |
@@ -19,25 +26,58 @@ arranque y pruebas habituales se resumen también en la ficha de
 | Pruebas unitarias | [POR DEFINIR] | [POR DEFINIR] |
 | Pruebas de integración | [POR DEFINIR] | [POR DEFINIR] |
 | Pruebas de extremo a extremo | [POR DEFINIR] | [POR DEFINIR] |
+| Una sola prueba o clase, con salida resumida | [POR DEFINIR] | [POR DEFINIR] |
 
 Consulta la configuración real de CI antes de afirmar qué comprobaciones son
-obligatorias. No ejecutes literalmente los marcadores pendientes.
+obligatorias. No ejecutes literalmente los marcadores pendientes. Si una
+tarea necesita un comando de pruebas o de análisis que falta porque la
+herramienta no está instalada, no la instales por tu cuenta: propón al
+usuario ejecutar `setup-testing` (`.ai/skills/setup-testing.md`). Al ejecutar
+pruebas, filtra al área afectada y muestra solo el resumen y los fallos: la
+salida completa de una suite llena la ventana de contexto.
 
-## Implementación y calidad
+### Base de datos de pruebas
 
-- Lee el código afectado y sus pruebas. Comprueba que rutas, símbolos y
-  dependencias existen antes de usarlos.
-- Haz cambios pequeños y completos, coherentes con los patrones del módulo.
-- No mezcles el objetivo con limpiezas ajenas ni reviertas trabajo de otros.
-- Prefiere código explícito, nombres descriptivos y responsabilidades claras.
-- Evita abstracciones especulativas y soluciones provisionales que se sepa que
-  habrá que rehacer inmediatamente.
-- Expresa los errores de forma útil; no ocultes fallos con capturas genéricas o
-  valores de sustitución sin justificar.
-- Mantén coherentes manifiestos y archivos de bloqueo al cambiar dependencias.
-- No edites archivos generados si existe una fuente o comando de regeneración.
+Las pruebas que reinician la base de datos (`RefreshDatabase`, migraciones
+en cada ejecución) borran lo que haya en la conexión que usan. Antes de
+ejecutar pruebas que acceden a base de datos, comprueba que su conexión es la
+de esta tabla. Si está `[POR DEFINIR]` o apunta a una base compartida, no las
+ejecutes y avisa al usuario.
 
-### Sistema de diseño
+| Dato | Valor |
+| ---- | ----- |
+| Conexión de pruebas y dónde se fija | [POR DEFINIR] |
+| Qué se borra o reinicia al ejecutarlas | [POR DEFINIR] |
+
+## Convenciones propias del proyecto
+
+Registra solo las decisiones de este proyecto que no estén en las reglas
+comunes ni en las de su lenguaje, o que las contradigan: por ejemplo, la
+estructura de paquetes, una librería obligatoria, qué puntos deben ampliarse
+solo con datos o configuración, sin tocar código existente, o una excepción
+justificada a una regla.
+
+| Convención | Decisión |
+| ---------- | -------- |
+| [POR DEFINIR] | [POR DEFINIR] |
+
+## API
+
+Aplica si el proyecto expone una API REST. Estas decisiones prevalecen sobre
+la guía general de `.claude/skills/api-design/SKILL.md`. Si hay un contrato
+OpenAPI, antes de cambiar la forma de una petición o una respuesta lee
+`.claude/skills/contract-first/SKILL.md`, si existe: el contrato cambia
+antes que el código.
+
+| Decisión | Valor |
+| -------- | ----- |
+| Prefijo y versión | [POR DEFINIR] |
+| Formato de error | [POR DEFINIR] |
+| Nombres de campos (`camelCase` o `snake_case`) | [POR DEFINIR] |
+| Paginación | [POR DEFINIR] |
+| Fichero del contrato OpenAPI | [POR DEFINIR] |
+
+## Sistema de diseño
 
 Aplica solo si la ficha de [AGENTS.md](../../AGENTS.md) declara un sistema de
 diseño. Su catálogo lo sirve el servidor MCP declarado en `.mcp.json`:
@@ -57,44 +97,35 @@ consúltalo en lugar de reproducirlo aquí.
 | Tokens y temas propios | [POR DEFINIR] |
 | Qué hacer si el diseño pide algo fuera del catálogo | [POR DEFINIR] |
 
-### Comentarios en el código
-
-- Explica decisiones, restricciones, workarounds y comportamientos no evidentes;
-  no repitas lo que ya dice el código.
-- Mantén los comentarios sincronizados y elimina los obsoletos.
-- No conserves código comentado «por si acaso»; el historial ya lo preserva.
-- No incluyas secretos, datos personales ni referencias temporales sin contexto.
-
-## Pruebas
-
-- Comprueba comportamiento observable, límites, errores y permisos relevantes.
-- Añade una prueba de regresión al corregir un fallo cuando sea razonable.
-- Empieza por las pruebas del área afectada y amplía según el riesgo.
-- Amplía la validación si cambian contratos públicos, datos persistentes,
-  seguridad, varias capas o dependencias.
-- Distingue pruebas automáticas de revisión funcional o de dominio: una no
-  sustituye a la otra.
-- No desactives pruebas para presentar una entrega como correcta.
-- Si una prueba falla, diferencia un problema introducido de uno previo o del
-  entorno y aporta la evidencia disponible.
-
-### Pruebas primero con especificaciones
+## Pruebas primero con especificaciones
 
 Aplica solo si la ficha de [AGENTS.md](../../AGENTS.md) declara OpenSpec en
 `Especificaciones`. El recorrido del cambio lo define el workflow que instala
-OpenSpec; aquí solo se fija el orden respecto a las pruebas.
-
-- Escribe la prueba del escenario antes de implementar la tarea que cambia
-  comportamiento y comprueba que falla por el motivo esperado.
-- Indica qué escenario del delta cubre cada prueba.
-- Ejecuta primero la prueba del escenario y después las del área afectada.
-- Una tarea puede declarar otra forma de verificación distinta de una prueba
-  automática. Cuando así sea, dilo al informar en lugar de darlo por probado.
+OpenSpec. El orden de pruebas primero (prueba del escenario que falla,
+implementación mínima, refactorización y nombre del escenario en la prueba)
+lo fijan `rules` y `operations` de `openspec/config.yaml`, que OpenSpec
+entrega al generar las tareas y al aplicar el cambio. Si faltan ahí, sigue
+igualmente ese orden y avisa al usuario.
 
 ## Entrega
 
+- Revisores (solo Claude Code): `java-reviewer`, `php-reviewer`,
+  `react-reviewer` y `security-reviewer` se lanzan solo cuando el usuario lo
+  decide. Tras `/opsx:verify` y antes de archivar, tras un cambio grande o al
+  tocar una parte crítica, pregúntale si quiere pasar alguno, proponiendo los
+  que apliquen, y sobre qué alcance (el cambio, varios o una parte concreta).
+  Si el cambio cruza backend y vistas, propón el revisor de cada parte.
+  Propón `security-reviewer` si el cambio toca autenticación, autorización,
+  entrada de usuario, endpoints, consultas, ficheros subidos, secretos o
+  dependencias. Si elige varios, lánzalos en paralelo y pasa a cada uno el
+  resultado de las pruebas ya ejecutadas sobre el mismo árbol, para que no las
+  repitan.
+- Corrige los hallazgos CRÍTICO y ALTO antes de entregar o archivar. Si
+  alguno queda sin corregir, expón por qué y hazlo solo con la conformidad
+  explícita del usuario.
 - Revisa el diff final y elimina archivos temporales o cambios accidentales.
 - Si el árbol cambia después de validarlo, repite las comprobaciones afectadas.
-- No ejecutes commits, pushes, despliegues ni publicaciones sin autorización.
-- Informa del comportamiento resultante, comprobaciones ejecutadas, resultados
-  y cualquier limitación o trabajo pendiente.
+- Antes de liberar una versión, analiza las dependencias con la herramienta
+  del stack (OWASP Dependency-Check, `composer audit` o `npm audit`).
+- En Laravel, antes de desplegar, sigue
+  [laravel-deploy.md](../skills/laravel-deploy.md).

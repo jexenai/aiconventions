@@ -1,7 +1,7 @@
 {
+  "autoMemoryEnabled": false,
   "permissions": {
     "deny": [
-      "Read(**/.env)",
       "Read(**/.env.prod*)",
       "Edit(**/.env)",
       "Edit(**/.env.local)",
@@ -16,7 +16,9 @@
       "Read(**/*.keystore)"
     ],
     "ask": [
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(php artisan migrate*)",
+      "Bash(php artisan db:*)"
     ]
   }
 }
