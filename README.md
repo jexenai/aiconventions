@@ -67,7 +67,9 @@ Quien quiera la memoria para sí puede reactivarla en su
    mantienen en cada plantilla.
 2. Ejecuta `/setup-project-context` en Claude Code o
    `$setup-project-context` en Codex. Las skills de setup solo se ejecutan al
-   invocarlas: el agente no las lanza por su cuenta.
+   invocarlas: el agente no las lanza por su cuenta. Si el proyecto no tiene
+   repositorio Git o no tiene commits, el setup lo inicializa y crea el commit
+   inicial antes de empezar.
 3. Responde a las tres rondas de preguntas del guion: ficha, ejecución y
    OpenSpec. Son siempre las mismas nueve preguntas, también al repetir el
    setup; cuando un dato ya está resuelto, la pregunta lo propone como

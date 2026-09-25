@@ -1183,7 +1183,9 @@
             <h3>Rellenar la ficha con evidencia</h3>
             <p>
               La skill solo arranca cuando el usuario la invoca, y sigue un flujo
-              fijo de seis fases. Primero analiza el repositorio sin tocar nada y
+              fijo de siete fases. Primero se asegura de que hay repositorio Git
+              con una línea base: si no lo hay, lo crea y versiona el estado inicial.
+              Después analiza el repositorio sin tocar nada y
               prepara una propuesta para cada dato de la ficha: propósito,
               tecnologías, ruta del código, vistas, comandos de arranque y pruebas,
               base de datos y sistema de diseño.

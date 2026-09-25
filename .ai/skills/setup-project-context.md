@@ -33,6 +33,34 @@ misma manera, se ejecute por primera vez o se repita.
   stack elegida.
 - No hagas preguntas fuera del guion. Lo que no cubra el guion se resuelve con
   evidencia o queda pendiente en el informe.
+- No hagas commits, salvo el commit inicial de la
+  [fase 0](#fase-0-asegurar-el-repositorio-git). No configures remotos ni
+  hagas push.
+
+## Fase 0: asegurar el repositorio Git
+
+Hazla siempre antes de leer o editar nada. Las fases siguientes usan Git para
+distinguir la plantilla de los cambios locales, y la retirada de stacks no
+puede decidir sin una línea base.
+
+1. Ejecuta `git rev-parse --show-toplevel` en la raíz del proyecto. Si falla,
+   o si devuelve otra carpeta (el proyecto está dentro de otro repositorio),
+   ejecuta `git init` en la raíz del proyecto. No cambies la configuración de
+   Git ni la identidad del usuario.
+2. Si el repositorio no tiene commits (`git rev-parse --verify HEAD` falla),
+   crea el commit inicial con el estado actual, antes de cualquier cambio de
+   este procedimiento:
+   1. Revisa `git status --short --untracked-files=all` y comprueba que
+      `.gitignore` excluye los ficheros de entorno, secretos, dependencias
+      descargadas y resultados de compilación que aparezcan.
+   2. Si algún fichero que se incluiría contiene secretos o datos
+      personales, o no está claro si debe versionarse, no hagas el commit:
+      detente e infórmalo.
+   3. Si no, sigue [commit.md](commit.md) con el mensaje
+      `chore: versiona el estado inicial del proyecto`. Invocar este
+      procedimiento autoriza ese commit y ningún otro.
+3. Si el repositorio ya tiene commits, no hagas ninguno: sus cambios locales
+   se preservan como indica la fase 1.
 
 ## Fase 1: recopilar evidencia
 
@@ -210,7 +238,7 @@ Termina siempre con un informe con estas secciones, en este orden:
 1. **Guion:** una tabla con una fila por pregunta, de `P1` a `P9`, con las
    columnas `Pregunta`, `Respuesta` y `Estado` (`Confirmada`, `Sin confirmar`
    o `Pendiente`). No omitas filas.
-2. **Fases:** una tabla con una fila por fase, de 1 a 6, con `Hecha` u
+2. **Fases:** una tabla con una fila por fase, de 0 a 6, con `Hecha` u
    `Omitida` y el motivo. Una fase solo puede omitirse por un límite de este
    procedimiento.
 3. **Documentos:** documentos y secciones completados.
@@ -227,6 +255,7 @@ Termina siempre con un informe con estas secciones, en este orden:
 8. **Comprobaciones:** comprobaciones ejecutadas y limitaciones de la revisión,
    incluida la versión de Claude Code de la fase 1. Si es anterior a 2.1.271
    o no se pudo obtener, recomienda actualizarla antes de usar los revisores.
+   Indica también si la fase 0 creó el repositorio o el commit inicial.
 
 ## Usar el stack declarado
 
