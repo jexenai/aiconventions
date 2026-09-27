@@ -327,7 +327,7 @@ repetir el procedimiento.
 
    | Componente | Se conserva si | Artefactos |
    | ---------- | -------------- | ---------- |
-   | Spring Boot | P2 incluye Java o Spring Boot | `.claude/rules/java/`, `.claude/agents/java-reviewer.md`, `.claude/skills/springboot-security/`, `springboot-tdd/`, `jpa-patterns/` |
+   | Spring Boot | P2 incluye Java o Spring Boot | `.claude/rules/java/`, `.claude/agents/java-reviewer.md`, `.claude/skills/springboot-security/`, `springboot-tdd/`, `jpa-patterns/`, `openapi-mapstruct/` |
    | Laravel | P2 incluye PHP o Laravel | `.claude/rules/php/`, `.claude/agents/php-reviewer.md`, `.claude/skills/laravel-security/`, `laravel-tdd/`; el procedimiento `laravel-deploy` (`.ai/skills/laravel-deploy.md`, `.claude/skills/laravel-deploy/`, `.agents/skills/laravel-deploy/`), su fila en `.ai/skills/README.md` y su línea en la sección "Entrega" de `development.md` |
    | Oracle | P7 es Oracle | `.claude/rules/java/oracle.md` y `.claude/rules/php/oracle.md` |
    | React | P2 o P4 incluyen React | `.claude/rules/react/`, `.claude/agents/react-reviewer.md`, `.claude/skills/react-testing/`, `frontend-a11y/`, `e2e-testing/` |

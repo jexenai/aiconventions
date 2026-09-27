@@ -83,8 +83,11 @@ formas:
 - Una regla o `development.md` indica leerla antes de una tarea concreta:
   `springboot-security` y `laravel-security` al cambiar la configuración de
   seguridad, la autenticación o la subida de ficheros, `api-design` al crear
-  o cambiar un endpoint, `e2e-testing` al escribir pruebas de Playwright y
-  `contract-first` antes de cambiar el contrato de la API.
+  o cambiar un endpoint, `jpa-patterns` al crear o cambiar una entidad, un
+  repositorio o una consulta, `openapi-mapstruct` al crear o cambiar un
+  mapper, `springboot-tdd` antes de escribir o corregir una prueba de Java,
+  `e2e-testing` al escribir pruebas de Playwright y `contract-first` antes
+  de cambiar el contrato de la API.
   La lectura funciona aunque la skill no sea invocable por el modelo.
 
 ## Reglas de código
@@ -94,7 +97,7 @@ formas:
 | `comun/estilo-codigo.md` | Cualquier fichero de código de los stacks (`.java`, `.php`, `.js`, `.jsx`, `.ts`, `.tsx`) |
 | `comun/seguridad.md` | Solo backend: `.java`, `.php` y `.sql` |
 | `comun/pruebas.md` y `<lenguaje>/pruebas.md` | Solo ficheros de prueba: `tests/**/*.php`, `phpunit.xml`, `src/test/**/*.java`, `*.test.*`, `*.spec.*`, `__tests__/` y la configuración de Vitest o Playwright |
-| `<lenguaje>/estilo-codigo.md`, `patrones.md` y `seguridad.md` | Cualquier fichero de su lenguaje (`java/seguridad.md` también `application*.yml`/`.properties`) |
+| `<lenguaje>/estilo-codigo.md`, `patrones.md` y `seguridad.md`, y `java/datos.md` | Cualquier fichero de su lenguaje (`java/seguridad.md` también `application*.yml`/`.properties`) |
 | `java/oracle.md` y `php/oracle.md` | Cualquier fichero de su lenguaje y `.sql`. El setup las retira si la base de datos no es Oracle |
 | `java/despliegue.md` | Solo `pom.xml`, `build.gradle`, `weblogic.xml`, `jboss-deployment-structure.xml`, la clase `*Application` y `application*.yml` |
 | `inertia/patrones.md` | Páginas de `resources/js/Pages/`, controladores, `HandleInertiaRequests` y `routes/web.php`. El setup la retira si las vistas no usan Inertia |

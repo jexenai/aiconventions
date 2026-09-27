@@ -146,7 +146,7 @@ las reglas indican cuándo leerla y tú puedes invocarla (`/laravel-tdd`).
 
 | Stack | Skills |
 | ----- | ------ |
-| Spring Boot | `springboot-security`, `jpa-patterns`, `springboot-tdd` |
+| Spring Boot | `springboot-security`, `jpa-patterns`, `springboot-tdd`, `openapi-mapstruct` |
 | Laravel | `laravel-security`, `laravel-tdd` y el procedimiento `laravel-deploy` |
 | Spring Boot y Laravel | `api-design` |
 | React | `react-testing`, `frontend-a11y`, `e2e-testing` |

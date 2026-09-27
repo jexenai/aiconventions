@@ -6,6 +6,9 @@ paths:
 
 JUnit 5, AssertJ y Mockito.
 
+Antes de escribir o corregir una prueba, lee
+`.claude/skills/springboot-tdd/SKILL.md`, si existe.
+
 | Qué se prueba | Cómo |
 | ------------- | ---- |
 | Lógica de servicio | Unitaria sin contexto de Spring: `@ExtendWith(MockitoExtension.class)` |

@@ -4,8 +4,9 @@ paths:
 ---
 # Java: estilo de código
 
-- `record` para DTO y objetos de valor; `switch` como expresión y *pattern
-  matching* en `instanceof` en lugar del cast.
+- `record` para objetos de valor (los DTO de la API se generan del contrato:
+  ver `datos.md`); `switch` como expresión y *pattern matching* en
+  `instanceof` en lugar del cast.
 
 > Aclaración: los *record patterns* y el *pattern matching* en `switch` son
 > de Java 21; con Java 17 no están disponibles.

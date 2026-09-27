@@ -5,11 +5,14 @@ paths:
 # Java: patrones de Spring Boot
 
 Al crear un endpoint o cambiar uno ya expuesto, lee antes
-`.claude/skills/api-design/SKILL.md`, si existe.
+`.claude/skills/api-design/SKILL.md`, si existe. Al crear o cambiar una
+entidad, un repositorio o una consulta, lee antes
+`.claude/skills/jpa-patterns/SKILL.md`, si existe.
 
 ## Capas
 
-- `Controller`: HTTP, validación y mapeo a DTO, sin lógica de negocio.
+- `Controller`: HTTP, validación y conversión a DTO con el mapper de
+  MapStruct, sin lógica de negocio.
 - `Service`: lógica de negocio y `@Transactional` (con `readOnly = true` en
   las lecturas). Nunca transacciones en controladores.
 - Un `Service` por funcionalidad del dominio (`ClienteService`: alta, baja y
@@ -17,7 +20,8 @@ Al crear un endpoint o cambiar uno ya expuesto, lee antes
   operación solo guarda lo validado, sin reglas de negocio, no crees un
   servicio que se limite a reenviarla al repositorio.
 - `Repository`: acceso a datos, sin reglas de negocio.
-- La API devuelve DTO o proyecciones, nunca entidades JPA.
+- La API devuelve DTO generados del contrato y rellenados con MapStruct
+  (`datos.md`), nunca entidades JPA ni proyecciones.
 - Errores centralizados en `@RestControllerAdvice`, que traduce cada
   excepción de dominio a su código HTTP.
 

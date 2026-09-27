@@ -67,7 +67,8 @@ public record PedidoResumen(Long id, String referencia, EstadoPedido estado) {}
 ```
 
 - Lecturas para pantallas o listados con proyecciones (`record` o interfaz),
-  no con entidades completas.
+  no con entidades completas. La proyección no sale a la API: se mapea con
+  MapStruct al DTO generado del contrato.
 - `JOIN FETCH` sobre una colección junto con `Pageable` pagina en memoria
   (Hibernate avisa con `HHH90003004`): pagina los identificadores y carga
   el detalle en una segunda consulta.

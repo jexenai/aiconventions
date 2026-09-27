@@ -51,7 +51,8 @@ Nunca 200 con un `"success": false` en el cuerpo.
 
 - Un recurso: `{ "data": { ... } }`. Una colección: `data`, más `meta` y
   `links` si está paginada. Es lo que genera `JsonResource` en Laravel; en
-  Spring, devuelve un DTO con la misma forma.
+  Spring, define esa forma en el contrato OpenAPI y devuelve el DTO generado,
+  rellenado con MapStruct.
 - Nombres de campos coherentes en toda la API: `camelCase` es lo natural en
   Spring (Jackson) y `snake_case` en Laravel (Eloquent). No los mezcles.
 - Fechas en ISO 8601 con zona (`2026-01-15T10:30:00Z`); importes con
@@ -79,8 +80,8 @@ pueda interpretar y, en validación, el detalle por campo.
   FETCH FIRST :n ROWS ONLY`; en Laravel, `cursorPaginate()`.
 - Tamaño de página con máximo en el servidor, aunque lo pida el cliente.
 - En Spring Boot, no serialices `PageImpl` directamente: su JSON no es
-  estable entre versiones. Usa un DTO propio o
-  `@EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO)`.
+  estable entre versiones. Mapea la `Page` con MapStruct al esquema de
+  paginación del contrato.
 
 ## Filtros y orden
 
