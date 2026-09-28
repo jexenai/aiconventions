@@ -9,12 +9,12 @@ JUnit 5, AssertJ y Mockito.
 Antes de escribir o corregir una prueba, lee
 `.claude/skills/springboot-tdd/SKILL.md`, si existe.
 
-| Qué se prueba | Cómo |
-| ------------- | ---- |
-| Lógica de servicio | Unitaria sin contexto de Spring: `@ExtendWith(MockitoExtension.class)` |
-| Controlador | `@WebMvcTest` con el servicio simulado |
-| Repositorio y consultas | `@DataJpaTest` contra la base de datos real |
-| Flujo completo | `@SpringBootTest`, solo en integración |
+| Qué se prueba           | Cómo                                                                                                                                                                           |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Lógica de servicio      | Unitaria sin contexto de Spring: `@ExtendWith(MockitoExtension.class)`                                                                                                         |
+| Controlador             | `@WebMvcTest` con el servicio simulado                                                                                                                                         |
+| Repositorio y consultas | `@DataJpaTest` contra la base de datos real, solo para métodos personalizados (`@Query` o de nombre derivado); no se prueban los heredados de `JpaRepository`/`CrudRepository` |
+| Flujo completo          | `@SpringBootTest`, solo en integración                                                                                                                                         |
 
 - Nombre de la prueba: `metodo_condicion_resultado`, por ejemplo
   `crear_conEmailDuplicado_lanzaExcepcion`. Si cubre un escenario de
