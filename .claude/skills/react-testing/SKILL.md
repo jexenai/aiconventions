@@ -18,7 +18,7 @@ import { setupServer } from "msw/node";
 import { http, HttpResponse } from "msw";
 
 export const servidor = setupServer(
-  http.get("/api/pedidos", () => HttpResponse.json({ data: [] })),
+  http.get("/pedidos", () => HttpResponse.json({ data: [] })),
 );
 
 // src/test/setup.ts (setupFiles de Vitest)
@@ -51,7 +51,7 @@ export function renderConProveedores(ui: React.ReactElement, { ruta = "/" } = {}
 
 ```tsx
 test("muestra un error si falla el guardado", async () => {
-  servidor.use(http.post("/api/pedidos", () => new HttpResponse(null, { status: 500 })));
+  servidor.use(http.post("/pedidos", () => new HttpResponse(null, { status: 500 })));
   const user = userEvent.setup();
   renderConProveedores(<FormularioPedido />);
 

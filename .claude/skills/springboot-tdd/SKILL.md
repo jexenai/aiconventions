@@ -42,7 +42,7 @@ class PedidoControllerTest {
   @Test
   @WithMockUser
   void crear_sinReferencia_devuelve400() throws Exception {
-    mvc.perform(post("/api/pedidos").with(csrf())
+    mvc.perform(post("/pedidos").with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content("{\"referencia\":\"\"}"))
         .andExpect(status().isBadRequest());
@@ -50,7 +50,7 @@ class PedidoControllerTest {
 
   @Test
   void listar_sinAutenticar_devuelve401() throws Exception {
-    mvc.perform(get("/api/pedidos")).andExpect(status().isUnauthorized());
+    mvc.perform(get("/pedidos")).andExpect(status().isUnauthorized());
   }
 }
 ```

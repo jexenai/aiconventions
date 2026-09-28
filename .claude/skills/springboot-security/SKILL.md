@@ -21,7 +21,7 @@ class SeguridadConfig {
     return http
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/actuator/health").permitAll()
-            .requestMatchers(HttpMethod.GET, "/api/publico/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/publico/**").permitAll()
             .anyRequest().authenticated())          // deniega por defecto
         .oauth2ResourceServer(rs -> rs.jwt(Customizer.withDefaults()))
         .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -77,7 +77,7 @@ CorsConfigurationSource corsConfigurationSource(@Value("${app.cors.origenes}") L
   config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
   config.setAllowCredentials(true);
   var source = new UrlBasedCorsConfigurationSource();
-  source.registerCorsConfiguration("/api/**", config);
+  source.registerCorsConfiguration("/**", config);
   return source;
 }
 ```

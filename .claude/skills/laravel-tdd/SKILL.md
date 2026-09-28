@@ -29,12 +29,12 @@ persistir.
 
 ```php
 $this->actingAs($user)
-    ->postJson('/api/pedidos', [])
+    ->postJson('/pedidos', [])
     ->assertUnprocessable()
     ->assertJsonValidationErrors(['referencia']);
 
 $this->withToken($user->createToken('prueba', ['pedidos:leer'])->plainTextToken)
-    ->getJson('/api/pedidos')
+    ->getJson('/pedidos')
     ->assertOk();
 ```
 
@@ -42,7 +42,7 @@ $this->withToken($user->createToken('prueba', ['pedidos:leer'])->plainTextToken)
 
 ```php
 Storage::fake('local');
-$this->actingAs($user)->postJson('/api/adjuntos', [
+$this->actingAs($user)->postJson('/adjuntos', [
     'fichero' => UploadedFile::fake()->create('doc.pdf', 100, 'application/pdf'),
 ])->assertCreated();
 

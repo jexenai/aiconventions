@@ -16,12 +16,19 @@ implementar.
 
 ## URL
 
-- Recursos en plural, minúsculas y `kebab-case`: `/api/v1/pedidos`,
-  `/api/v1/lineas-pedido`. Sin verbos en la ruta.
-- Relaciones de propiedad como subrecurso: `/api/v1/clientes/{id}/pedidos`.
+- Sin prefijo ni versión: la ruta empieza por el recurso (`/pedidos`, no
+  `/api/pedidos` ni `/api/v1/pedidos`). El nombre de la aplicación lo añade el
+  servidor como contexto del despliegue. En Laravel, `routes/api.php` añade
+  `/api` por defecto: quítalo con `apiPrefix: ''` en `withRouting()` de
+  `bootstrap/app.php`.
+- Ningún recurso puede llamarse como una ruta técnica de la raíz (contrato
+  OpenAPI, Swagger UI, Actuator).
+- Recursos en plural, minúsculas y `kebab-case`: `/pedidos`,
+  `/lineas-pedido`. Sin verbos en la ruta.
+- Relaciones de propiedad como subrecurso: `/clientes/{id}/pedidos`.
   No más de un nivel de anidamiento.
 - Acciones que no son CRUD, como verbo tras el recurso y con `POST`:
-  `/api/v1/pedidos/{id}/cancelar`.
+  `/pedidos/{id}/cancelar`.
 - Filtros, orden y búsqueda en parámetros de consulta, nunca en la ruta.
 
 ## Métodos y códigos
@@ -93,14 +100,13 @@ pueda interpretar y, en validación, el detalle por campo.
 
 ## Versionado y compatibilidad
 
-- Versión en la ruta (`/api/v1`) desde el primer endpoint público.
-- Compatibles, sin nueva versión: añadir endpoints, campos de respuesta o
-  parámetros opcionales.
-- Incompatibles, con nueva versión o acuerdo explícito con los clientes:
-  quitar o renombrar campos, cambiar tipos o nulabilidad, cambiar rutas o la
-  autenticación.
-- Como mucho dos versiones activas; anuncia la retirada con la cabecera
-  `Sunset`.
+- Sin versión en la ruta: la API evoluciona con cambios compatibles.
+- Compatibles: añadir endpoints, campos de respuesta o parámetros
+  opcionales.
+- Incompatibles, solo con acuerdo explícito con los clientes y despliegue
+  coordinado: quitar o renombrar campos, cambiar tipos o nulabilidad, cambiar
+  rutas o la autenticación. Si ambas formas deben convivir, publica un
+  recurso nuevo y anuncia la retirada del antiguo con la cabecera `Sunset`.
 
 ## Antes de dar por terminado un endpoint
 
