@@ -107,6 +107,14 @@ pueda interpretar y, en validación, el detalle por campo.
   contra una lista blanca de campos.
 - Búsqueda de texto libre en `?q=`.
 
+## Documentación del contrato
+
+- Todo esquema que se use como cuerpo de una petición (`requestBody`) lleva
+  un bloque `example` con valores completos y válidos, no solo por campo:
+  así "Try it out" en Swagger UI (o el explorador equivalente) ya trae un
+  cuerpo relleno y listo para ejecutar, sin que haya que escribirlo a mano
+  ni consultar el esquema para adivinar un valor válido por campo.
+
 ## Versionado y compatibilidad
 
 - Sin versión en la ruta: la API evoluciona con cambios compatibles.
@@ -126,3 +134,4 @@ pueda interpretar y, en validación, el detalle por campo.
 - [ ] Listados paginados con tamaño máximo.
 - [ ] Sin detalles internos en errores (trazas, SQL, clases).
 - [ ] Contrato OpenAPI actualizado, si el proyecto lo mantiene.
+- [ ] Esquema del cuerpo de la petición con un `example` completo.
