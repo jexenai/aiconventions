@@ -15,7 +15,7 @@ Dos modelos, según quién llama:
 
 - **La SPA propia (o páginas del servidor):** sesión de servidor en una
   cookie `HttpOnly` y CSRF activo. Es el modelo por defecto: el navegador
-  nunca guarda un token (`.claude/rules/react/seguridad.md`).
+  nunca guarda un token (`.claude/rules/react/seguridad.md`, si existe).
 - **Clientes máquina a máquina:** JWT Bearer, sin sesión ni CSRF, en una
   cadena aparte y solo si existen.
 
