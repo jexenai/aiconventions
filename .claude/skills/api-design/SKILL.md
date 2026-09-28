@@ -114,6 +114,12 @@ pueda interpretar y, en validación, el detalle por campo.
   así "Try it out" en Swagger UI (o el explorador equivalente) ya trae un
   cuerpo relleno y listo para ejecutar, sin que haya que escribirlo a mano
   ni consultar el esquema para adivinar un valor válido por campo.
+- Toda operación lleva `tags` con el nombre de la entidad o recurso al que
+  pertenece (`Zonas`, `Municipios`, `Convocatorias`...), en plural y con la
+  misma capitalización en todas las operaciones de ese recurso. Sin tags,
+  Swagger UI agrupa todas las operaciones del contrato en un único bloque y
+  deja de servir como documentación navegable. Cada recurso nuevo añade su
+  propio tag; no reutilices el de otro recurso.
 
 ## Versionado y compatibilidad
 
@@ -135,3 +141,4 @@ pueda interpretar y, en validación, el detalle por campo.
 - [ ] Sin detalles internos en errores (trazas, SQL, clases).
 - [ ] Contrato OpenAPI actualizado, si el proyecto lo mantiene.
 - [ ] Esquema del cuerpo de la petición con un `example` completo.
+- [ ] Operación con `tags` del recurso al que pertenece.
