@@ -79,7 +79,9 @@ Usa el mecanismo de la tabla
 [Mecanismo de preguntas](setup-project-context.md#mecanismo-de-preguntas).
 Plantea solo las preguntas de esta sección, y de cada una solo las opciones
 de lo que la fase 1 marcó como `Falta herramienta`. Omite la pregunta que se
-quede sin opciones. Ninguna opción lleva `(Recomendado)`.
+quede sin opciones; si T1 o T2 se quedan con una sola, añade `Nada por
+ahora` como segunda, porque cada pregunta necesita al menos dos. Ninguna
+opción lleva `(Recomendado)`.
 
 ### Ronda 1: alcance
 
@@ -88,10 +90,12 @@ quede sin opciones. Ninguna opción lleva `(Recomendado)`.
 | T1 | Vistas | ¿Qué preparo en las vistas? (selección múltiple) | `Pruebas de componentes` · `Lint` · `Comprobación de tipos` |
 | T2 | Backend | ¿Qué preparo en el backend? (selección múltiple) | `Análisis estático` · `Cobertura` · `Pruebas contra <base de datos>` |
 | T3 | Extremo | ¿Preparo las pruebas de extremo a extremo con Playwright? | `Sí` · `No por ahora` |
-| T4 | BD pruebas | ¿Contra qué base de datos se ejecutan las pruebas? | `Base dedicada que ya existe (indica cuál)` · `Contenedor local de <base de datos>` · `Dejar pendiente` |
+| T4 | BD pruebas | ¿Contra qué base de datos se ejecutan las pruebas? | `Contenedor local de <base de datos>` · `Dejar pendiente` |
 
 T4 solo se plantea si la tabla "Base de datos de pruebas" está
-`[POR DEFINIR]` y el proyecto usa base de datos.
+`[POR DEFINIR]` y el proyecto usa base de datos. Una opción no admite texto:
+en la descripción de la primera, indica que una base dedicada ya existente
+se responde con la opción de escribir un valor propio y su nombre.
 
 ### Ronda 2: instalación
 
@@ -113,11 +117,12 @@ declara pendiente todo lo que dependía de ella.
    añade los plugins o dependencias de prueba al manifiesto.
 2. Configura cada herramienta elegida:
    - **Vitest:** bloque `test` en `vite.config.*` con `environment: "jsdom"`,
-     `setupFiles` e `include` limitado a la carpeta de las vistas
-     (`resources/js/` en Laravel). Si el plugin de Laravel interfiere,
-     `vitest.config.*` propio con el plugin de React y el mismo alias `@`.
-     El fichero de `setupFiles`, en `<vistas>/test/setup.*`, registra los
-     *matchers* de `jest-dom`.
+     `setupFiles` e `include` limitado a `<vistas>/tests/unit` y
+     `<vistas>/tests/integration`, donde `<vistas>` es `src/` en una SPA y
+     `resources/js/` en Laravel (`react/pruebas.md`). Si el plugin de
+     Laravel interfiere, `vitest.config.*` propio con el plugin de React y el
+     mismo alias `@`. El fichero de `setupFiles`, en
+     `<vistas>/tests/setup/setup.*`, registra los *matchers* de `jest-dom`.
    - **ESLint:** si no hay configuración, `eslint.config.js` con las reglas
      recomendadas de `react-hooks` y `jsx-a11y` sobre la carpeta de las
      vistas; si la hay, añade solo esos dos plugins. No ejecutes `--fix`
@@ -129,6 +134,10 @@ declara pendiente todo lo que dependía de ella.
      T4 sin credenciales; las credenciales, en variables de entorno o en un
      `.env.testing` fuera de Git que completa el usuario. En Spring Boot,
      Testcontainers o un perfil `test`.
+   - **Carpetas de pruebas:** `phpunit.xml` con los `testsuites` `Unit` e
+     `Integration` apuntando a `tests/Unit` y `tests/Integration`. En Java,
+     Surefire (unitarias) limitado a `**/unit/**` y Failsafe (integración y
+     e2e) a `**/integration/**` y `**/e2e/**`, dentro de `src/test/java/`.
    - **Playwright:** la configuración de la skill `e2e-testing`, si existe,
      y `playwright/.auth/`, `test-results/` y `playwright-report/` en
      `.gitignore`.
@@ -137,9 +146,10 @@ declara pendiente todo lo que dependía de ella.
 
 ## Fase 4: pruebas semilla
 
-Crea una prueba por cada tipo preparado que no tenga ya una. Como aún no hay
-un fichero vecino, lee antes las reglas del tipo en `.claude/rules/`
-(`comun/pruebas.md` y las del lenguaje, y las de `inertia/` si existen).
+Crea una prueba por cada tipo preparado que no tenga ya una, en su carpeta
+(`unit`, `integration` o `e2e`, según el tipo). Como aún no hay un fichero
+vecino, lee antes las reglas del tipo en `.claude/rules/` (`comun/pruebas.md`
+y las del lenguaje, y las de `inertia/` si existen).
 
 - Prueba comportamiento real del código existente: una página que se
   muestra, un componente que pinta su etiqueta o una ruta protegida que

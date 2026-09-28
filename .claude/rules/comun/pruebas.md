@@ -13,9 +13,9 @@ Los comandos están en [development.md](../../../.ai/project/development.md).
 Con OpenSpec, el orden de pruebas primero lo fija `openspec/config.yaml`.
 
 - Prueba comportamiento observable, límites, errores y permisos.
-- Elige el nivel según lo que se prueba: unitarias para la lógica aislada, de
-  integración para endpoints y acceso a datos, y de extremo a extremo solo
-  para los flujos críticos.
+- Tres carpetas de pruebas, con la ruta concreta de cada lenguaje en su
+  `pruebas.md`: `unit` para la lógica aislada, `integration` para endpoints
+  y acceso a datos, y `e2e` solo para los flujos críticos.
 - Un comportamiento por prueba, con estructura preparar-actuar-comprobar y un
   nombre que describa el caso.
 - Pruebas independientes y deterministas: sin estado compartido, sin esperas

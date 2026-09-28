@@ -3,7 +3,7 @@ context:
   template: laravel10
   declared:
     language: PHP 8.4
-    framework: Laravel 10 o superior
+    framework: Laravel 12 o superior
     server: Apache 2.4
     ci: GitLab CI
   database: Oracle 19c
@@ -40,6 +40,8 @@ context:
       routes: routes/
       migrations: database/migrations/
       tests: tests/
+      viewTests: resources/js/tests/
+      e2e: tests/e2e/
       config: config/
       views: resources/js/
       layouts: resources/views/

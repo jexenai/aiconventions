@@ -4,7 +4,8 @@ paths:
 ---
 # Inertia: pruebas
 
-- Una prueba de *feature* por página con `assertInertia`: comprueba el
+- Una prueba de integración por página, en `tests/Integration`, con
+  `assertInertia`: comprueba el
   componente, las props que pinta y que no viajan las que no debe.
 
 ```php

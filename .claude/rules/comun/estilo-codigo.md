@@ -22,13 +22,43 @@ pautas y sobre las de cada lenguaje.
   distingue si el problema es nuevo, previo o del entorno, y nunca la
   desactives para dar algo por bueno.
 
+## Organización
+
+La estructura de carpetas concreta de cada stack está en su `patrones.md`.
+
+- El dominio se agrupa por entidad, con la carpeta en plural
+  (`convocatorias/`).
+- En el backend, la lógica de dominio vive solo en los casos de uso y en el
+  validador de cada entidad. Controladores, modelos, mappers, DTO,
+  repositorios y el resto son auxiliares: no deciden reglas de negocio.
+- Un caso de uso por operación, con el formato
+  `Verbo+Entidad+PosibleDetalle` y sin sufijos como `Service`. En el backend
+  es una clase en `PascalCase`: `services/tramites/BuscarTramitePorIdentificador`,
+  `services/usuarios/CrearUsuario`,
+  `services/consejerias/BuscarConsejeriasConFiltros`. En React es una
+  función de API en `camelCase` (`crearUsuario`; ver `react/patrones.md`).
+- Cada caso de uso es breve y hace una sola cosa: así es reutilizable y un
+  humano lo entiende sin esfuerzo. Escríbelo con el vocabulario funcional
+  acordado (`architecture.md`), no con términos técnicos que el negocio no
+  usaría, y reutiliza otros casos de uso antes de repetir sus pasos.
+
+  > Aclaración: si `ejecutar` no cabe en una pantalla, es una señal de que
+  > conviene extraer un paso a otro caso de uso.
+
+- Las reglas de negocio de una entidad van en su validador
+  (`TramiteValidator`), en su propia carpeta, con un método público por
+  acción (`validarCreacion`, `validarModificacion`, `validarBorrado`). El
+  caso de uso no comprueba reglas: delega en el método correspondiente del
+  validador, justo antes de guardar, y se mantiene centrado en coordinar el
+  caso de uso. El formato de la entrada (obligatorios, longitudes,
+  patrones) se valida en el límite: contrato, petición o formulario.
+
 ## Diseño
 
 Escribe para que lo entienda sin esfuerzo un desarrollador senior de nivel
 medio, no uno avanzado.
 
-- Código explícito y lineal, y una responsabilidad por función. Organiza por
-  funcionalidad o dominio antes que por tipo técnico.
+- Código explícito y lineal, y una responsabilidad por función.
 - Nombres descriptivos completos (`jugadorActual`, no `ja` ni `flag`).
 - Nada de abstracciones especulativas ni «ingeniosas» que ahorran tres líneas
   y cuestan diez minutos de estudio, ni soluciones provisionales que haya que

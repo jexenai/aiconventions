@@ -60,9 +60,9 @@ $this->artisan('pedidos:caducar')
 ## Entorno
 
 - `phpunit.xml` con `BCRYPT_ROUNDS=4`, `QUEUE_CONNECTION=sync`,
-  `MAIL_MAILER=array` y la caché en `array` (`CACHE_DRIVER` en Laravel 10,
-  `CACHE_STORE` desde Laravel 11).
-- Una sola prueba: `php artisan test --filter=PedidoApiTest`.
+  `MAIL_MAILER=array` y `CACHE_STORE=array`.
+- Una sola prueba: `php artisan test --filter=PedidoApiTest`. Una carpeta:
+  `php artisan test tests/Integration`.
 - La conexión de pruebas es la de la tabla "Base de datos de pruebas" de
   `development.md`. Con Oracle, hacen falta la extensión `oci8` y el Instant
   Client en el equipo y en la imagen de CI; la skill `setup-testing` indica

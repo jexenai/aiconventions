@@ -8,6 +8,42 @@ paths:
 > formulario son de React 19. Úsalos solo si `package.json` tiene React 19 o
 > superior.
 
+## Carpetas
+
+Aplica a la SPA con API REST. Con Inertia, las páginas están donde fija
+`.claude/rules/inertia/patrones.md`, si existe, y la validación la hace el
+`FormRequest`.
+
+`<vistas>` es la carpeta de las vistas: `src/` en una SPA y `resources/js/`
+en Laravel. Cada entidad tiene su carpeta en plural y en `kebab-case`
+(`<vistas>/features/motivos-denegacion/`):
+
+| Carpeta | Contenido |
+| ------- | --------- |
+| `<vistas>/features/{entidades}/api` | Un caso de uso por operación, con el nombre `Verbo+Entidad+PosibleDetalle` en `camelCase` (`crearConvocatoria.ts`, `buscarConvocatoriasConFiltros.ts`) |
+| `<vistas>/features/{entidades}/hooks` | *Hooks* de la entidad (`useCrearConvocatoria`, `useConvocatorias`) |
+| `<vistas>/features/{entidades}/validator` | El validador de la entidad: una función por acción (`convocatoriaValidator.ts`, con `validarCreacion`, `validarModificacion`...) |
+| `<vistas>/features/{entidades}/components` | Componentes propios de la entidad |
+| `<vistas>/components`, `<vistas>/hooks` | Lo compartido por varias entidades |
+| `<vistas>/lib` | Cliente HTTP y sus interceptores |
+
+Crea estas solo cuando hagan falta: `<vistas>/auth` (sesión y usuario),
+`<vistas>/constants` (valores compartidos; los conjuntos cerrados, como uniones
+de literales o objetos `as const`), `<vistas>/types` (tipos compartidos por
+varias entidades) y guardas de ruta junto al *router*.
+
+- Los *hooks* y módulos con lógica que no es de presentación van en la
+  carpeta de su entidad.
+- Cada caso de uso es breve y hace una sola cosa, con el vocabulario
+  funcional del dominio (`comun/estilo-codigo.md`).
+- El validador de la entidad expone una función por acción
+  (`validarCreacion`, `validarModificacion`, `validarBorrado`), que recibe
+  los datos del formulario y devuelve los errores por campo, componiendo
+  comprobaciones privadas reutilizables cuando haga falta. Se llama al
+  enviar, justo antes del caso de uso de API. Adelanta las reglas para el
+  usuario, pero no sustituye la validación del backend.
+- Las funciones de API y sus tipos siguen el contrato OpenAPI, si existe.
+
 ## *Hooks*
 
 - Solo en el nivel superior del componente o de otro *hook*: nunca en
@@ -28,7 +64,8 @@ paths:
 - Con Inertia, los datos del servidor llegan como props de la página: sigue
   `.claude/rules/inertia/patrones.md`, si existe. Con una API REST, si el
   proyecto usa una librería de datos (TanStack Query, SWR), úsala en lugar de
-  `fetch` dentro de `useEffect`, y las llamadas HTTP van en un módulo de API.
+  `fetch` dentro de `useEffect`, y las llamadas HTTP van en la carpeta `api`
+  de su entidad.
 - Contempla los estados de carga, error y vacío.
 
 ## Composición y rendimiento

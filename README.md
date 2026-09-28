@@ -35,7 +35,8 @@ Estos archivos aplican controles que no dependen de que el modelo obedezca:
 
 | Herramienta | Archivo | Control |
 | ----------- | ------- | ------- |
-| Claude Code | `.claude/settings.json` | Bloquea leer y editar `.env` y `.env.prod*`, editar `.env.local` y `.env.*.local`, y leer claves y certificados; pide confirmación antes de `git push` y de las migraciones y los comandos `db:` de Artisan |
+| Claude Code | `.claude/settings.json` | Bloquea leer y editar `.env.prod*`, editar `.env`, `.env.local` y `.env.*.local`, y leer claves y certificados (el `.env` local sí puede leerse); pide confirmación antes de `git push` y de las migraciones y los comandos `db:` de Artisan |
+| Claude Code | `.claude/hooks/revisor-solo-lectura.sh` | Los revisores solo pueden ejecutar lecturas de Git, comprobaciones estáticas y auditorías de dependencias; nunca pruebas ni comandos que escriban |
 | Codex | `.codex/config.toml` | Limita la escritura al repositorio, desactiva la red y pide aprobación para salir del sandbox |
 
 Codex no permite bloquear la lectura de archivos concretos. La regla de
@@ -69,7 +70,8 @@ Quien quiera la memoria para sí puede reactivarla en su
    `$setup-project-context` en Codex. Las skills de setup solo se ejecutan al
    invocarlas: el agente no las lanza por su cuenta. Si el proyecto no tiene
    repositorio Git o no tiene commits, el setup lo inicializa y crea el commit
-   inicial antes de empezar.
+   inicial antes de empezar. Si está dentro de otro repositorio (un
+   monorepo), trabaja sobre ese y no crea uno anidado.
 3. Responde a las tres rondas de preguntas del guion: ficha, ejecución y
    OpenSpec. Son siempre las mismas nueve preguntas, también al repetir el
    setup; cuando un dato ya está resuelto, la pregunta lo propone como
@@ -132,7 +134,8 @@ orden de pruebas primero en cada cambio.
 | `react-reviewer` | React con Vite, también las páginas de Inertia |
 | `security-reviewer` | Seguridad de cualquiera de los anteriores |
 
-Solo informan; las correcciones las hace la conversación principal. Claude
+Solo informan; las correcciones las hace la conversación principal. Tampoco
+ejecutan pruebas: Claude las ejecuta antes y les pasa el resultado. Claude
 te propone pasarlos en los momentos que fija la sección "Entrega" de
 [development.md](.ai/project/development.md), que es la única fuente de esa
 política. También puedes pedirlos directamente sobre un cambio de OpenSpec,

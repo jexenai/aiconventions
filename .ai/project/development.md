@@ -52,8 +52,9 @@ ejecutes y avisa al usuario.
 ## Convenciones propias del proyecto
 
 Registra solo las decisiones de este proyecto que no estén en las reglas
-comunes ni en las de su lenguaje, o que las contradigan: por ejemplo, la
-estructura de paquetes, una librería obligatoria, qué puntos deben ampliarse
+comunes ni en las de su lenguaje, o que las contradigan: por ejemplo, una
+desviación de la estructura de carpetas que fija el `patrones.md` de su
+lenguaje, una librería obligatoria, qué puntos deben ampliarse
 solo con datos o configuración, sin tocar código existente, o una excepción
 justificada a una regla.
 
@@ -65,9 +66,9 @@ justificada a una regla.
 
 Aplica si el proyecto expone una API REST. Estas decisiones prevalecen sobre
 la guía general de `.claude/skills/api-design/SKILL.md`. Si hay un contrato
-OpenAPI, antes de cambiar la forma de una petición o una respuesta lee
-`.claude/skills/contract-first/SKILL.md`, si existe: el contrato cambia
-antes que el código.
+OpenAPI, se actualiza antes de crear o cambiar una operación, y el código se
+implementa después. Si además lo consume una SPA, lee antes
+`.claude/skills/contract-first/SKILL.md`, si existe.
 
 | Decisión | Valor |
 | -------- | ----- |
@@ -117,9 +118,10 @@ igualmente ese orden y avisa al usuario.
   Si el cambio cruza backend y vistas, propón el revisor de cada parte.
   Propón `security-reviewer` si el cambio toca autenticación, autorización,
   entrada de usuario, endpoints, consultas, ficheros subidos, secretos o
-  dependencias. Si elige varios, lánzalos en paralelo y pasa a cada uno el
-  resultado de las pruebas ya ejecutadas sobre el mismo árbol, para que no las
-  repitan.
+  dependencias. Los revisores no ejecutan pruebas (un hook se lo impide):
+  antes de lanzarlos, ejecuta las pruebas del área afectada, respetando la
+  "Base de datos de pruebas", y pasa a cada uno el resultado sobre el mismo
+  árbol. Si elige varios, lánzalos en paralelo.
 - Corrige los hallazgos CRÍTICO y ALTO antes de entregar o archivar. Si
   alguno queda sin corregir, expón por qué y hazlo solo con la conformidad
   explícita del usuario.

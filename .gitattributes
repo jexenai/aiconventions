@@ -1,0 +1,2 @@
+# Los scripts de hooks los ejecuta bash: con CRLF fallarían en Windows.
+*.sh text eol=lf

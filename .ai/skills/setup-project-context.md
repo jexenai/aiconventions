@@ -43,13 +43,19 @@ Hazla siempre antes de leer o editar nada. Las fases siguientes usan Git para
 distinguir la plantilla de los cambios locales, y la retirada de stacks no
 puede decidir sin una línea base.
 
-1. Ejecuta `git rev-parse --show-toplevel` en la raíz del proyecto. Si falla,
-   o si devuelve otra carpeta (el proyecto está dentro de otro repositorio),
-   ejecuta `git init` en la raíz del proyecto. No cambies la configuración de
-   Git ni la identidad del usuario.
-2. Si el repositorio no tiene commits (`git rev-parse --verify HEAD` falla),
-   crea el commit inicial con el estado actual, antes de cualquier cambio de
-   este procedimiento:
+1. Ejecuta `git rev-parse --show-toplevel` en la raíz del proyecto:
+   - Si falla, no hay repositorio: ejecuta `git init` en la raíz del
+     proyecto. No cambies la configuración de Git ni la identidad del
+     usuario.
+   - Si devuelve otra carpeta, el proyecto está dentro de otro repositorio
+     (por ejemplo, un monorepo): trabaja sobre ese repositorio y no
+     ejecutes `git init`, porque un repositorio anidado lo ocultaría al
+     padre. Si ese repositorio no tiene commits, detente e infórmalo: su
+     commit inicial abarca más que este proyecto y no lo decide este
+     procedimiento.
+2. Si el repositorio es el del proyecto y no tiene commits
+   (`git rev-parse --verify HEAD` falla), crea el commit inicial con el
+   estado actual, antes de cualquier cambio de este procedimiento:
    1. Revisa `git status --short --untracked-files=all` y comprueba que
       `.gitignore` excluye los ficheros de entorno, secretos, dependencias
       descargadas y resultados de compilación que aparezcan.
@@ -186,7 +192,8 @@ Continúa con la ronda siguiente.
 
 Aplica las respuestas y la clasificación de la fase 2:
 
-- `AGENTS.md`: ficha del proyecto con las respuestas de P1 a P8. La fila
+- `AGENTS.md`: ficha del proyecto con las respuestas de P1 a P6 y P8. La
+  ficha no tiene fila de base de datos: P7 va a `architecture.md`. La fila
   `Especificaciones` se resuelve en la fase 5.
 - `architecture.md`: alcance, componentes, mapa, dominio, decisiones de
   arquitectura y seguridad del sistema, con la persistencia de P7.
@@ -255,7 +262,8 @@ Termina siempre con un informe con estas secciones, en este orden:
 8. **Comprobaciones:** comprobaciones ejecutadas y limitaciones de la revisión,
    incluida la versión de Claude Code de la fase 1. Si es anterior a 2.1.271
    o no se pudo obtener, recomienda actualizarla antes de usar los revisores.
-   Indica también si la fase 0 creó el repositorio o el commit inicial.
+   Indica también si la fase 0 creó el repositorio o el commit inicial, o
+   si el proyecto está dentro de otro repositorio.
 
 ## Usar el stack declarado
 

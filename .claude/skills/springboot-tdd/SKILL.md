@@ -1,51 +1,75 @@
 ---
 name: springboot-tdd
-description: Pruebas en Spring Boot 3 y 4 con JUnit 5, Mockito, MockMvc, spring-security-test y Testcontainers, con ejemplos por capa. Úsala al escribir o corregir pruebas de servicios, controladores o repositorios, o al implementar una funcionalidad con pruebas primero.
+description: Pruebas en Spring Boot 3 y 4 con JUnit 5, Hamcrest, Mockito, MockMvc, spring-security-test y Testcontainers, con ejemplos por capa. Úsala al escribir o corregir pruebas de casos de uso, validadores, controladores o repositorios, o al implementar una funcionalidad con pruebas primero.
 disable-model-invocation: true
 ---
 
 # Pruebas en Spring Boot
 
-Complementa `.claude/rules/java/pruebas.md`, que fija herramientas, niveles y
-nombres. Con OpenSpec, el orden de pruebas primero lo fija
-`openspec/config.yaml`.
+Complementa `.claude/rules/java/pruebas.md`, que fija herramientas, carpetas
+(`unit`, `integration`, `e2e`) y nombres. Con OpenSpec, el orden de pruebas
+primero lo fija `openspec/config.yaml`.
 
-## Servicio (unitaria)
+## Caso de uso y validador (unitarias)
 
 ```java
 @ExtendWith(MockitoExtension.class)
-class PedidoServiceTest {
+class CancelarPedidoTest {
 
   @Mock PedidoRepository repositorio;
-  @InjectMocks PedidoService servicio;
+  @Mock PedidoValidator pedidoValidator;
+  @InjectMocks CancelarPedido cancelarPedido;
 
   @Test
-  void cancelar_pedidoEnviado_lanzaExcepcion() {
-    when(repositorio.findById(1L)).thenReturn(Optional.of(pedidoEnEstado(ENVIADO)));
+  void pedidoNoCancelable_noGuarda() {
+    Pedido pedido = pedidoEnEstado(ENVIADO);
+    when(repositorio.findById(1L)).thenReturn(Optional.of(pedido));
+    doThrow(new PedidoNoCancelableException(1L))
+        .when(pedidoValidator).validarCancelacion(pedido);
 
-    assertThatThrownBy(() -> servicio.cancelar(1L))
-        .isInstanceOf(PedidoNoCancelableException.class);
+    assertThrows(PedidoNoCancelableException.class, () -> cancelarPedido.ejecutar(1L));
     verify(repositorio, never()).save(any());
+  }
+}
+
+@ExtendWith(MockitoExtension.class)
+class PedidoValidatorTest {
+
+  @InjectMocks PedidoValidator pedidoValidator;
+
+  @Test
+  void pedidoEnviado_lanzaExcepcion() {
+    PedidoNoCancelableException excepcion = assertThrows(PedidoNoCancelableException.class,
+        () -> pedidoValidator.validarCancelacion(pedidoEnEstado(ENVIADO)));
+
+    assertThat(excepcion.getMessage(), containsString("ya ha sido enviado"));
   }
 }
 ```
 
+- Cada regla se prueba en el método del validador que la aplica
+  (`validarCancelacion`, `validarModificacion`...), no en el caso de uso. En
+  el caso de uso basta comprobar que llama al validador antes de guardar y
+  que no guarda si este lanza la excepción.
+
 ## Controlador
 
 ```java
-@WebMvcTest(PedidoController.class)
-class PedidoControllerTest {
+@WebMvcTest(PedidosController.class)
+class PedidosControllerTest {
 
   @Autowired MockMvc mvc;
-  @MockitoBean PedidoService servicio;
+  @MockitoBean CrearPedido crearPedido;
+  @MockitoBean ListarPedidos listarPedidos;
 
   @Test
   @WithMockUser
-  void crear_sinReferencia_devuelve400() throws Exception {
+  void crear_sinReferencia_devuelve422() throws Exception {
     mvc.perform(post("/pedidos").with(csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content("{\"referencia\":\"\"}"))
-        .andExpect(status().isBadRequest());
+        .andExpect(status().isUnprocessableEntity())
+        .andExpect(jsonPath("$.errors").exists());   // forma: "Formato de error" de development.md
   }
 
   @Test
@@ -59,7 +83,8 @@ class PedidoControllerTest {
   propios (por ejemplo, `spring-boot-webmvc-test`): si no resuelve el
   import, falta la dependencia de ese módulo.
 - Con JWT: `.with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))`.
-- Comprueba el cuerpo con `jsonPath` y cubre 400, 401, 403 y 404 además del
+- Comprueba el cuerpo con `jsonPath` y cubre 422 (validación), 400 (JSON
+  mal formado), 401, 403 y 404 además del
   caso correcto.
 
 ## Repositorio e integración con Testcontainers
@@ -95,5 +120,5 @@ defecto válidos, y en cada prueba solo los campos que importan para el caso.
 
 ## Comandos
 
-Usa los de `development.md`. Una sola clase: `mvn test -Dtest=PedidoServiceTest`
-o `./gradlew test --tests PedidoServiceTest`.
+Usa los de `development.md`. Una sola clase: `mvn test -Dtest=CancelarPedidoTest`
+o `./gradlew test --tests CancelarPedidoTest`.

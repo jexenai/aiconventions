@@ -7,13 +7,14 @@ disable-model-invocation: true
 # Pruebas en React
 
 Complementa `.claude/rules/react/pruebas.md`, que fija herramientas,
-prioridad de consultas, `userEvent` y la regla de no usar *snapshots*. Con
-OpenSpec, el orden de pruebas primero lo fija `openspec/config.yaml`.
+carpetas (`unit`, `integration`, `e2e`), prioridad de consultas, `userEvent`
+y la regla de no usar *snapshots*. Con OpenSpec, el orden de pruebas
+primero lo fija `openspec/config.yaml`.
 
 ## Red simulada con MSW
 
 ```ts
-// src/test/servidor.ts
+// src/tests/setup/servidor.ts (en Laravel, resources/js/tests/setup/)
 import { setupServer } from "msw/node";
 import { http, HttpResponse } from "msw";
 
@@ -21,7 +22,7 @@ export const servidor = setupServer(
   http.get("/pedidos", () => HttpResponse.json({ data: [] })),
 );
 
-// src/test/setup.ts (setupFiles de Vitest)
+// src/tests/setup/setup.ts (setupFiles de Vitest)
 beforeAll(() => servidor.listen({ onUnhandledRequest: "error" }));
 afterEach(() => servidor.resetHandlers());
 afterAll(() => servidor.close());
@@ -33,7 +34,7 @@ afterAll(() => servidor.close());
 ## Proveedores
 
 ```tsx
-// src/test/render.tsx
+// src/tests/setup/render.tsx
 export function renderConProveedores(ui: React.ReactElement, { ruta = "/" } = {}) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
@@ -45,7 +46,9 @@ export function renderConProveedores(ui: React.ReactElement, { ruta = "/" } = {}
 ```
 
 - Los mismos proveedores que en producción; no simules los *hooks* de las
-  librerías.
+  librerías. Excepción: una página de Inertia no se monta sin su contexto;
+  simula `@inertiajs/react` (`usePage`, `useForm`, `Link`, `Head`) y pasa
+  las props directamente, como en la prueba semilla de `setup-testing`.
 
 ## Ejemplo completo
 
@@ -104,4 +107,4 @@ usuario, usa Playwright.
 ## Comandos
 
 Usa los de `development.md`. Una sola prueba:
-`npx vitest run src/pedidos/FormularioPedido.test.tsx`.
+`npx vitest run src/tests/integration/FormularioPedido.test.tsx`.

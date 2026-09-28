@@ -21,7 +21,8 @@ context:
     paths:
       code: src/
       static: public/
-      tests: src/
+      tests: src/tests/
+      e2e: tests/e2e/
       config: vite.config.ts
       ci: .gitlab-ci.yml
     generated:

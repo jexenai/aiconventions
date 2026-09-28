@@ -6,7 +6,10 @@ paths:
 ---
 # Java: Oracle 19c
 
-- Identificadores con `GenerationType.SEQUENCE` y una secuencia explícita.
+- Identificadores con `@GeneratedValue(strategy = GenerationType.SEQUENCE)`,
+  sin `@SequenceGenerator`: Hibernate usa la secuencia `{tabla}_seq` con un
+  `allocationSize` de 50, así que la migración la crea con
+  `INCREMENT BY 50`. Si no coinciden, se generan identificadores duplicados.
 - Oracle 19c no tiene tipo `BOOLEAN` en SQL: mapea a `NUMBER(1)` o
   `CHAR(1)` con un convertidor.
 - Una lista `IN` admite como máximo 1000 elementos (ORA-01795): divide la

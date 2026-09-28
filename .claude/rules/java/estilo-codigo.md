@@ -14,8 +14,11 @@ paths:
 - Formateo y análisis con Spotless y Checkstyle si están configurados.
 - Clases, records y enums en `PascalCase`; métodos y campos en `camelCase`;
   constantes en `UPPER_SNAKE_CASE`; paquetes en minúsculas. Sufijos por rol
-  (`*Controller`, `*Service`, `*Repository`, `*Mapper`, `*Exception`) y una
-  clase pública por fichero.
+  (`*Controller`, `*Repository`, `*Mapper`, `*Exception`, `*Interceptor`,
+  `*Validator`) y una clase pública por fichero. Los casos de uso no llevan
+  sufijo: se nombran con `Verbo+Entidad+PosibleDetalle`
+  (`CrearConvocatoria`, `BuscarConvocatoriaPorIdentificador`; ver
+  `patrones.md`).
 - Campos `final` por defecto; sin *setters* salvo en entidades JPA.
 - Colecciones vacías en lugar de `null`. `Optional` solo como retorno, nunca
   en campos ni parámetros, y sin `get()`: usa `orElseThrow()`, `map()` u

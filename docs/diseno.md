@@ -63,8 +63,21 @@ Los agentes no lo leen durante su trabajo.
 - En un cambio de OpenSpec leen las especificaciones delta: cada escenario
   debe tener una prueba que lo nombre y compruebe su *Then*. Un escenario sin
   prueba es un hallazgo ALTO.
-- Reciben el resultado de las pruebas ya ejecutadas sobre el mismo árbol y no
-  las repiten; así, varios revisores en paralelo no se pisan.
+- No ejecutan pruebas: las ejecuta la conversación principal, que conoce la
+  "Base de datos de pruebas", y les pasa el resultado sobre el mismo árbol.
+  Así ningún revisor reinicia una base de datos y varios en paralelo no se
+  pisan.
+- Lo que pueden ejecutar no depende del prompt: un hook `PreToolUse` en su
+  frontmatter (`.claude/hooks/revisor-solo-lectura.sh`) solo deja pasar
+  lecturas de Git, comprobaciones estáticas (compilación, formato en modo
+  comprobación, lint, tipos, análisis) y auditorías de dependencias, y
+  bloquea todo lo demás, incluido lo que no reconoce. Si el proyecto usa
+  otro comando de comprobación, añádelo a la lista del script. Necesita
+  `bash` (en Windows, Git Bash).
+- Su bloque «Además de las reglas» solo contiene lo que las reglas no
+  cubren (concurrencia, flujos con estado, entrada peligrosa, escenarios).
+  La arquitectura y el estilo los comprueban leyendo las reglas: no los
+  repitas en los revisores.
 - Usan las reglas de `.claude/rules/` como lista de comprobación. Algunos
   leen además una skill cuando el alcance lo requiere: `java-reviewer`,
   `jpa-patterns`; `react-reviewer`, `frontend-a11y`; `java-reviewer` y
@@ -85,7 +98,8 @@ formas:
   seguridad, la autenticación o la subida de ficheros, `api-design` al crear
   o cambiar un endpoint, `jpa-patterns` al crear o cambiar una entidad, un
   repositorio o una consulta, `openapi-mapstruct` al crear o cambiar un
-  mapper, `springboot-tdd` antes de escribir o corregir una prueba de Java,
+  mapper, `springboot-tdd`, `laravel-tdd` y `react-testing` antes de
+  escribir o corregir una prueba de su stack,
   `e2e-testing` al escribir pruebas de Playwright y `contract-first` antes
   de cambiar el contrato de la API.
   La lectura funciona aunque la skill no sea invocable por el modelo.
@@ -96,9 +110,9 @@ formas:
 | ----- | ---------------- |
 | `comun/estilo-codigo.md` | Cualquier fichero de código de los stacks (`.java`, `.php`, `.js`, `.jsx`, `.ts`, `.tsx`) |
 | `comun/seguridad.md` | Solo backend: `.java`, `.php` y `.sql` |
-| `comun/pruebas.md` y `<lenguaje>/pruebas.md` | Solo ficheros de prueba: `tests/**/*.php`, `phpunit.xml`, `src/test/**/*.java`, `*.test.*`, `*.spec.*`, `__tests__/` y la configuración de Vitest o Playwright |
+| `comun/pruebas.md` y `<lenguaje>/pruebas.md` | Solo ficheros de prueba: `tests/**/*.php`, `phpunit.xml`, `src/test/**/*.java`, `*.test.*`, `*.spec.*` y `__tests__/`. La configuración de Vitest o Playwright solo carga `react/pruebas.md` |
 | `<lenguaje>/estilo-codigo.md`, `patrones.md` y `seguridad.md`, y `java/datos.md` | Cualquier fichero de su lenguaje (`java/seguridad.md` también `application*.yml`/`.properties`) |
-| `java/oracle.md` y `php/oracle.md` | Cualquier fichero de su lenguaje y `.sql`. El setup las retira si la base de datos no es Oracle |
+| `java/oracle.md` y `php/oracle.md` | Cualquier fichero de su lenguaje y `.sql` (`java/oracle.md`, también `db/migration/` y `db/changelog/`). El setup las retira si la base de datos no es Oracle |
 | `java/despliegue.md` | Solo `pom.xml`, `build.gradle`, `weblogic.xml`, `jboss-deployment-structure.xml`, la clase `*Application` y `application*.yml` |
 | `inertia/patrones.md` | Páginas de `resources/js/Pages/`, controladores, `HandleInertiaRequests` y `routes/web.php`. El setup la retira si las vistas no usan Inertia |
 | `inertia/seguridad.md` | Controladores y `HandleInertiaRequests` |

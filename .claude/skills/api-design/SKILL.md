@@ -21,6 +21,12 @@ implementar.
   servidor como contexto del despliegue. En Laravel, `routes/api.php` añade
   `/api` por defecto: quítalo con `apiPrefix: ''` en `withRouting()` de
   `bootstrap/app.php`.
+- Excepción: si la API comparte origen con páginas servidas por la misma
+  aplicación (páginas de Inertia, una SPA servida por Laravel con una ruta
+  comodín en `routes/web.php` o una SPA en `static/` del mismo WAR), sus
+  rutas chocarían con las de las páginas (`GET /pedidos` sería a la vez la
+  pantalla y el listado JSON). En ese caso, mantén un prefijo (`/api`), sin
+  versión, y regístralo en la sección "API" de `development.md`.
 - Ningún recurso puede llamarse como una ruta técnica de la raíz (contrato
   OpenAPI, Swagger UI, Actuator).
 - Recursos en plural, minúsculas y `kebab-case`: `/pedidos`,
@@ -74,6 +80,9 @@ pueda interpretar y, en validación, el detalle por campo.
 - **Spring Boot:** `ProblemDetail` (RFC 9457), activado con
   `spring.mvc.problemdetails.enabled=true` y ampliado en el
   `@RestControllerAdvice` con un campo `code` y, en validación, `errors`.
+  Spring responde 400 por defecto cuando falla `@Valid`: el advice traduce
+  `MethodArgumentNotValidException` a 422, igual que Laravel, y deja el 400
+  para el JSON mal formado (`HttpMessageNotReadableException`).
 - **Laravel:** el formato por defecto (`message` y `errors` por campo) para
   422; para el resto, personalízalo en el manejador de excepciones si el
   proyecto necesita un `code` estable.

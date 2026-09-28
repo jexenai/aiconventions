@@ -17,8 +17,10 @@ paths:
 
 - Nombres de Laravel: clases en `PascalCase`, métodos y variables en
   `camelCase`, modelos en singular (`Pedido`) y tablas en plural
-  `snake_case` (`pedidos`). Sufijos `*Controller`, `*Request`, `*Resource` y
-  `*Policy`.
+  `snake_case` (`pedidos`). Sufijos `*Controller`, `*Request`, `*Resource`,
+  `*Policy` y `*Validator`. Los casos de uso no llevan sufijo: se nombran
+  con `Verbo+Entidad+PosibleDetalle` (`CrearConvocatoria`,
+  `BuscarConvocatoriaPorIdentificador`; ver `patrones.md`).
 - Sin `dd()`, `dump()`, `var_dump()` ni `die()`.
 - Lo no previsto lo gestiona el manejador de excepciones de Laravel; no lo
   captures en cada controlador.

@@ -1,6 +1,6 @@
 ---
 name: laravel-security
-description: Seguridad en Laravel 10 o superior - Sanctum (SPA y tokens), sesión, policies, validación, CSRF, CORS, cabeceras, límite de peticiones, ficheros, colas y registro de eventos de seguridad. Úsala al añadir o cambiar autenticación, autorización, endpoints expuestos o configuración de producción.
+description: Seguridad en Laravel 12 o superior - Sanctum (SPA y tokens), sesión, policies, validación, CSRF, CORS, cabeceras, límite de peticiones, ficheros, colas y registro de eventos de seguridad. Úsala al añadir o cambiar autenticación, autorización, endpoints expuestos o configuración de producción.
 disable-model-invocation: true
 ---
 
@@ -9,10 +9,9 @@ disable-model-invocation: true
 Complementa `.claude/rules/comun/seguridad.md` y
 `.claude/rules/php/seguridad.md`. Aquí va cómo se configura.
 
-> Aclaración: en Laravel 10 el *middleware* y los límites se registran en
-> `app/Http/Kernel.php` y `RouteServiceProvider`; desde Laravel 11, en
-> `bootstrap/app.php` y `AppServiceProvider`. Comprueba la versión en
-> `composer.json`.
+> Aclaración: el *middleware* se registra en `bootstrap/app.php` y los
+> límites de peticiones, en `AppServiceProvider`. No existen
+> `app/Http/Kernel.php` ni `RouteServiceProvider`.
 
 ## Autenticación con Sanctum
 

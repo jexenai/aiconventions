@@ -7,18 +7,23 @@ disable-model-invocation: true
 # Patrones de JPA
 
 Complementa `.claude/rules/java/patrones.md`, que ya fija relaciones `LAZY`,
-`JOIN FETCH`, paginación y las restricciones de Oracle 19c. Aquí va el detalle.
+`JOIN FETCH` y paginación, y `.claude/rules/java/oracle.md`, si existe, con
+las restricciones de Oracle 19c. Aquí va el detalle.
 
 ## Entidades
 
 ```java
+// Tabla pedido, secuencia pedido_seq y columna cliente_id, por convención.
 @Entity
-@Table(name = "PEDIDOS")
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Pedido {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pedidos_seq")
-  @SequenceGenerator(name = "pedidos_seq", sequenceName = "PEDIDOS_SEQ", allocationSize = 50)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE)
   private Long id;
 
   @Version
@@ -32,13 +37,37 @@ public class Pedido {
   private EstadoPedido estado;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "CLIENTE_ID")
   private Cliente cliente;
+
+  // Las líneas no existen sin su pedido: cascada y orphanRemoval (patrones.md).
+  @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
+  @Builder.Default
+  private List<LineaPedido> lineas = new ArrayList<>();
+
+  private LocalDateTime creadoEn;
+  private LocalDateTime actualizadoEn;
+
+  @PrePersist
+  void alCrear() {
+    creadoEn = LocalDateTime.now();
+    actualizadoEn = creadoEn;
+  }
+
+  @PreUpdate
+  void alActualizar() {
+    actualizadoEn = LocalDateTime.now();
+  }
 }
 ```
 
-- `allocationSize` igual al `INCREMENT BY` de la secuencia en Oracle; si no
-  coinciden, se generan identificadores duplicados o con huecos inesperados.
+- Los nombres físicos los deriva Spring Boot
+  (`CamelCaseToUnderscoresNamingStrategy`): la clase `LineaPedido` va a la
+  tabla `linea_pedido`, el campo `fechaEntrega` a `fecha_entrega` y la
+  relación `cliente` a `cliente_id`. No los fijes con `@Table`, `name` ni
+  `@SequenceGenerator`; la migración usa esos mismos nombres.
+- La secuencia por defecto es `{tabla}_seq` con un `allocationSize` de 50:
+  créala con `INCREMENT BY 50`. Si no coinciden, se generan identificadores
+  duplicados o con huecos inesperados.
 - `@Version` para bloqueo optimista en entidades que se editan de forma
   concurrente; traduce `OptimisticLockException` a 409 en el manejador
   centralizado.
@@ -46,6 +75,23 @@ public class Pedido {
 - `equals()` y `hashCode()` basados en el identificador de negocio o en el
   `id` con clase constante; nunca en todas las columnas ni en relaciones.
 - `@ManyToOne` es `EAGER` por defecto en JPA: decláralo `LAZY` siempre.
+
+## Auditoría
+
+- `creadoEn` y `actualizadoEn` en toda entidad, y `borradoEn` si admite baja
+  lógica, los tres `LocalDateTime`, con columnas `creado_en`,
+  `actualizado_en` y `borrado_en` por convención.
+- Los rellenan `@PrePersist` y `@PreUpdate` de la propia entidad; nunca se
+  fijan a mano desde el caso de uso.
+- `@JsonIgnore` en los tres si la entidad llega a serializarse fuera del
+  mapper (por ejemplo, en un log); con MapStruct y DTO del contrato
+  (`datos.md`), la entidad nunca sale directamente, así que no suele hacer
+  falta.
+- Con baja lógica, las consultas de listado excluyen `borradoEn IS NOT NULL`
+  (`@SQLRestriction` de Hibernate, que sustituye al `@Where` obsoleto, o la
+  condición en el repositorio); la de detalle
+  por identificador puede incluir los borrados si el caso de uso lo pide
+  explícitamente.
 
 ## Consultas
 

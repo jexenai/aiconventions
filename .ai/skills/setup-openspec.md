@@ -39,8 +39,9 @@ texto libre ni añadas otras preguntas.
 | O2 | Instalación | ¿Ejecuto la instalación y la inicialización? | `Ejecutar <comandos>` · `Cancelar y dejar pendiente` |
 
 P9 es la misma pregunta que la ronda 3 de `setup-project-context`: si llegas
-desde allí con la respuesta `Sí, instalarlo ahora`, no la repitas. O1 y O2 se
-plantean juntas en una sola ronda. Ninguna opción lleva `(Recomendado)`,
+desde allí con la respuesta `Sí, instalarlo ahora`, no la repitas. O1 y O2 van
+en dos rondas seguidas: los comandos de O2 dependen de las herramientas
+elegidas en O1. Ninguna opción lleva `(Recomendado)`,
 salvo en O1 las herramientas cuya configuración ya exista en el repositorio
 (`.claude/` o `.agents/`).
 
@@ -69,10 +70,10 @@ Si una ronda no obtiene respuesta, no vuelvas a preguntar: conserva
 1. Consulta la documentación oficial vigente para el comando de instalación e
    inicialización y sus opciones. No des por fijos los nombres de los flags:
    compruébalos antes de ejecutarlos.
-2. Plantea O1 y O2 en una sola ronda. En la descripción de O2 indica los
-   comandos exactos, el gestor de paquetes, el ámbito de la instalación y que
-   requiere acceso a red. Si el usuario cancela, aplica el paso 4 de
-   [Decidir](#decidir).
+2. Plantea O1. Con sus herramientas, prepara los comandos y plantea O2 en
+   una segunda ronda; en su descripción indica los comandos exactos, el
+   gestor de paquetes, el ámbito de la instalación y que requiere acceso a
+   red. Si el usuario cancela, aplica el paso 4 de [Decidir](#decidir).
 3. Ejecuta la inicialización en la raíz indicando de forma no interactiva
    solo las herramientas elegidas en O1, porque el modo interactivo puede
    bloquearse en un entorno sin terminal.
@@ -90,6 +91,17 @@ Si una ronda no obtiene respuesta, no vuelvas a preguntar: conserva
      Las reglas comunes están en AGENTS.md.
      La documentación estable está en .ai/project/.
      Lee solo el contexto y los artefactos necesarios para el cambio.
+     Redacta las especificaciones y los cambios en español de España.
+     Al recibir una petición con varios requisitos, identifica las capacidades
+     que puedan especificarse, implementarse y revisarse de forma
+     independiente y crea un cambio OpenSpec por cada una. Cada cambio debe
+     tener su propia carpeta en openspec/changes/, una propuesta, deltas y
+     tareas limitados a un objetivo cohesionado y un resultado concreto y
+     comprobable. No representes varias capacidades independientes como
+     hitos o bloques de tareas dentro de un único cambio. Agrúpalas solo
+     cuando no puedan entregarse, revisarse o mantenerse de forma
+     independiente; en ese caso, documenta la dependencia que obliga a
+     tratarlas como un único cambio.
 
    rules:
      specs:
@@ -98,6 +110,12 @@ Si una ronda no obtiene respuesta, no vuelvas a preguntar: conserva
        - Toda tarea que cambie comportamiento empieza por la prueba del
          escenario que cubre, y esa prueba debe fallar antes de implementar.
        - Indica en la tarea qué escenario del delta cubre.
+       - Limita las tareas a la capacidad definida por el cambio. Si aparecen
+         varias capacidades independientes, crea cambios OpenSpec separados
+         en lugar de convertirlas en hitos del mismo cambio.
+       - Divide las tareas de un mismo cambio en pasos concretos y
+         secuenciales; indica las dependencias con otros cambios cuando
+         existan.
 
    operations:
      apply:

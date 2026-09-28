@@ -1693,7 +1693,7 @@ paths:
               <td>Código PHP de producción: todo menos pruebas. <code>php/oracle</code> entra con cualquier <code>.php</code> porque el proyecto usa Oracle; en otro proyecto, el setup la habría retirado</td>
             </tr>
             <tr>
-              <td><code>tests/Feature/AltaClienteTest.php</code></td>
+              <td><code>tests/Integration/AltaClienteTest.php</code></td>
               <td>Las anteriores más <code>comun/pruebas</code> <code>php/pruebas</code></td>
               <td>Está en <code>tests/</code>: es una prueba</td>
             </tr>
@@ -1703,12 +1703,12 @@ paths:
               <td>Configura las pruebas; no es código</td>
             </tr>
             <tr>
-              <td><code>resources/js/clientes/AltaClienteForm.tsx</code></td>
+              <td><code>resources/js/features/clientes/components/AltaClienteForm.tsx</code></td>
               <td><code>comun/estilo-codigo</code> <code>react/estilo-codigo</code> <code>react/patrones</code> <code>react/seguridad</code></td>
               <td>Componente React; la seguridad común es de backend</td>
             </tr>
             <tr>
-              <td><code>resources/js/clientes/AltaClienteForm.test.tsx</code></td>
+              <td><code>resources/js/tests/integration/AltaClienteForm.test.tsx</code></td>
               <td>Las anteriores más <code>comun/pruebas</code> <code>react/pruebas</code></td>
               <td>Termina en <code>.test.tsx</code></td>
             </tr>
@@ -1868,7 +1868,7 @@ paths:
               emparejar escenario y prueba con una búsqueda.
             </p>
             <figure class="codigo">
-              <figcaption><code>tests/Feature/AltaClienteTest.php</code><span class="etiqueta et-prueba">Prueba</span></figcaption>
+              <figcaption><code>tests/Integration/AltaClienteTest.php</code><span class="etiqueta et-prueba">Prueba</span></figcaption>
               <div class="terminal">class AltaClienteTest extends TestCase
 {
     use RefreshDatabase;                         <span class="c">← php/pruebas: base de datos limpia</span>
@@ -1881,7 +1881,7 @@ paths:
 
         <span class="c">// WHEN envía el alta con nombre y email válidos</span>
         $this-&gt;actingAs($gestor)
-            -&gt;postJson('/api/v1/clientes', [     <span class="c">← php/pruebas: postJson en la API</span>
+            -&gt;postJson('/api/clientes', [     <span class="c">← php/pruebas: postJson en la API</span>
                 'nombre' =&gt; 'Cliente Ejemplo',
                 'email' =&gt; 'cliente@ejemplo.test',
             ])
@@ -1896,7 +1896,7 @@ paths:
             <p>El agente principal la ejecuta sola, antes de escribir nada más:</p>
             <div class="terminal rojo">$ php artisan test --filter=AltaClienteTest
 
-   <span class="r">FAIL</span>  Tests\Feature\AltaClienteTest
+   <span class="r">FAIL</span>  Tests\Integration\AltaClienteTest
   <span class="r">⨯</span> Alta correcta
   Expected response status code [201] but received 404.
 
@@ -1924,13 +1924,25 @@ paths:
               <figcaption><code>app/Http/Controllers/ClienteController.php</code><span class="etiqueta et-codigo">Código</span></figcaption>
               <div class="terminal">class ClienteController extends Controller
 {
+    public function __construct(private readonly CrearCliente $crearCliente) {}
+
     public function store(StoreClienteRequest $request): JsonResponse
     {
-        $cliente = Cliente::create($request-&gt;validated());
+        $cliente = $this-&gt;crearCliente-&gt;ejecutar($request-&gt;validated());
 
         return (new ClienteResource($cliente))
             -&gt;response()
             -&gt;setStatusCode(201);
+    }
+}</div>
+            </figure>
+            <figure class="codigo">
+              <figcaption><code>app/Actions/Clientes/CrearCliente.php</code><span class="etiqueta et-codigo">Código</span></figcaption>
+              <div class="terminal">class CrearCliente
+{
+    public function ejecutar(array $datos): Cliente
+    {
+        return Cliente::create($datos);
     }
 }</div>
             </figure>
@@ -1957,17 +1969,17 @@ paths:
                   <tr><th>Lo que hace el código</th><th>Quién lo pidió</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td>Controlador de tres líneas que delega la validación, sin servicio ni acción</td><td><code>php/patrones.md</code>: controladores delgados con <code>FormRequest</code>; un alta sin reglas de negocio puede quedarse en el controlador. Si el alta tuviera reglas propias, irían en una acción <code>AltaCliente</code></td></tr>
+                  <tr><td>Controlador de tres líneas que delega en el caso de uso <code>CrearCliente</code></td><td><code>php/patrones.md</code>: controladores delgados con <code>FormRequest</code>; toda operación pasa por su caso de uso, aunque no tenga reglas propias</td></tr>
                   <tr><td>Responde con <code>ClienteResource</code>, no con el modelo</td><td><code>php/patrones.md</code>: respuestas con <code>JsonResource</code></td></tr>
                   <tr><td>Crea con <code>validated()</code> y el modelo declara <code>$fillable</code></td><td><code>php/seguridad.md</code>: evitar la asignación masiva</td></tr>
-                  <tr><td>Responde 201 en <code>/api/v1/clientes</code></td><td>Skill <code>api-design</code> y sección «API» de <code>development.md</code></td></tr>
+                  <tr><td>Responde 201 en <code>/api/clientes</code> (prefijo porque la SPA comparte origen)</td><td>Skill <code>api-design</code> y sección «API» de <code>development.md</code></td></tr>
                   <tr><td>Nombres en español y en <code>PascalCase</code>, sin <code>dd()</code></td><td><code>php/estilo-codigo.md</code></td></tr>
                 </tbody>
               </table>
             </div>
             <div class="terminal verde">$ php artisan test --filter=AltaClienteTest
 
-   <span class="g">PASS</span>  Tests\Feature\AltaClienteTest
+   <span class="g">PASS</span>  Tests\Integration\AltaClienteTest
   <span class="g">✓</span> Alta correcta                                   0.18s
 
   Tests:  <span class="g">1 passed</span></div>
@@ -1985,7 +1997,7 @@ paths:
               comprueba; solo cómo se escribe. Vuelve a ejecutar: sigue en verde.
             </p>
             <figure class="codigo">
-              <figcaption><code>tests/Feature/AltaClienteTest.php</code><span class="etiqueta et-verde">Sigue en verde</span></figcaption>
+              <figcaption><code>tests/Integration/AltaClienteTest.php</code><span class="etiqueta et-verde">Sigue en verde</span></figcaption>
               <div class="terminal">private function datosValidos(array $cambios = []): array
 {
     return array_merge([
@@ -2026,9 +2038,22 @@ paths:
               producción como un error 500. El escenario lo destapó antes de escribir
               la solución.
             </p>
+            <div class="nota">
+              <span class="nota-rotulo">Formato frente a regla de negocio</span>
+              <p>
+                <code>unique:clientes,email</code> depende de los datos guardados, pero
+                es una regla declarativa de Laravel: <code>php/patrones.md</code> la
+                admite en el <code>FormRequest</code>, que devuelve el error en su campo.
+                Una regla que sí dependiera del dominio (por ejemplo, «un cliente dado
+                de baja no admite nuevas altas con el mismo NIF») iría en
+                <code>ClienteValidator::validarCreacion()</code>
+                (<code>php/patrones.md</code>), que <code>CrearCliente</code> llamaría
+                justo antes de guardar.
+              </p>
+            </div>
             <div class="terminal verde">$ php artisan test --filter=AltaClienteTest
 
-   <span class="g">PASS</span>  Tests\Feature\AltaClienteTest
+   <span class="g">PASS</span>  Tests\Integration\AltaClienteTest
   <span class="g">✓</span> Alta correcta                                   0.18s
   <span class="g">✓</span> Email duplicado                                 0.07s
   <span class="g">✓</span> Usuario sin permiso                             0.06s
@@ -2162,10 +2187,10 @@ paths:
               prueba, que simula la respuesta del servidor sin llamar a nada real:
             </p>
             <figure class="codigo">
-              <figcaption><code>resources/js/clientes/AltaClienteForm.test.tsx</code><span class="etiqueta et-prueba">Prueba</span></figcaption>
+              <figcaption><code>resources/js/tests/integration/AltaClienteForm.test.tsx</code><span class="etiqueta et-prueba">Prueba</span></figcaption>
               <div class="terminal">it("Error del servidor junto al campo", async () =&gt; {   <span class="c">← nombre del escenario</span>
   servidor.use(                                          <span class="c">← react/pruebas: red simulada con MSW</span>
-    http.post("/api/v1/clientes", () =&gt;
+    http.post("/api/clientes", () =&gt;
       HttpResponse.json(
         { message: "Datos no válidos",
           errors: { email: ["Ya existe un cliente con ese email."] } },
@@ -2184,7 +2209,7 @@ paths:
   expect(screen.getByLabelText("Email")).toHaveAttribute("aria-invalid", "true");
 });</div>
             </figure>
-            <div class="terminal rojo">$ npx vitest run resources/js/clientes/AltaClienteForm.test.tsx
+            <div class="terminal rojo">$ npx vitest run resources/js/tests/integration/AltaClienteForm.test.tsx
 
  <span class="r">FAIL</span>  AltaClienteForm &gt; Error del servidor junto al campo
  Unable to find an element with the text: Ya existe un cliente con ese email.
@@ -2204,14 +2229,14 @@ paths:
             <div class="paso-meta"><span class="actor a-agente">Agente principal</span></div>
             <h3>Verde: el formulario con los componentes del catálogo</h3>
             <figure class="codigo">
-              <figcaption><code>resources/js/clientes/AltaClienteForm.tsx</code> (extracto)<span class="etiqueta et-codigo">Código</span></figcaption>
+              <figcaption><code>resources/js/features/clientes/components/AltaClienteForm.tsx</code> (extracto)<span class="etiqueta et-codigo">Código</span></figcaption>
               <div class="terminal">export function AltaClienteForm() {
   const [errores, setErrores] = useState&lt;ErroresCampo&gt;({});
   const emailId = useId();
 
   async function enviar(evento: FormEvent&lt;HTMLFormElement&gt;) {
     evento.preventDefault();
-    const resultado = await crearCliente(new FormData(evento.currentTarget));  <span class="c">← módulo de API</span>
+    const resultado = await crearCliente(new FormData(evento.currentTarget));  <span class="c">← features/clientes/api</span>
     if (!resultado.ok) {
       setErrores(resultado.errores);
       return;
@@ -2238,7 +2263,7 @@ paths:
                   <tr><th>Lo que hace el código</th><th>Quién lo pidió</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td>La llamada HTTP vive en <code>crearCliente</code>, no dentro del componente</td><td><code>react/patrones.md</code>: llamadas en un módulo de API</td></tr>
+                  <tr><td>La llamada HTTP vive en <code>features/clientes/api/crearCliente.ts</code>, no dentro del componente</td><td><code>react/patrones.md</code>: un caso de uso por operación, en la carpeta de su entidad</td></tr>
                   <tr><td><code>Label</code>, <code>Input</code> y <code>Button</code> del catálogo</td><td>Sistema de diseño de <code>development.md</code> y el servidor MCP</td></tr>
                   <tr><td>Cada campo con su etiqueta, botón real para enviar</td><td><code>react/patrones.md</code>: accesibilidad básica</td></tr>
                   <tr><td>El estado de errores se sustituye, no se modifica</td><td><code>react/estilo-codigo.md</code>: no mutar el estado</td></tr>
@@ -2246,7 +2271,7 @@ paths:
                 </tbody>
               </table>
             </div>
-            <div class="terminal verde">$ npx vitest run resources/js/clientes/AltaClienteForm.test.tsx
+            <div class="terminal verde">$ npx vitest run resources/js/tests/integration/AltaClienteForm.test.tsx
 
  <span class="g">✓</span> AltaClienteForm &gt; Error del servidor junto al campo
 
@@ -2471,7 +2496,7 @@ $ npm test
             <figure class="codigo">
               <figcaption>Informe de <code>php-reviewer</code><span class="etiqueta et-rojo">Bloqueado</span></figcaption>
               <div class="terminal"><span class="r">[ALTO]</span> La prueba de «Email duplicado» no comprueba todo su THEN
-Fichero: tests/Feature/AltaClienteTest.php:41
+Fichero: tests/Integration/AltaClienteTest.php:41
 Problema: el escenario exige además que «no se crea ningún cliente
 nuevo», pero la prueba solo comprueba el 422. Si un cambio futuro
 guardara el duplicado antes de validar, la prueba seguiría en verde.
@@ -2643,7 +2668,7 @@ Veredicto: <span class="r">Bloqueado</span> (1 ALTO)</div>
               <code>-A</code> sin haber verificado antes todo su alcance: el objetivo es
               que ningún cambio ajeno entre por arrastre.
             </p>
-            <div class="terminal">git add app/Http/Controllers/ClienteController.php tests/Feature/AltaClienteTest.php ...
+            <div class="terminal">git add app/Http/Controllers/ClienteController.php tests/Integration/AltaClienteTest.php ...
 git status --short          <span class="c">¿falta o sobra algo?</span>
 git diff --cached           <span class="c">¿es esto lo que creo?</span>
 git diff --cached --check   <span class="c">errores de espacios en blanco</span></div>
