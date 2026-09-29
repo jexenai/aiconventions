@@ -33,9 +33,9 @@ La estructura de carpetas concreta de cada stack está en su `patrones.md`.
   repositorios y el resto son auxiliares: no deciden reglas de negocio.
 - Un caso de uso por operación, con el formato
   `Verbo+Entidad+PosibleDetalle` y sin sufijos como `Service`. En el backend
-  es una clase en `PascalCase`: `services/tramites/BuscarTramitePorIdentificador`,
-  `services/usuarios/CrearUsuario`,
-  `services/consejerias/BuscarConsejeriasConFiltros`. En React es una
+  es una clase en `PascalCase` (`BuscarTramitePorIdentificador`,
+  `CrearUsuario`, `BuscarConsejeriasConFiltros`), en la carpeta de casos de
+  uso que fija el `patrones.md` de su stack. En React es una
   función de API en `camelCase` (`crearUsuario`; ver `react/patrones.md`).
 - Cada caso de uso es breve y hace una sola cosa: así es reutilizable y un
   humano lo entiende sin esfuerzo. Escríbelo con el vocabulario funcional

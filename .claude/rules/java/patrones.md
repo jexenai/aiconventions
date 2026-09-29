@@ -17,7 +17,7 @@ en minúsculas y sin separadores (`motivosdenegacion`).
 | Paquete | Contenido |
 | ------- | --------- |
 | `controllers` | Controladores REST |
-| `services/{entidades}` | Casos de uso: `services/convocatorias/CrearConvocatoria` |
+| `actions/{entidades}` | Casos de uso: `actions/convocatorias/CrearConvocatoria` |
 | `validator` | Un validador por entidad: `validator/ConvocatoriaValidator` |
 | `models` | Entidades JPA y sus `enum` |
 | `mappers` | Mappers de MapStruct y `MapeoConfig` (`datos.md`) |
@@ -36,11 +36,11 @@ Crea estos solo cuando hagan falta:
 | `projections` | Modelos de lectura: proyecciones de Spring Data o datos calculados en memoria. Nunca salen a la API |
 
 Lo transversal se organiza igual, como una entidad más:
-`services/auditorias/RegistrarAuditoria`.
+`actions/auditorias/RegistrarAuditoria`.
 
 ## Capas
 
-- La lógica de dominio vive solo en `services` y en el validador de
+- La lógica de dominio vive solo en `actions` y en el validador de
   `validator`. Controladores, entidades, mappers, DTO, repositorios e
   interceptores no deciden reglas de negocio.
 - Caso de uso: una clase `@Service` por operación, con el nombre

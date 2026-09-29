@@ -20,7 +20,7 @@ probado dentro de cada una:
 | `integration` | Controlador, repositorio y consultas | `@WebMvcTest` con los casos de uso simulados; `@DataJpaTest` contra la base de datos real, solo para métodos personalizados (`@Query` o de nombre derivado) — no se prueban los heredados de `JpaRepository`/`CrudRepository` |
 | `e2e` | Flujo completo | `@SpringBootTest(webEnvironment = RANDOM_PORT)`, solo para los flujos críticos |
 
-`unit/services/convocatorias/CrearConvocatoriaTest`,
+`unit/actions/convocatorias/CrearConvocatoriaTest`,
 `integration/controllers/ConvocatoriasControllerTest`.
 
 ## Aserciones
