@@ -82,6 +82,7 @@ json_string() {
 
 absolute_path() {
   local path="$1"
+  mkdir -p "$(dirname "$path")"
   cd "$(dirname "$path")" && printf '%s/%s\n' "$(pwd -P)" "$(basename "$path")"
 }
 
