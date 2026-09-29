@@ -15,6 +15,17 @@
       "Read(**/*.jks)",
       "Read(**/*.keystore)"
     ],
+    "allow": [
+      "Bash(git rev-parse *)",
+      "Bash(git init)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(xargs -0 git add *)",
+      "Bash(git rm:*)"
+    ],
     "ask": [
       "Bash(git push *)",
       "Bash(php artisan migrate*)",

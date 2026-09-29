@@ -59,11 +59,18 @@ puede decidir sin una línea base.
    1. Revisa `git status --short --untracked-files=all` y comprueba que
       `.gitignore` excluye los ficheros de entorno, secretos, dependencias
       descargadas y resultados de compilación que aparezcan.
+      Comprueba también que `.gitignore` no excluye ficheros de la plantilla
+      que deben versionarse (`.claude/`, `.ai/`, `.codex/`, `.agents/`,
+      `AGENTS.md`, `CLAUDE.md`). Si los excluye, no edites `.gitignore`: haz
+      el commit sin ellos e infórmalo en la sección "Comprobaciones" del
+      informe, proponiendo retirar esas líneas y versionarlos después.
    2. Si algún fichero que se incluiría contiene secretos o datos
       personales, o no está claro si debe versionarse, no hagas el commit:
       detente e infórmalo.
    3. Si no, sigue [commit.md](commit.md) con el mensaje
-      `chore: versiona el estado inicial del proyecto`. Invocar este
+      `chore: versiona el estado inicial del proyecto`. Prepara el staging con
+      rutas explícitas, tomadas de `git ls-files --others --exclude-standard`
+      una vez revisadas, y sin `git add -A` ni `git add .`. Invocar este
       procedimiento autoriza ese commit y ningún otro.
 3. Si el repositorio ya tiene commits, no hagas ninguno: sus cambios locales
    se preservan como indica la fase 1.
