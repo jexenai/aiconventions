@@ -20,6 +20,9 @@ misma manera, se ejecute por primera vez o se repita.
 - No instales, inicialices, sincronices ni archives OpenSpec desde este
   procedimiento. Si el usuario decide adoptarlo, continúa con
   [setup-openspec.md](setup-openspec.md) en la fase 5.
+- No instales herramientas de pruebas desde este procedimiento. Si el
+  usuario decide prepararlas en S1, continúa con
+  [setup-testing.md](setup-testing.md) en la fase 6.
 - No modifiques código de aplicación ni configuración funcional salvo que el
   usuario amplíe expresamente el alcance. La única excepción es el ajuste
   del [formateador](#excluir-la-documentación-del-formateador) que fija el
@@ -37,8 +40,9 @@ misma manera, se ejecute por primera vez o se repita.
   Materializar su configuración no es activarlos.
 - No edites `docs/stack.yaml`: lo genera el plugin a partir de la plantilla de
   stack elegida.
-- No hagas preguntas fuera del guion. Lo que no cubra el guion se resuelve con
-  evidencia o queda pendiente en el informe.
+- No hagas preguntas fuera del guion, que incluye las
+  [preguntas condicionales](#preguntas-condicionales) C1 y S1. Lo que no
+  cubra el guion se resuelve con evidencia o queda pendiente en el informe.
 - No hagas commits, salvo el commit inicial de la
   [fase 0](#fase-0-asegurar-el-repositorio-git). No configures remotos ni
   hagas push.
@@ -81,6 +85,16 @@ puede decidir sin una línea base.
       rutas explícitas, tomadas de `git ls-files --others --exclude-standard`
       una vez revisadas, y sin `git add -A` ni `git add .`. Invocar este
       procedimiento autoriza ese commit y ningún otro.
+   4. Si la herramienta deniega el commit (permisos, modo automático o
+      clasificador de seguridad), no lo reintentes por tu cuenta ni sigas
+      sin él: plantea [C1](#preguntas-condicionales). Con `Crear el commit
+      inicial`, repítelo una sola vez con las mismas rutas y el mismo
+      mensaje; si vuelve a denegarse, continúa sin commit. Con `Seguir sin
+      commit` o sin respuesta, continúa sin él. En ambos casos no hay línea
+      base: la retirada de stacks marca `Pendiente` cada componente que
+      debería retirarse, y el informe lo indica en "Comprobaciones". Un
+      hook que falla no es una denegación: sigue lo que indica
+      [commit.md](commit.md).
 3. Si el repositorio ya tiene commits, no hagas ninguno: sus cambios locales
    se preservan como indica la fase 1.
 
@@ -204,6 +218,23 @@ Opciones de P9 según el estado:
 - **No existe:** `Sí, instalarlo ahora` · `No se usa` · `Decidir más tarde`.
   Ninguna lleva `(Recomendado)`: es una decisión de equipo.
 
+### Preguntas condicionales
+
+Se plantean solo cuando se da su condición, cada una en una ronda propia y
+en el momento que indica su fase, con el mismo mecanismo que las demás.
+Ninguna opción lleva `(Recomendado)`.
+
+| Id  | Cuándo                                                                                                                         | Cabecera | Pregunta                                                                                  | Opciones                                               |
+| --- | ------------------------------------------------------------------------------------------------------------------------------ | -------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| C1  | Fase 0: la herramienta deniega el commit inicial                                                                               | Commit   | La herramienta ha denegado el commit inicial. ¿Lo creo con tu autorización?               | `Crear el commit inicial` · `Seguir sin commit`        |
+| S1  | Fase 6: algún comando de pruebas, lint o análisis queda pendiente porque falta la herramienta, o una parte no tiene `test` (P6) | Pruebas  | Faltan herramientas de pruebas en `<partes>`. ¿Las preparo ahora con `setup-testing`?     | `Sí, ejecutar setup-testing` · `Más tarde`             |
+
+En la descripción de `Crear el commit inicial`, indica el mensaje, cuántos
+ficheros incluye y el motivo de la denegación si la herramienta lo dio. En la
+de `Sí, ejecutar setup-testing`, indica qué falta en cada parte y que
+`setup-testing` preguntará qué preparar y pedirá confirmación antes de
+instalar nada.
+
 ### Respuestas ausentes
 
 Si una ronda no obtiene respuesta porque la herramienta no está disponible, la
@@ -214,6 +245,8 @@ preguntes en texto. Para cada pregunta de esa ronda:
   informe como "sin confirmar".
 - En los demás casos, y siempre en P4 cuando el `bridge` esté sin fijar y en
   P9, conserva `[POR DEFINIR]`.
+- En C1, sigue sin commit; en S1, no ejecutes `setup-testing` y deja
+  pendiente lo que faltaba.
 
 Continúa con la ronda siguiente.
 
@@ -276,12 +309,17 @@ Según la respuesta a P9:
    retirados.
 8. Revisa el diff para detectar datos inventados, duplicaciones y cambios fuera
    del alcance documental.
+9. Si se cumple la condición de [S1](#preguntas-condicionales), plantéala.
+   Con `Sí, ejecutar setup-testing`, sigue [setup-testing.md](setup-testing.md)
+   desde su fase 1, con sus propias preguntas y su confirmación antes de
+   instalar, y añade su informe a continuación de este. Con `Más tarde` o sin
+   respuesta, no lo ejecutes.
 
 Termina siempre con un informe con estas secciones, en este orden:
 
-1. **Guion:** una tabla con una fila por pregunta, de `P1` a `P9`, con las
-   columnas `Pregunta`, `Respuesta` y `Estado` (`Confirmada`, `Sin confirmar`
-   o `Pendiente`). No omitas filas.
+1. **Guion:** una tabla con una fila por pregunta, de `P1` a `P9`, más `C1`
+   y `S1`, con las columnas `Pregunta`, `Respuesta` y `Estado` (`Confirmada`,
+   `Sin confirmar`, `Pendiente` o `No planteada`). No omitas filas.
 2. **Fases:** una tabla con una fila por fase, de 0 a 6, con `Hecha` u
    `Omitida` y el motivo. Una fase solo puede omitirse por un límite de este
    procedimiento.
@@ -299,12 +337,13 @@ Termina siempre con un informe con estas secciones, en este orden:
    [Retirar los stacks no usados](#retirar-los-stacks-no-usados), con
    `Conservado`, `Retirado` o `Pendiente` y el motivo. No omitas filas.
 7. **Pendientes:** marcadores restantes con su motivo concreto. Si algún
-   comando de pruebas, lint o análisis queda pendiente porque falta la
-   herramienta, recomienda ejecutar `setup-testing`.
+   comando de pruebas, lint o análisis sigue pendiente porque falta la
+   herramienta, indica la respuesta a S1.
 8. **Comprobaciones:** comprobaciones ejecutadas y limitaciones de la revisión,
    incluida la versión de Claude Code de la fase 1. Si es anterior a 2.1.271
    o no se pudo obtener, recomienda actualizarla antes de usar los revisores.
-   Indica también si la fase 0 creó el repositorio o el commit inicial, o
+   Indica también si la fase 0 creó el repositorio o el commit inicial
+   (y, si se planteó C1, su respuesta y el resultado), o
    si el proyecto está dentro de otro repositorio, y si la versión del
    intérprete local es inferior a la declarada.
 
@@ -347,7 +386,7 @@ Destino de cada clave de `buildTools.commands`:
 Un comando de formato o de lint no es un comando de pruebas: no lo propongas
 en P6. Si una parte no tiene `test` respaldado (por ejemplo, las vistas del
 kit de Laravel con React, cuyo `npm run check` solo formatea y hace lint),
-esa parte queda pendiente en P6 y el informe recomienda `setup-testing`.
+esa parte queda pendiente en P6 y la fase 6 plantea S1.
 
 El archivo no aporta el propósito, los usuarios, el dominio, las decisiones de
 arquitectura ni la seguridad del proyecto. Complétalos con otra evidencia o

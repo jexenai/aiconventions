@@ -1,8 +1,8 @@
 # Preparar las pruebas
 
 Utiliza este procedimiento cuando a una parte del proyecto le falten las
-herramientas para ejecutar sus pruebas o su análisis: al terminar
-`setup-project-context` con comandos de pruebas pendientes, cuando
+herramientas para ejecutar sus pruebas o su análisis: al aceptar su
+pregunta S1 al final de `setup-project-context`, cuando
 `development.md` no tenga el comando que una tarea necesita o cuando el
 usuario lo pida.
 

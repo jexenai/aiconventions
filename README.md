@@ -71,7 +71,8 @@ Quien quiera la memoria para sí puede reactivarla en su
    invocarlas: el agente no las lanza por su cuenta. Si el proyecto no tiene
    repositorio Git o no tiene commits, el setup lo inicializa y crea el commit
    inicial antes de empezar. Si está dentro de otro repositorio (un
-   monorepo), trabaja sobre ese y no crea uno anidado. Ese commit es la
+   monorepo), trabaja sobre ese y no crea uno anidado. Si la herramienta
+   deniega ese commit, te pregunta si lo autorizas. Ese commit es la
    línea base que permite revisar y deshacer lo que el setup retira; el
    resultado del setup queda sin commit para que lo revises. Si `.gitignore`
    excluye ficheros de la plantilla (`.claude/`, `AGENTS.md`, `.mcp.json`…),
@@ -95,11 +96,12 @@ Quien quiera la memoria para sí puede reactivarla en su
    `iniciar_proyecto`), el setup no lo ejecuta, pero deja en la sección
    "Sistema de diseño" de `development.md` cómo adaptarlo al stack; tras
    aprobarlo, pide al agente que inicie el sistema de diseño.
-7. Si el informe deja pendientes comandos de pruebas, lint o análisis porque
-   falta la herramienta (por ejemplo, Vitest o ESLint en un Laravel con vistas
-   React), ejecuta `/setup-testing`. Te pregunta qué preparar, instala solo
-   con tu confirmación, crea una prueba semilla por tipo y registra los
-   comandos.
+7. Si quedan pendientes comandos de pruebas, lint o análisis porque falta la
+   herramienta (por ejemplo, Vitest en un Laravel con vistas React), el setup
+   te pregunta al final si los preparas con `setup-testing`. Si aceptas,
+   continúa en la misma ejecución: te pregunta qué preparar, instala solo con
+   tu confirmación, crea una prueba semilla por tipo y registra los comandos.
+   Si lo dejas para más tarde, ejecuta `/setup-testing` cuando quieras.
 
 ### Qué aplica el setup según el stack
 
