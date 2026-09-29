@@ -96,6 +96,37 @@ Quien quiera la memoria para sí puede reactivarla en su
 Los campos `[POR DEFINIR]` que no afecten al trabajo actual pueden mantenerse
 pendientes. No conviertas suposiciones en datos del proyecto.
 
+### Manifest de distribución
+
+Antes de distribuir una versión de la plantilla, genera `dist/manifest.json`
+con una versión CalVer `YY.MM.PATCH`. El comando también crea
+`dist/aiconventions.zip` con los mismos archivos inventariados:
+
+```bash
+bash scripts/new-manifest.sh --template-version "26.09.0"
+```
+
+El script calcula los hashes SHA-256 de los archivos gestionados, añade al
+manifest el hash del zip y escribe ambos artefactos en `dist/`. En Git Bash
+necesita tener disponible el comando `zip`. Si quieres usar solo los archivos
+ya versionados en Git, añade `--tracked-only`.
+
+El workflow de GitHub Actions `Build distribution` solo se ejecuta al empujar
+una etiqueta `vYY.MM.PATCH` o `YY.MM.PATCH`, por ejemplo `v26.09.0`. Usa esa
+etiqueta como versión de plantilla y publica `manifest.json` y
+`aiconventions.zip` como artefactos del job.
+
+Para publicar manualmente una versión:
+
+```bash
+git tag v26.09.0
+git push origin main
+git push origin v26.09.0
+```
+
+Si tu rama principal no se llama `main`, cambia `main` por el nombre real de
+la rama.
+
 ### Mínimo para empezar
 
 No es necesario completar toda la plantilla de una vez. Para comenzar con un

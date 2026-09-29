@@ -1,0 +1,33 @@
+name: Build distribution
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install zip
+        run: sudo apt-get update && sudo apt-get install -y zip
+
+      - name: Build manifest and archive
+        shell: bash
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          bash scripts/new-manifest.sh --template-version "$version"
+
+      - name: Upload distribution artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: aiconventions-dist
+          path: |
+            dist/manifest.json
+            dist/aiconventions.zip
+          if-no-files-found: error
