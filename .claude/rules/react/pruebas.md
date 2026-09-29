@@ -22,7 +22,7 @@ Antes de escribir o corregir una prueba, lee
   (`.claude/skills/e2e-testing/SKILL.md`, si existe).
 
   > Aclaración: en Laravel, `tests/` de la raíz es de PHP (`tests/Unit`,
-  > `tests/Integration`). En Windows, `tests/unit` y `tests/Unit` son la
+  > `tests/Feature`). En Windows, `tests/unit` y `tests/Unit` son la
   > misma carpeta: por eso las de React van dentro de `resources/js/`.
 
 - React Testing Library con el ejecutor del proyecto: con Vite, lo natural

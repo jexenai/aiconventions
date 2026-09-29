@@ -97,6 +97,11 @@ T4 solo se plantea si la tabla "Base de datos de pruebas" está
 en la descripción de la primera, indica que una base dedicada ya existente
 se responde con la opción de escribir un valor propio y su nombre.
 
+Si `context.database` es un mapa por entorno, `<base de datos>` es la de
+`production`, y la de `tests` (por ejemplo, `SQLite en memoria`) se añade
+como primera opción de T4. Las pruebas contra la base de producción (T2)
+siguen siendo opcionales: cubren lo que SQLite no reproduce.
+
 ### Ronda 2: instalación
 
 | Id | Cabecera | Pregunta | Opciones |
@@ -134,8 +139,9 @@ declara pendiente todo lo que dependía de ella.
      T4 sin credenciales; las credenciales, en variables de entorno o en un
      `.env.testing` fuera de Git que completa el usuario. En Spring Boot,
      Testcontainers o un perfil `test`.
-   - **Carpetas de pruebas:** `phpunit.xml` con los `testsuites` `Unit` e
-     `Integration` apuntando a `tests/Unit` y `tests/Integration`. En Java,
+   - **Carpetas de pruebas:** `phpunit.xml` con los `testsuites` `Unit` y
+     `Feature` apuntando a `tests/Unit` y `tests/Feature`, las que crea
+     Laravel; si ya existen, no las renombres. En Java,
      Surefire (unitarias) limitado a `**/unit/**` y Failsafe (integración y
      e2e) a `**/integration/**` y `**/e2e/**`, dentro de `src/test/java/`.
    - **Playwright:** la configuración de la skill `e2e-testing`, si existe,

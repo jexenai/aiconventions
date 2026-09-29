@@ -2,20 +2,24 @@ standard: 26.9.21
 context:
   template: laravel10
   declared:
-    language: PHP 8.4
+    language: PHP 8.3 o superior
     framework: Laravel 12 o superior
     server: Apache 2.4
     ci: GitLab CI
-  database: Oracle 19c
+  database:
+    production: Oracle 19c
+    development: SQLite
+    tests: SQLite en memoria
   dependencies:
   - package: yajra/laravel-oci8
-    purpose: Conexión con Oracle 19c; Laravel no soporta Oracle de serie
+    purpose: Conexión con Oracle 19c en preproducción y producción; Laravel no soporta Oracle de serie
+  auth: SSO corporativo (JWT)
   deployment:
     packaging: Código PHP desplegado sobre Apache 2.4
     documentRoot: public/
     assets: Compilados con Vite antes del despliegue
   ui:
-    views: React 18
+    views: React 18 o superior
     entry: resources/js/
     rootTemplate: Blade, solo la plantilla raíz que monta la aplicación React
     bridge: "[POR DEFINIR]"
@@ -28,12 +32,20 @@ context:
     - package: "@vitejs/plugin-react"
       purpose: Compilación de JSX con el Vite que ya usa Laravel
   mcp:
-  - name: shadcn
-    purpose: Catálogo de componentes de shadcn/ui para las vistas React de resources/js/
-    requires: components.json
+  - name: dsjex
+    purpose: Sistema de Diseño de la Junta de Extremadura (componentes shadcn sobre Base UI, tokens y app shell) para las vistas React de resources/js/
     server:
-      command: npx
-      args: ["shadcn@latest", "mcp"]
+      type: http
+      url: https://dsjex.socialytech.es/mcp/
+    init:
+      tool: iniciar_proyecto
+      adaptation:
+      - El proyecto ya lo crea el kit de Laravel; no se ejecuta `npm create vite`.
+      - Donde el plan dice `src/`, se usa `resources/js/`; el alias `@` del kit ya apunta ahí.
+      - Los tokens de `tokens_jex` van en `resources/css/app.css`.
+      - Con Inertia no se instala `react-router-dom`; las rutas del `app_shell` se declaran en `routes/web.php` y se navega con `Link` de Inertia.
+      - El layout del `app_shell` va en `resources/js/layouts/` y las páginas en `resources/js/pages/`.
+      - Los componentes de `resources/js/components/ui/` que trae el kit (Radix) se sustituyen por los del catálogo (Base UI), pedidos con `codigo_componente`; Base UI usa la prop `render`, no `asChild`.
   conventions:
     paths:
       code: app/
@@ -69,15 +81,51 @@ context:
     - file: composer.json
       commands:
         install: composer install
-        run: php artisan serve
+        setup: composer setup
+        run: composer dev
         migrate: php artisan migrate
         test: php artisan test
-        format: vendor/bin/pint
-        staticAnalysis: vendor/bin/phpstan analyse
+        testFilter: php artisan test --filter=NombreDeLaPrueba
+        format: composer lint
+        formatCheck: composer lint:check
+        staticAnalysis: composer types:check
+        ci: composer ci:check
     - file: package.json
       commands:
         install: npm ci
-        run: npm run dev
         build: npm run build
-        test: npm test
-        staticAnalysis: npm run lint
+        formatCheck: npm run check
+        format: npm run check:fix
+        staticAnalysis: npm run types:check
+    ci:
+      file: .gitlab-ci.yml
+      replaces: .github/workflows/
+      content: |
+        # Generado por setup-project-context a partir de docs/stack.yaml.
+        # Hace lo mismo que el workflow de GitHub Actions del kit de Laravel:
+        # prepara la aplicación y ejecuta las comprobaciones de composer ci:check.
+        stages:
+          - check
+
+        variables:
+          COMPOSER_CACHE_DIR: "$CI_PROJECT_DIR/.cache/composer"
+          npm_config_cache: "$CI_PROJECT_DIR/.cache/npm"
+
+        ci:
+          stage: check
+          # [POR DEFINIR] Imagen del registro corporativo con PHP 8.3 o superior,
+          # Composer 2, Node 22 y las extensiones de Laravel (pdo_sqlite incluida).
+          image: "$CI_PHP_NODE_IMAGE"
+          cache:
+            key:
+              files:
+                - composer.lock
+                - package-lock.json
+            paths:
+              - .cache/
+          script:
+            - composer setup
+            - composer ci:check
+          rules:
+            - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+            - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

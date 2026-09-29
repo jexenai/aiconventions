@@ -49,6 +49,23 @@ ejecutes y avisa al usuario.
 | Conexión de pruebas y dónde se fija | [POR DEFINIR] |
 | Qué se borra o reinicia al ejecutarlas | [POR DEFINIR] |
 
+### Entorno local
+
+Particularidades del equipo de desarrollo que cambian cómo se ejecutan los
+comandos. Registra solo las comprobadas.
+
+| Dato | Valor |
+| ---- | ----- |
+| Sistema operativo y distribución del lenguaje | [POR DEFINIR] |
+| Versión local del intérprete frente a la declarada | [POR DEFINIR] |
+| Ajustes necesarios para ejecutar herramientas | [POR DEFINIR] |
+
+> Aclaración: en Windows con PHP de Laragon o XAMPP, `openssl_pkey_new()`
+> falla si no encuentra `openssl.cnf`; en las pruebas que generan claves,
+> pasa la opción `config` con un fichero mínimo. PHPStan puede necesitar
+> `--memory-limit`. Python no suele estar instalado: para scripts auxiliares,
+> usa `php`.
+
 ## Convenciones propias del proyecto
 
 Registra solo las decisiones de este proyecto que no estén en las reglas

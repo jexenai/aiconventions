@@ -12,7 +12,8 @@ Antes de escribir o corregir una prueba, lee
 - PHPUnit, o Pest si el proyecto ya lo usa; no mezcles los dos.
 - Tres carpetas: `tests/Unit` sin arrancar el framework ni acceder a base de
   datos (validadores cuyas reglas no consultan la base, *enums* y lógica
-  pura); `tests/Integration` para HTTP, autorización, validación,
+  pura); `tests/Feature`, la carpeta de integración que crea Laravel, para
+  HTTP, autorización, validación,
   persistencia y los casos de uso y validadores que usan Eloquent, que no
   se prueban sin framework ni base de datos; el
   extremo a extremo, en `tests/e2e` con Playwright

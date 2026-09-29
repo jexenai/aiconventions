@@ -4,7 +4,7 @@ paths:
 ---
 # Inertia: pruebas
 
-- Una prueba de integración por página, en `tests/Integration`, con
+- Una prueba de integración por página, en `tests/Feature`, con
   `assertInertia`: comprueba el
   componente, las props que pinta y que no viajan las que no debe.
 
@@ -22,6 +22,11 @@ $this->actingAs($user)
   (`assertSessionHasErrors`), no un 422, y el éxito, `assertRedirect()`.
 - Mantén activa la comprobación de que el componente existe
   (`ensure_pages_exist` en `config/inertia.php`).
+- Desactiva el SSR de Inertia en las pruebas (`inertia.ssr.enabled` a
+  `false` en el `TestCase` base, o con una variable de entorno en
+  `config/inertia.php` fijada en `phpunit.xml`). El kit lo trae activado y,
+  con `Http::preventStrayRequests()`, la llamada al servidor SSR hace que
+  cada página responda 500.
 
 > Aclaración: `assertInertia` comprueba el contrato entre el controlador y
 > la página sin navegador. Las pruebas de extremo a extremo quedan para los

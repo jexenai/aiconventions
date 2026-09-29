@@ -35,7 +35,7 @@ Estos archivos aplican controles que no dependen de que el modelo obedezca:
 
 | Herramienta | Archivo | Control |
 | ----------- | ------- | ------- |
-| Claude Code | `.claude/settings.json` | Bloquea leer y editar `.env.prod*`, editar `.env`, `.env.local` y `.env.*.local`, y leer claves y certificados (el `.env` local sí puede leerse); pide confirmación antes de `git push` y de las migraciones y los comandos `db:` de Artisan |
+| Claude Code | `.claude/settings.json` | Bloquea leer y editar `.env.prod*`, editar `.env`, `.env.local` y `.env.*.local`, y leer claves y certificados (el `.env` local sí puede leerse); permite sin preguntar las órdenes de Git del commit inicial del setup y `git rm`; pide confirmación antes de `git push` y de las migraciones y los comandos `db:` de Artisan |
 | Claude Code | `.claude/hooks/revisor-solo-lectura.sh` | Los revisores solo pueden ejecutar lecturas de Git, comprobaciones estáticas y auditorías de dependencias; nunca pruebas ni comandos que escriban |
 | Codex | `.codex/config.toml` | Limita la escritura al repositorio, desactiva la red y pide aprobación para salir del sandbox |
 
@@ -71,7 +71,11 @@ Quien quiera la memoria para sí puede reactivarla en su
    invocarlas: el agente no las lanza por su cuenta. Si el proyecto no tiene
    repositorio Git o no tiene commits, el setup lo inicializa y crea el commit
    inicial antes de empezar. Si está dentro de otro repositorio (un
-   monorepo), trabaja sobre ese y no crea uno anidado.
+   monorepo), trabaja sobre ese y no crea uno anidado. Ese commit es la
+   línea base que permite revisar y deshacer lo que el setup retira; el
+   resultado del setup queda sin commit para que lo revises. Si `.gitignore`
+   excluye ficheros de la plantilla (`.claude/`, `AGENTS.md`, `.mcp.json`…),
+   como hace el del kit de Laravel, el informe propone versionarlos.
 3. Responde a las tres rondas de preguntas del guion: ficha, ejecución y
    OpenSpec. Son siempre las mismas nueve preguntas, también al repetir el
    setup; cuando un dato ya está resuelto, la pregunta lo propone como
@@ -84,14 +88,44 @@ Quien quiera la memoria para sí puede reactivarla en su
    retira lo de los stacks que no uses. La sección "Stacks" del informe
    indica qué se conservó y qué se retiró; lo que depende de una respuesta
    pendiente no se borra.
-6. Si el stack declara servidores MCP (por ejemplo, el catálogo de shadcn/ui
-   para las vistas React), el setup los añade a `.mcp.json`. Apruébalos en
-   la primera sesión: añadirlos no los activa.
+6. Si el stack declara servidores MCP (por ejemplo, `dsjex`, el Sistema de
+   Diseño de la Junta de Extremadura, para las vistas React de Laravel), el
+   setup los añade a `.mcp.json`. Apruébalos en la primera sesión: añadirlos
+   no los activa. Si el servidor tiene un paso de inicio (`dsjex`:
+   `iniciar_proyecto`), el setup no lo ejecuta, pero deja en la sección
+   "Sistema de diseño" de `development.md` cómo adaptarlo al stack; tras
+   aprobarlo, pide al agente que inicie el sistema de diseño.
 7. Si el informe deja pendientes comandos de pruebas, lint o análisis porque
    falta la herramienta (por ejemplo, Vitest o ESLint en un Laravel con vistas
    React), ejecuta `/setup-testing`. Te pregunta qué preparar, instala solo
    con tu confirmación, crea una prueba semilla por tipo y registra los
    comandos.
+
+### Qué aplica el setup según el stack
+
+Lo que declara cada `templates/*.yaml` y el setup materializa, además de la
+ficha y los documentos:
+
+| Clave del stack | Efecto en el setup | Ejemplo en `laravel10` |
+| --------------- | ------------------ | ---------------------- |
+| `database` | Persistencia y base de pruebas; puede declararse por entorno | Oracle 19c en producción, SQLite en desarrollo y en pruebas |
+| `auth` | Se documenta como requisito; si el kit trae otra autenticación, se informa sin retirarla | SSO corporativo (JWT) |
+| `mcp` | `.mcp.json` y, con `init`, la adaptación del paso de inicio en `development.md` | `dsjex` con `iniciar_proyecto` |
+| `conventions.buildTools` | Comandos propuestos en P5 y P6, contrastados con los scripts | `composer dev`, `composer ci:check`, `npm run check` |
+| `conventions.formatIgnore` | Excluye la documentación del formateador del kit | `fmt.ignorePatterns` de `vite.config.ts` |
+| `conventions.ci` | Genera el fichero de CI si no existe y retira los workflows que sustituye, si no tienen cambios | `.gitlab-ci.yml` en lugar de `.github/workflows/`; la imagen queda `[POR DEFINIR]` |
+
+El proyecto Laravel se crea con el kit oficial, que trae su propia
+autenticación. Cómo crearlo sin ella, para usar el SSO corporativo desde el
+principio, está pendiente de estudio.
+
+### Modo automático de Claude Code
+
+En modo automático, un clasificador revisa cada comando aunque haya una regla
+`allow` en `settings.json`, y deniega los que ve masivos o destructivos (por
+ejemplo, un `git rm` de muchos ficheros). Para el setup y para las retiradas
+grandes, usa un modo que pida confirmación (Shift+Tab) o ejecuta tú el
+comando que el agente te indique.
 
 Los campos `[POR DEFINIR]` que no afecten al trabajo actual pueden mantenerse
 pendientes. No conviertas suposiciones en datos del proyecto.
