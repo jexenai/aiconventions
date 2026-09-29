@@ -71,7 +71,14 @@ Solo lectura.
    `node` y `java`, y las extensiones de PHP (`php -m`) si la base es Oracle
    o se pide cobertura.
 5. Resume el estado en una tabla con una fila por parte y tipo:
-   `Preparado`, `Falta herramienta`, `Falta prueba` o `No aplica`.
+   `Preparado`, `Falta herramienta`, `Falta prueba` o `No aplica`. Una
+   herramienta equivalente ya presente cuenta como `Preparado`, aunque no
+   sea la del estándar ni tenga su nombre de script. Por ejemplo, el kit de
+   Laravel con React trae `vp check` (formato y lint, configurados en la
+   sección `lint` de `vite.config.ts`), `npm run types:check` (`tsc
+   --noEmit`) y `composer types:check` (Larastan): con ellos, lint, tipos y
+   análisis estático están preparados, y se registran esos scripts sin
+   añadir `lint` ni `typecheck`.
 
 ## Fase 2: preguntar
 

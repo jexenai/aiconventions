@@ -154,7 +154,7 @@ formas:
   y los comandos candidatos. Son la intención del estándar, no la prueba de
   lo implementado: el setup los contrasta con el repositorio.
 - Una plantilla por decisión que se toma al crear el proyecto. En Laravel,
-  Inertia o API REST condiciona el kit, los scripts, la CI, cómo se inicia
+  Inertia o API REST condiciona el kit, los scripts, cómo se inicia
   el sistema de diseño y cómo llega el token del SSO, así que son dos
   plantillas (`laravel-inertia` y `laravel-api`) con `bridge` fijado.
   `bridgeOptions` queda para los stacks en los que el puente pueda elegirse

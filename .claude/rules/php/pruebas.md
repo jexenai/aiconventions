@@ -27,7 +27,11 @@ Antes de escribir o corregir una prueba, lee
 - En la API, `getJson()`, `postJson()`...: sin ellos, los errores 401 y 422
   redirigen en lugar de responder JSON. Con `Http::fake()`, añade
   `Http::preventStrayRequests()` para que falle toda llamada no simulada.
-- Autenticación con `actingAs()` o `Sanctum::actingAs()`.
+- Autenticación con `actingAs()` o `Sanctum::actingAs()` cuando el proyecto
+  usa el sistema de autenticación de Laravel. Si la identidad llega de un
+  SSO externo sin guard de Laravel (`auth` en `docs/stack.yaml`), autentica
+  como indique `development.md`, normalmente con las cabeceras o el token de
+  prueba que espera el middleware de identidad.
 - En las pruebas de integración, comprueba el código de estado y la
   estructura (`assertJson`, `assertJsonStructure`), los casos 401/403 y 422,
   y el efecto en base de datos (`assertDatabaseHas`, `assertDatabaseMissing`).

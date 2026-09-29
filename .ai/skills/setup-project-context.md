@@ -21,13 +21,11 @@ misma manera, se ejecute por primera vez o se repita.
   procedimiento. Si el usuario decide adoptarlo, continúa con
   [setup-openspec.md](setup-openspec.md) en la fase 5.
 - No modifiques código de aplicación ni configuración funcional salvo que el
-  usuario amplíe expresamente el alcance. Las únicas excepciones son los
-  ajustes que fija el stack declarado:
-  [el formateador](#excluir-la-documentación-del-formateador) y
-  [la CI](#generar-la-ci-declarada). En `AGENTS.md` edita solo su ficha.
+  usuario amplíe expresamente el alcance. La única excepción es el ajuste
+  del [formateador](#excluir-la-documentación-del-formateador) que fija el
+  stack declarado. En `AGENTS.md` edita solo su ficha.
 - No borres ficheros, salvo los artefactos que indique
-  [Retirar los stacks no usados](#retirar-los-stacks-no-usados) y los
-  workflows que sustituye [la CI declarada](#generar-la-ci-declarada).
+  [Retirar los stacks no usados](#retirar-los-stacks-no-usados).
 - No llames a las herramientas de los servidores MCP: hasta que el usuario
   los apruebe no están disponibles. Sus pasos de inicio se registran para
   después, como indica
@@ -70,8 +68,9 @@ puede decidir sin una línea base.
       Comprueba también que `.gitignore` no excluye ficheros de la plantilla
       que deben versionarse (`.claude/`, `.ai/`, `.codex/`, `.agents/`,
       `AGENTS.md`, `CLAUDE.md` y `.mcp.json`, que no lleva secretos y hace
-      llegar el sistema de diseño a todo el equipo; el `.gitignore` del kit
-      de Laravel excluye varios). Si los excluye, no edites `.gitignore`: haz
+      llegar el sistema de diseño a todo el equipo; el `.gitignore` que genera
+      el framework puede excluir varios, como hace el del kit de Laravel con
+      React). Si los excluye, no edites `.gitignore`: haz
       el commit sin ellos e infórmalo en la sección "Comprobaciones" del
       informe, proponiendo retirar esas líneas y versionarlos después.
    2. Si algún fichero que se incluiría contiene secretos o datos
@@ -114,6 +113,14 @@ Solo lectura. No edites nada en esta fase.
    declarada, anótalo para el informe sin instalar ni cambiar nada. Anota
    también el sistema operativo y la distribución del entorno (por ejemplo,
    Laragon en Windows) para la sección "Entorno local" de `development.md`.
+10. Si `context.ui.bridge` está fijado, comprueba que el repositorio usa ese
+    puente. En Laravel, `inertiajs/inertia-laravel` en `composer.json` o
+    `@inertiajs/react` en `package.json` indican Inertia; `routes/api.php` sin
+    ninguno de los dos indica API REST. Si el observado no coincide con el
+    declarado, la plantilla elegida no corresponde al proyecto: anótalo para
+    P4 y para "Evidencia". Los ajustes que dependen del stack (formateador,
+    adaptación del sistema de diseño, reglas que se retiran) serían los de la
+    otra plantilla.
 
 Solo ejecuta comprobaciones locales rápidas y sin efectos cuando aporten
 evidencia necesaria, como consultar la versión de una herramienta ya
@@ -173,7 +180,7 @@ la añade la herramienta como `Other`; en Codex, indícalo al final del mensaje.
 | P1 | Propósito | ¿Cuál es el propósito principal del proyecto? | Propuesta deducida del README o del código · Dejar pendiente |
 | P2 | Tecnologías | ¿Qué tecnologías y versiones usa el proyecto? | Declaradas en `context.declared` · Las del manifiesto, si difieren · Dejar pendiente |
 | P3 | Código | ¿Dónde está el código de aplicación? | Ruta de `context.conventions.paths.code` si existe · Ruta observada, si difiere · Dejar pendiente |
-| P4 | Vistas | ¿Qué tecnología renderiza las vistas y dónde viven? | Con `context.ui`: la declarada con su `bridge` o, si está sin fijar, una opción por cada `bridgeOptions` · Dejar pendiente. Sin `context.ui`: vistas del framework · No aplica · Dejar pendiente |
+| P4 | Vistas | ¿Qué tecnología renderiza las vistas y dónde viven? | Con `context.ui`: la declarada con su `bridge` o, si está sin fijar, una opción por cada `bridgeOptions` · El puente observado, si la fase 1 detectó que no coincide · Dejar pendiente. Sin `context.ui`: vistas del framework · No aplica · Dejar pendiente |
 
 ### Ronda 2: ejecución
 
@@ -234,8 +241,6 @@ Aplica las respuestas y la clasificación de la fase 2:
 - `vite.config.*`: solo si el stack declara `context.conventions.formatIgnore`,
   aplicando
   [Excluir la documentación del formateador](#excluir-la-documentación-del-formateador).
-- Fichero de CI: solo si el stack declara `context.conventions.ci`, aplicando
-  [Generar la CI declarada](#generar-la-ci-declarada).
 - `.claude/` y `development.md`: retira lo de los stacks que el proyecto no
   usa, aplicando
   [Retirar los stacks no usados](#retirar-los-stacks-no-usados).
@@ -263,16 +268,13 @@ Según la respuesta a P9:
 4. Si el stack declara `context.conventions.formatIgnore`, comprueba que el
    fichero indicado contiene todos sus `patterns` en la clave `key`, o
    anota por qué el paso queda pendiente.
-5. Si el stack declara `context.conventions.ci`, comprueba que su `file`
-   existe y que no quedan workflows de `replaces` sin retirar, o anota por
-   qué el paso queda pendiente.
-6. Revisa que no se hayan documentado ejemplos como configuración activa.
-7. Contrasta los comandos registrados con scripts, manifiestos o CI.
-8. Comprueba que no queda ningún artefacto de los componentes retirados y
+5. Revisa que no se hayan documentado ejemplos como configuración activa.
+6. Contrasta los comandos registrados con scripts, manifiestos o CI.
+7. Comprueba que no queda ningún artefacto de los componentes retirados y
    que ningún fichero de `.claude/` ni `development.md` los cita sin la
    salvedad «si existe». Busca por el nombre de cada carpeta, agente y skill
    retirados.
-9. Revisa el diff para detectar datos inventados, duplicaciones y cambios fuera
+8. Revisa el diff para detectar datos inventados, duplicaciones y cambios fuera
    del alcance documental.
 
 Termina siempre con un informe con estas secciones, en este orden:
@@ -285,7 +287,10 @@ Termina siempre con un informe con estas secciones, en este orden:
    procedimiento.
 3. **Documentos:** documentos y secciones completados.
 4. **Evidencia:** fuentes utilizadas y datos tomados de `docs/stack.yaml`, con
-   sus diferencias respecto al código.
+   sus diferencias respecto al código. Si el puente observado no coincide con
+   el declarado, dilo al principio de la sección y recomienda volver a
+   generar `docs/stack.yaml` con la plantilla que corresponde (por ejemplo,
+   `laravel-inertia` en lugar de `laravel-api`) y repetir el setup.
 5. **MCP:** servidores añadidos a `.mcp.json` y aviso de que el usuario debe
    aprobarlos; en ejecuciones desatendidas se cargan sin preguntar. Si un
    servidor declara `init`, indica la herramienta que hay que pedir al
@@ -319,13 +324,30 @@ reales son los de [.ai/skills/README.md](README.md).
 | `context.auth` | Autenticación en la seguridad del sistema de `architecture.md` | Mecanismo de identidad que exige el estándar. Documéntalo como requerido. Si el repositorio trae otra autenticación (login, registro o paquetes como Fortify que instala el kit), informa de la diferencia en "Evidencia" sin retirarla: es código de aplicación |
 | `context.dependencies` | Configuración y dependencias en `architecture.md` | Dependencias que el estándar exige para el stack. Comprueba si están en el manifiesto e informa de su ausencia sin instalarlas |
 | `context.deployment` | Entornos de ejecución y despliegue en `architecture.md` | Documenta el empaquetado y el destino declarados. Si el manifiesto o el CI producen otro artefacto, informa de la diferencia sin resolverla |
-| `context.ui` | Ficha de `AGENTS.md` (capa de vistas) y mapa del repositorio en `architecture.md` | Propuesta de P4. Documenta la ruta de `entry` solo si existe. Si `bridge` está fijado o el manifiesto lo demuestra, es la primera opción; si no, ofrece cada valor de `bridgeOptions` sin `(Recomendado)`. Sus `dependencies` son paquetes npm: comprueba si están en `package.json` e informa de su ausencia sin instalarlas. Si la clave no existe, propón las vistas del framework declarado con la evidencia del repositorio y reserva `No aplica` para los proyectos que no sirven interfaz |
+| `context.ui` | Ficha de `AGENTS.md` (capa de vistas) y mapa del repositorio en `architecture.md` | Propuesta de P4. Documenta la ruta de `entry` solo si existe. Si `bridge` está fijado o el manifiesto lo demuestra, es la primera opción; si está fijado pero el manifiesto demuestra otro (fase 1, paso 10), el declarado pierde el `(Recomendado)` y el observado se ofrece como alternativa; si no, ofrece cada valor de `bridgeOptions` sin `(Recomendado)`. Sus `dependencies` son paquetes npm: comprueba si están en `package.json` e informa de su ausencia sin instalarlas. Si la clave no existe, propón las vistas del framework declarado con la evidencia del repositorio y reserva `No aplica` para los proyectos que no sirven interfaz |
 | `context.mcp` | `.mcp.json` de la raíz, ficha de `AGENTS.md` (sistema de diseño) y sección "Sistema de diseño" de `development.md` | Propuesta de P8. Si la clave no existe, el stack no usa ninguno y la primera opción es `No se usa` |
 | `context.conventions.paths` | Ficha de `AGENTS.md` (código de aplicación) y mapa del repositorio en `architecture.md` | Propuesta de P3. Documenta solo las rutas que existan. `views` es la carpeta de las vistas reales del proyecto, que puede no coincidir con la de plantillas del framework; contrástala con `context.ui` |
 | `context.conventions.generated` | Archivos generados en el mapa del repositorio | Documenta solo los que existan o estén declarados en `.gitignore` |
 | `context.conventions.formatIgnore` | Fichero de configuración del formateador (`file`, clave `key`) | Patrones que el formateador del kit debe ignorar para no fallar con la documentación de la plantilla. Se aplican en la fase 4 con [Excluir la documentación del formateador](#excluir-la-documentación-del-formateador); no es una pregunta del guion |
-| `context.conventions.ci` | Fichero de CI del proyecto y mapa del repositorio en `architecture.md` | CI que exige el estándar. Se genera en la fase 4 con [Generar la CI declarada](#generar-la-ci-declarada); no es una pregunta del guion |
-| `context.conventions.buildTools` | Ficha de `AGENTS.md` (arranque y pruebas) y comandos de `development.md` | Propuestas de P5 y P6. Usa todas las herramientas cuyo `file` exista. Si hay varias, como `composer.json` y `package.json` en Laravel con vistas React, la opción reúne un comando de cada una, etiquetado por parte (`Backend: …` · `Vistas: …`); si un único script arranca ambas partes, prefiérelo. Las claves de `commands` son candidatas del estándar, no comandos garantizados: propón cada una solo si la respaldan sus scripts, un wrapper del repositorio o el CI; si hay wrapper, prefiérelo |
+| `context.conventions.buildTools` | Ficha de `AGENTS.md` (arranque y pruebas) y comandos de `development.md` | Propuestas de P5 y P6. Usa todas las herramientas cuyo `file` exista. Si hay varias, como `composer.json` y `package.json` en Laravel con vistas React, la opción reúne un comando de cada una, etiquetado por parte (`Backend: …` · `Vistas: …`); si un único script arranca ambas partes, prefiérelo. Las claves de `commands` son candidatas del estándar, no comandos garantizados: propón cada una solo si la respaldan sus scripts, un wrapper del repositorio o el CI; si hay wrapper, prefiérelo. Cada clave va a un destino fijo, según la tabla siguiente |
+
+Destino de cada clave de `buildTools.commands`:
+
+| Clave | Pregunta | Fila de "Comandos" en `development.md` |
+| ----- | -------- | -------------------------------------- |
+| `install`, `setup` | — | Preparar dependencias (`setup` si existe, porque además prepara la aplicación) |
+| `run` | P5 | Arrancar en local |
+| `build` | — | Compilar |
+| `formatCheck`, `format` | — | Comprobar formato (`formatCheck`; `format` es el que corrige) |
+| `staticAnalysis` | — | Ejecutar análisis estático |
+| `test` | P6 | Pruebas unitarias y de integración |
+| `testFilter` | — | Una sola prueba o clase |
+| `migrate` | — | Ninguna: solo se cita si una tarea lo necesita |
+
+Un comando de formato o de lint no es un comando de pruebas: no lo propongas
+en P6. Si una parte no tiene `test` respaldado (por ejemplo, las vistas del
+kit de Laravel con React, cuyo `npm run check` solo formatea y hace lint),
+esa parte queda pendiente en P6 y el informe recomienda `setup-testing`.
 
 El archivo no aporta el propósito, los usuarios, el dominio, las decisiones de
 arquitectura ni la seguridad del proyecto. Complétalos con otra evidencia o
@@ -384,25 +406,6 @@ un paso del setup y no un fichero de la plantilla.
    errores. No ejecutes `npm run check:fix` para resolverlo: reescribiría
    los documentos.
 
-## Generar la CI declarada
-
-Aplica en la fase 4 solo si el stack declara `context.conventions.ci`. El kit
-de Laravel trae workflows de GitHub Actions, pero el estándar pide la CI de
-`context.declared.ci`. El fichero no es de la plantilla porque su contenido
-depende del stack; por eso se genera en el setup.
-
-1. Si `file` no existe, créalo con el texto de `content`, sin cambios.
-   Conserva sus marcadores `[POR DEFINIR]` (por ejemplo, la imagen del
-   registro corporativo) y cítalos en "Pendientes" del informe.
-2. Si `file` ya existe, no lo sustituyas ni lo fusiones: conserva el del
-   proyecto e informa de que no se generó.
-3. Si existe la carpeta `replaces` (`.github/workflows/`), borra sus ficheros
-   solo si no tienen cambios locales en Git respecto a la línea base de la
-   fase 0; si los tienen, consérvalos e infórmalo. No borres el resto de
-   `.github/`.
-4. Contrasta los comandos de `content` con los scripts del manifiesto. Si
-   alguno no existe, no lo cambies: anótalo en "Pendientes".
-
 ## Retirar los stacks no usados
 
 La plantilla trae reglas, revisores y skills de Claude Code para Spring Boot,
@@ -424,7 +427,7 @@ repetir el procedimiento.
    | Componente | Se conserva si | Artefactos |
    | ---------- | -------------- | ---------- |
    | Spring Boot | P2 incluye Java o Spring Boot | `.claude/rules/java/`, `.claude/agents/java-reviewer.md`, `.claude/skills/springboot-security/`, `springboot-tdd/`, `jpa-patterns/`, `openapi-mapstruct/` |
-   | Laravel | P2 incluye PHP o Laravel | `.claude/rules/php/`, `.claude/agents/php-reviewer.md`, `.claude/skills/laravel-security/`, `laravel-tdd/`; el procedimiento `laravel-deploy` (`.ai/skills/laravel-deploy.md`, `.claude/skills/laravel-deploy/`, `.agents/skills/laravel-deploy/`), su fila en `.ai/skills/README.md` y su línea en la sección "Entrega" de `development.md` |
+   | Laravel | P2 incluye PHP o Laravel | `.claude/rules/php/`, `.claude/agents/php-reviewer.md`, `.claude/skills/laravel-security/`, `laravel-tdd/`; el procedimiento `laravel-deploy` (`.ai/skills/laravel-deploy.md`, `.claude/skills/laravel-deploy/`, `.agents/skills/laravel-deploy/`), su fila en `.ai/skills/README.md`, su línea en la sección "Entrega" de `development.md` y la aclaración sobre PHP en Windows de su sección "Entorno local" |
    | Oracle | P7 incluye Oracle en algún entorno | `.claude/rules/java/oracle.md` y `.claude/rules/php/oracle.md` |
    | React | P2 o P4 incluyen React | `.claude/rules/react/`, `.claude/agents/react-reviewer.md`, `.claude/skills/react-testing/`, `frontend-a11y/`, `e2e-testing/` |
    | Backend | Se conserva Spring Boot o Laravel | `.claude/rules/comun/seguridad.md`, `.claude/skills/api-design/` y la sección "API" de `development.md` |

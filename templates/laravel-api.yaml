@@ -84,39 +84,3 @@ context:
         build: npm run build
         test: npm test
         staticAnalysis: npm run lint
-    ci:
-      file: .gitlab-ci.yml
-      replaces: .github/workflows/
-      content: |
-        # Generado por setup-project-context a partir de docs/stack.yaml.
-        # Comprueba el backend (formato y pruebas) y compila la SPA.
-        stages:
-          - check
-
-        variables:
-          COMPOSER_CACHE_DIR: "$CI_PROJECT_DIR/.cache/composer"
-          npm_config_cache: "$CI_PROJECT_DIR/.cache/npm"
-
-        ci:
-          stage: check
-          # [POR DEFINIR] Imagen del registro corporativo con PHP 8.3 o superior,
-          # Composer 2, Node 22 y las extensiones de Laravel (pdo_sqlite incluida).
-          image: "$CI_PHP_NODE_IMAGE"
-          cache:
-            key:
-              files:
-                - composer.lock
-                - package-lock.json
-            paths:
-              - .cache/
-          script:
-            - composer install --no-interaction --prefer-dist
-            - cp .env.example .env
-            - php artisan key:generate
-            - vendor/bin/pint --test
-            - php artisan test
-            - npm ci
-            - npm run build
-          rules:
-            - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-            - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

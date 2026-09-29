@@ -90,7 +90,6 @@ context:
         format: composer lint
         formatCheck: composer lint:check
         staticAnalysis: composer types:check
-        ci: composer ci:check
     - file: package.json
       commands:
         install: npm ci
@@ -98,35 +97,3 @@ context:
         formatCheck: npm run check
         format: npm run check:fix
         staticAnalysis: npm run types:check
-    ci:
-      file: .gitlab-ci.yml
-      replaces: .github/workflows/
-      content: |
-        # Generado por setup-project-context a partir de docs/stack.yaml.
-        # Hace lo mismo que el workflow de GitHub Actions del kit de Laravel:
-        # prepara la aplicación y ejecuta las comprobaciones de composer ci:check.
-        stages:
-          - check
-
-        variables:
-          COMPOSER_CACHE_DIR: "$CI_PROJECT_DIR/.cache/composer"
-          npm_config_cache: "$CI_PROJECT_DIR/.cache/npm"
-
-        ci:
-          stage: check
-          # [POR DEFINIR] Imagen del registro corporativo con PHP 8.3 o superior,
-          # Composer 2, Node 22 y las extensiones de Laravel (pdo_sqlite incluida).
-          image: "$CI_PHP_NODE_IMAGE"
-          cache:
-            key:
-              files:
-                - composer.lock
-                - package-lock.json
-            paths:
-              - .cache/
-          script:
-            - composer setup
-            - composer ci:check
-          rules:
-            - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-            - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

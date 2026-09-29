@@ -110,13 +110,12 @@ ficha y los documentos:
 | --------------- | ------------------ | ----------------- | ------------- |
 | `database` | Persistencia y base de pruebas; puede declararse por entorno | Oracle 19c en producción, SQLite en desarrollo y en pruebas | Igual |
 | `auth` | Se documenta como requisito; si el proyecto trae otra autenticación, se informa sin retirarla | SSO corporativo (JWT) | Igual |
-| `ui.bridge` | Primera opción de P4 y decisión de qué reglas y skills se retiran | Inertia.js | API REST + SPA |
+| `ui.bridge` | Primera opción de P4 y decisión de qué reglas y skills se retiran. El setup comprueba que el repositorio usa ese puente y, si no, recomienda la otra plantilla | Inertia.js | API REST + SPA |
 | `mcp` | `.mcp.json` y, con `init`, la adaptación del paso de inicio en `development.md` | `dsjex`; `iniciar_proyecto` adaptado a Inertia, sin react-router y sustituyendo los componentes Radix del kit | `dsjex`; `iniciar_proyecto` casi tal cual, en `resources/js/` y con react-router |
-| `conventions.buildTools` | Comandos propuestos en P5 y P6, contrastados con los scripts | Scripts del kit: `composer dev`, `composer ci:check`, `npm run check` | Los de Laravel sin kit: `php artisan test`, `vendor/bin/pint`, `npm run build` |
+| `conventions.buildTools` | Comandos propuestos en P5 y P6 y filas de "Comandos", contrastados con los scripts. Formato y lint nunca cuentan como pruebas | Scripts del kit: `composer dev`, `composer lint:check`, `npm run check`; las pruebas de vistas quedan para `setup-testing` | Los de Laravel sin kit: `php artisan test`, `vendor/bin/pint`, `npm run build` |
 | `conventions.formatIgnore` | Excluye la documentación del formateador del kit | `fmt.ignorePatterns` de `vite.config.ts` | No aplica: no hay kit |
-| `conventions.ci` | Genera el fichero de CI si no existe y retira los workflows que sustituye, si no tienen cambios | `.gitlab-ci.yml` con `composer setup` y `composer ci:check` | `.gitlab-ci.yml` con Pint, pruebas y compilación de la SPA |
 
-La imagen de la CI queda `[POR DEFINIR]` en los dos casos.
+La CI declarada (GitLab CI) no se genera todavía: el setup solo la documenta.
 
 ### Elegir entre `laravel-inertia` y `laravel-api`
 

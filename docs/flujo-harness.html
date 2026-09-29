@@ -1261,12 +1261,12 @@
               cuando el servidor esté aprobado.
             </p>
             <p>
-              El stack pide GitLab CI: si no hay <code>.gitlab-ci.yml</code>, la skill
-              lo genera con el formato, las pruebas y la compilación de la SPA, y
-              retira <code>.github/workflows/</code> si existe y no tiene cambios. La
-              imagen del registro corporativo queda <code>[POR DEFINIR]</code>. También
-              documenta el SSO como la autenticación requerida; si el proyecto trae
-              otra, la señala sin retirarla, porque es código de aplicación.
+              También documenta el SSO como la autenticación requerida; si el
+              proyecto trae otra, la señala sin retirarla, porque es código de
+              aplicación. Y comprueba que el repositorio usa de verdad el puente del
+              stack: si fuera un proyecto con Inertia, el informe recomendaría
+              volver a generar <code>docs/stack.yaml</code> con
+              <code>laravel-inertia</code>.
             </p>
             <p>
               Después retira de <code>.claude/</code> lo de los stacks que el proyecto no
