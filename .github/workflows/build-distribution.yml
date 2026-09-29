@@ -6,6 +6,9 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+"
       - "[0-9]+.[0-9]+.[0-9]+"
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -31,3 +34,19 @@ jobs:
             dist/manifest.json
             dist/aiconventions.zip
           if-no-files-found: error
+
+      - name: Publish release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          if ! gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release create "$GITHUB_REF_NAME" \
+              --title "$GITHUB_REF_NAME" \
+              --notes "Distribucion $GITHUB_REF_NAME"
+          fi
+
+          gh release upload "$GITHUB_REF_NAME" \
+            dist/manifest.json \
+            dist/aiconventions.zip \
+            --clobber

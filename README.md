@@ -114,7 +114,14 @@ ya versionados en Git, añade `--tracked-only`.
 El workflow de GitHub Actions `Build distribution` solo se ejecuta al empujar
 una etiqueta `vYY.MM.PATCH` o `YY.MM.PATCH`, por ejemplo `v26.09.0`. Usa esa
 etiqueta como versión de plantilla y publica `manifest.json` y
-`aiconventions.zip` como artefactos del job.
+`aiconventions.zip` como artefactos del job y como assets de la release.
+
+URLs de descarga de la última release:
+
+```text
+https://github.com/jexenai/aiconventions/releases/latest/download/manifest.json
+https://github.com/jexenai/aiconventions/releases/latest/download/aiconventions.zip
+```
 
 Para publicar manualmente una versión:
 
