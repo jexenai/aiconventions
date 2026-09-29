@@ -214,6 +214,9 @@ Aplica las respuestas y la clasificación de la fase 2:
   procedimiento no las edita.
 - `.mcp.json`: según P8, aplicando
   [Materializar los servidores MCP](#materializar-los-servidores-mcp).
+- `vite.config.*`: solo si el stack declara `context.conventions.formatIgnore`,
+  aplicando
+  [Excluir la documentación del formateador](#excluir-la-documentación-del-formateador).
 - `.claude/` y `development.md`: retira lo de los stacks que el proyecto no
   usa, aplicando
   [Retirar los stacks no usados](#retirar-los-stacks-no-usados).
@@ -238,13 +241,16 @@ Según la respuesta a P9:
 2. Comprueba que los enlaces y rutas locales añadidos existen.
 3. Si el stack declara `context.mcp`, comprueba que `.mcp.json` es JSON válido,
    que conserva los servidores previos y que la ficha coincide con él.
-4. Revisa que no se hayan documentado ejemplos como configuración activa.
-5. Contrasta los comandos registrados con scripts, manifiestos o CI.
-6. Comprueba que no queda ningún artefacto de los componentes retirados y
+4. Si el stack declara `context.conventions.formatIgnore`, comprueba que el
+   fichero indicado contiene todos sus `patterns` en la clave `key`, o
+   anota por qué el paso queda pendiente.
+5. Revisa que no se hayan documentado ejemplos como configuración activa.
+6. Contrasta los comandos registrados con scripts, manifiestos o CI.
+7. Comprueba que no queda ningún artefacto de los componentes retirados y
    que ningún fichero de `.claude/` ni `development.md` los cita sin la
    salvedad «si existe». Busca por el nombre de cada carpeta, agente y skill
    retirados.
-7. Revisa el diff para detectar datos inventados, duplicaciones y cambios fuera
+8. Revisa el diff para detectar datos inventados, duplicaciones y cambios fuera
    del alcance documental.
 
 Termina siempre con un informe con estas secciones, en este orden:
@@ -291,6 +297,7 @@ reales son los de [.ai/skills/README.md](README.md).
 | `context.mcp` | `.mcp.json` de la raíz y ficha de `AGENTS.md` (sistema de diseño) | Propuesta de P8. Si la clave no existe, el stack no usa ninguno y la primera opción es `No se usa` |
 | `context.conventions.paths` | Ficha de `AGENTS.md` (código de aplicación) y mapa del repositorio en `architecture.md` | Propuesta de P3. Documenta solo las rutas que existan. `views` es la carpeta de las vistas reales del proyecto, que puede no coincidir con la de plantillas del framework; contrástala con `context.ui` |
 | `context.conventions.generated` | Archivos generados en el mapa del repositorio | Documenta solo los que existan o estén declarados en `.gitignore` |
+| `context.conventions.formatIgnore` | Fichero de configuración del formateador (`file`, clave `key`) | Patrones que el formateador del kit debe ignorar para no fallar con la documentación de la plantilla. Se aplican en la fase 4 con [Excluir la documentación del formateador](#excluir-la-documentación-del-formateador); no es una pregunta del guion |
 | `context.conventions.buildTools` | Ficha de `AGENTS.md` (arranque y pruebas) y comandos de `development.md` | Propuestas de P5 y P6. Usa todas las herramientas cuyo `file` exista. Si hay varias, como `composer.json` y `package.json` en Laravel con vistas React, la opción reúne un comando de cada una, etiquetado por parte (`Backend: …` · `Vistas: …`); si un único script arranca ambas partes, prefiérelo. Las claves de `commands` son candidatas del estándar, no comandos garantizados: propón cada una solo si la respaldan sus scripts, un wrapper del repositorio o el CI; si hay wrapper, prefiérelo |
 
 El archivo no aporta el propósito, los usuarios, el dominio, las decisiones de
@@ -321,6 +328,28 @@ interactiva.
    procedimiento.
 5. Registra en la ficha de `AGENTS.md` el sistema de diseño y el servidor que
    sirve su catálogo, o `No se usa` si esa fue la respuesta a P8.
+
+## Excluir la documentación del formateador
+
+Aplica en la fase 4 solo si el stack declara `context.conventions.formatIgnore`.
+El kit de Laravel con React formatea con `npm run check` todo el repositorio,
+incluidos los Markdown de la plantilla y de OpenSpec, que no siguen su formato
+y lo hacen fallar sin que el código tenga ningún defecto. La plantilla no trae
+`vite.config.ts`: lo genera el kit al crear el proyecto, por eso el ajuste es
+un paso del setup y no un fichero de la plantilla.
+
+1. Lee `file` (`vite.config.ts`). Si no existe, o no tiene la sección `fmt`,
+   no lo crees ni lo inventes: informa de que el paso queda pendiente hasta
+   que exista el fichero.
+2. Añade a la lista `key` (`fmt.ignorePatterns`) los `patterns` que falten,
+   sin quitar ni reordenar los existentes. Si el proyecto ya no usa OpenSpec
+   o no tiene `docs/`, añade igualmente los patrones: no cuestan nada y
+   evitan un fallo si aparecen después.
+3. Si el formateador declara otra clave o el fichero usa otro formato que no
+   puedes editar con seguridad, no lo modifiques: informa del ajuste manual.
+4. Ejecuta `npm run check` si hay `node_modules/` y anota si termina sin
+   errores. No ejecutes `npm run check:fix` para resolverlo: reescribiría
+   los documentos.
 
 ## Retirar los stacks no usados
 

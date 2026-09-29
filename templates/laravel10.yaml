@@ -54,6 +54,17 @@ context:
     - bootstrap/cache/
     - storage/framework/
     - public/build/
+    formatIgnore:
+      file: vite.config.ts
+      key: fmt.ignorePatterns
+      patterns:
+      - .agents/**
+      - .ai/**
+      - .claude/**
+      - docs/**
+      - openspec/**
+      - AGENTS.md
+      - CLAUDE.md
     buildTools:
     - file: composer.json
       commands:
