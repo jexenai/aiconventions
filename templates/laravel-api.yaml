@@ -1,6 +1,6 @@
 standard: 26.9.21
 context:
-  template: laravel10
+  template: laravel-api
   declared:
     language: PHP 8.3 o superior
     framework: Laravel 12 o superior
@@ -17,39 +17,38 @@ context:
   deployment:
     packaging: Código PHP desplegado sobre Apache 2.4
     documentRoot: public/
-    assets: Compilados con Vite antes del despliegue
+    assets: SPA compilada con Vite antes del despliegue
   ui:
     views: React 18 o superior
     entry: resources/js/
-    rootTemplate: Blade, solo la plantilla raíz que monta la aplicación React
-    bridge: "[POR DEFINIR]"
-    bridgeOptions:
-    - Inertia.js
-    - API REST + SPA
+    rootTemplate: Blade, solo la plantilla raíz que monta la SPA
+    bridge: API REST + SPA
     dependencies:
     - package: react, react-dom
       purpose: Capa de vistas de la aplicación
+    - package: react-router-dom
+      purpose: Enrutado en el cliente de la SPA
     - package: "@vitejs/plugin-react"
       purpose: Compilación de JSX con el Vite que ya usa Laravel
   mcp:
   - name: dsjex
-    purpose: Sistema de Diseño de la Junta de Extremadura (componentes shadcn sobre Base UI, tokens y app shell) para las vistas React de resources/js/
+    purpose: Sistema de Diseño de la Junta de Extremadura (componentes shadcn sobre Base UI, tokens y app shell) para la SPA React de resources/js/
     server:
       type: http
       url: https://dsjex.socialytech.es/mcp/
     init:
       tool: iniciar_proyecto
       adaptation:
-      - El proyecto ya lo crea el kit de Laravel; no se ejecuta `npm create vite`.
-      - Donde el plan dice `src/`, se usa `resources/js/`; el alias `@` del kit ya apunta ahí.
+      - El proyecto lo crea Laravel; no se ejecuta `npm create vite`. Las dependencias del paso 2 del plan se instalan en el `package.json` de la raíz.
+      - Donde el plan dice `src/`, se usa `resources/js/`, con el alias `@` apuntando ahí en `vite.config.*` y en `tsconfig.json`.
       - Los tokens de `tokens_jex` van en `resources/css/app.css`.
-      - Con Inertia no se instala `react-router-dom`; las rutas del `app_shell` se declaran en `routes/web.php` y se navega con `Link` de Inertia.
-      - El layout del `app_shell` va en `resources/js/layouts/` y las páginas en `resources/js/pages/`.
-      - Los componentes de `resources/js/components/ui/` que trae el kit (Radix) se sustituyen por los del catálogo (Base UI), pedidos con `codigo_componente`; Base UI usa la prop `render`, no `asChild`.
+      - El `app_shell` se usa tal cual, con `react-router-dom`; Laravel sirve la plantilla Blade raíz en una ruta comodín de `routes/web.php` y deja `/api/*` para la API.
+      - Los componentes se inicializan con Base UI y se piden con `codigo_componente`; Base UI usa la prop `render`, no `asChild`.
   conventions:
     paths:
       code: app/
       routes: routes/
+      apiRoutes: routes/api.php
       migrations: database/migrations/
       tests: tests/
       viewTests: resources/js/tests/
@@ -66,17 +65,6 @@ context:
     - bootstrap/cache/
     - storage/framework/
     - public/build/
-    formatIgnore:
-      file: vite.config.ts
-      key: fmt.ignorePatterns
-      patterns:
-      - .agents/**
-      - .ai/**
-      - .claude/**
-      - docs/**
-      - openspec/**
-      - AGENTS.md
-      - CLAUDE.md
     buildTools:
     - file: composer.json
       commands:
@@ -86,24 +74,22 @@ context:
         migrate: php artisan migrate
         test: php artisan test
         testFilter: php artisan test --filter=NombreDeLaPrueba
-        format: composer lint
-        formatCheck: composer lint:check
-        staticAnalysis: composer types:check
-        ci: composer ci:check
+        formatCheck: vendor/bin/pint --test
+        format: vendor/bin/pint
+        staticAnalysis: vendor/bin/phpstan analyse
     - file: package.json
       commands:
         install: npm ci
+        run: npm run dev
         build: npm run build
-        formatCheck: npm run check
-        format: npm run check:fix
-        staticAnalysis: npm run types:check
+        test: npm test
+        staticAnalysis: npm run lint
     ci:
       file: .gitlab-ci.yml
       replaces: .github/workflows/
       content: |
         # Generado por setup-project-context a partir de docs/stack.yaml.
-        # Hace lo mismo que el workflow de GitHub Actions del kit de Laravel:
-        # prepara la aplicación y ejecuta las comprobaciones de composer ci:check.
+        # Comprueba el backend (formato y pruebas) y compila la SPA.
         stages:
           - check
 
@@ -124,8 +110,13 @@ context:
             paths:
               - .cache/
           script:
-            - composer setup
-            - composer ci:check
+            - composer install --no-interaction --prefer-dist
+            - cp .env.example .env
+            - php artisan key:generate
+            - vendor/bin/pint --test
+            - php artisan test
+            - npm ci
+            - npm run build
           rules:
             - if: $CI_PIPELINE_SOURCE == "merge_request_event"
             - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

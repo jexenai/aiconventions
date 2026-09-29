@@ -153,6 +153,12 @@ formas:
   tecnologías, la base de datos, las vistas y su puente (`bridge`), las rutas
   y los comandos candidatos. Son la intención del estándar, no la prueba de
   lo implementado: el setup los contrasta con el repositorio.
+- Una plantilla por decisión que se toma al crear el proyecto. En Laravel,
+  Inertia o API REST condiciona el kit, los scripts, la CI, cómo se inicia
+  el sistema de diseño y cómo llega el token del SSO, así que son dos
+  plantillas (`laravel-inertia` y `laravel-api`) con `bridge` fijado.
+  `bridgeOptions` queda para los stacks en los que el puente pueda elegirse
+  después de crear el proyecto.
 - Los servidores MCP no se configuran a mano: cada plantilla declara en
   `context.mcp` los suyos con su configuración completa, y el setup los
   fusiona en `.mcp.json` solo cuando el stack los declara. Así un backend sin

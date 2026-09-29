@@ -106,18 +106,37 @@ Quien quiera la memoria para sí puede reactivarla en su
 Lo que declara cada `templates/*.yaml` y el setup materializa, además de la
 ficha y los documentos:
 
-| Clave del stack | Efecto en el setup | Ejemplo en `laravel10` |
-| --------------- | ------------------ | ---------------------- |
-| `database` | Persistencia y base de pruebas; puede declararse por entorno | Oracle 19c en producción, SQLite en desarrollo y en pruebas |
-| `auth` | Se documenta como requisito; si el kit trae otra autenticación, se informa sin retirarla | SSO corporativo (JWT) |
-| `mcp` | `.mcp.json` y, con `init`, la adaptación del paso de inicio en `development.md` | `dsjex` con `iniciar_proyecto` |
-| `conventions.buildTools` | Comandos propuestos en P5 y P6, contrastados con los scripts | `composer dev`, `composer ci:check`, `npm run check` |
-| `conventions.formatIgnore` | Excluye la documentación del formateador del kit | `fmt.ignorePatterns` de `vite.config.ts` |
-| `conventions.ci` | Genera el fichero de CI si no existe y retira los workflows que sustituye, si no tienen cambios | `.gitlab-ci.yml` en lugar de `.github/workflows/`; la imagen queda `[POR DEFINIR]` |
+| Clave del stack | Efecto en el setup | `laravel-inertia` | `laravel-api` |
+| --------------- | ------------------ | ----------------- | ------------- |
+| `database` | Persistencia y base de pruebas; puede declararse por entorno | Oracle 19c en producción, SQLite en desarrollo y en pruebas | Igual |
+| `auth` | Se documenta como requisito; si el proyecto trae otra autenticación, se informa sin retirarla | SSO corporativo (JWT) | Igual |
+| `ui.bridge` | Primera opción de P4 y decisión de qué reglas y skills se retiran | Inertia.js | API REST + SPA |
+| `mcp` | `.mcp.json` y, con `init`, la adaptación del paso de inicio en `development.md` | `dsjex`; `iniciar_proyecto` adaptado a Inertia, sin react-router y sustituyendo los componentes Radix del kit | `dsjex`; `iniciar_proyecto` casi tal cual, en `resources/js/` y con react-router |
+| `conventions.buildTools` | Comandos propuestos en P5 y P6, contrastados con los scripts | Scripts del kit: `composer dev`, `composer ci:check`, `npm run check` | Los de Laravel sin kit: `php artisan test`, `vendor/bin/pint`, `npm run build` |
+| `conventions.formatIgnore` | Excluye la documentación del formateador del kit | `fmt.ignorePatterns` de `vite.config.ts` | No aplica: no hay kit |
+| `conventions.ci` | Genera el fichero de CI si no existe y retira los workflows que sustituye, si no tienen cambios | `.gitlab-ci.yml` con `composer setup` y `composer ci:check` | `.gitlab-ci.yml` con Pint, pruebas y compilación de la SPA |
 
-El proyecto Laravel se crea con el kit oficial, que trae su propia
-autenticación. Cómo crearlo sin ella, para usar el SSO corporativo desde el
-principio, está pendiente de estudio.
+La imagen de la CI queda `[POR DEFINIR]` en los dos casos.
+
+### Elegir entre `laravel-inertia` y `laravel-api`
+
+En Laravel, cómo se unen backend y vistas se decide al crear el proyecto, no
+después: el kit oficial de React ya trae Inertia, y una API se crea sin él.
+Por eso son dos stacks y el setup no lo pregunta, solo lo confirma.
+
+- **`laravel-inertia`:** una aplicación web con un único cliente. Los
+  controladores pasan los datos a páginas React, sin API ni contrato que
+  mantener. El navegador no añade el JWT del SSO a las visitas: o lo inyecta
+  el gateway corporativo en cada petición, o Laravel abre una sesión tras el
+  acceso por SSO. Está por decidir con Identidad corporativa.
+- **`laravel-api`:** la misma API sirve también a otros clientes (móvil,
+  integraciones) o el equipo de interfaz trabaja aparte. La SPA obtiene el
+  token del SSO y lo envía como `Bearer`, y Laravel lo valida sin estado. Si
+  la SPA vive en otro repositorio, ese repositorio usa `react18`.
+
+El kit oficial trae su propia autenticación. Cómo crear cada variante sin
+ella, para usar el SSO corporativo desde el principio, está pendiente de
+estudio.
 
 ### Modo automático de Claude Code
 

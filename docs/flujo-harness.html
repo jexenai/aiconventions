@@ -1164,13 +1164,19 @@
             <h3>Elegir el stack</h3>
             <p>
               El plugin genera <code>docs/stack.yaml</code> a partir de una plantilla
-              de <code>templates/</code>. Para este recorrido, <code>laravel10</code>:
-              PHP 8.3 o superior con Laravel en el backend, vistas React en
-              <code>resources/js/</code>, Oracle 19c en producción y SQLite en
+              de <code>templates/</code>. Para este recorrido, <code>laravel-api</code>:
+              PHP 8.3 o superior con Laravel exponiendo una API REST, una SPA React en
+              <code>resources/js/</code> que la consume, Oracle 19c en producción y SQLite en
               desarrollo y pruebas, identidad por el SSO corporativo (JWT),
               el Sistema de Diseño JEX y GitLab CI. Ese archivo
               es la intención declarada del equipo, no la prueba de lo implementado:
               todo lo que salga de él se contrasta después con el repositorio.
+            </p>
+            <p>
+              La forma de unir Laravel y React se elige aquí, con el stack, porque en
+              Laravel se decide al crear el proyecto: el kit oficial de React ya trae
+              Inertia, y una API se crea sin él. La otra opción es
+              <code>laravel-inertia</code>.
             </p>
           </div>
         </li>
@@ -1195,12 +1201,11 @@
             <p>
               Después plantea siempre el mismo guion de nueve preguntas en tres
               rondas —ficha, ejecución y OpenSpec—, también al repetir el setup.
-              En <code>laravel10</code>, la pregunta de las vistas ofrece las dos formas
-              de unir Laravel y React que declara el stack: <em>Inertia.js</em> o
-              <em>API REST + SPA</em>. En este recorrido se elige
-              <strong>API REST + SPA</strong>: Laravel expone endpoints JSON y React los
-              consume. Lo que nadie confirma queda en <code>[POR DEFINIR]</code> en
-              lugar de inventarse.
+              Como <code>laravel-api</code> fija el puente, la pregunta de las vistas
+              propone <strong>API REST + SPA</strong> como primera opción y el usuario
+              la confirma: Laravel expone endpoints JSON y React los consume. Lo que
+              nadie confirma queda en <code>[POR DEFINIR]</code> en lugar de
+              inventarse.
             </p>
           </div>
         </li>
@@ -1245,25 +1250,23 @@
             <div class="paso-meta"><span class="actor a-skill">setup-project-context</span></div>
             <h3>Materializar lo que el stack declare y retirar lo que sobra</h3>
             <p>
-              <code>laravel10</code> declara el servidor MCP <code>dsjex</code>, el
+              <code>laravel-api</code> declara el servidor MCP <code>dsjex</code>, el
               catálogo del Sistema de Diseño de la Junta de Extremadura. La skill lo
               añade a <code>.mcp.json</code> sin arrancarlo: configurar un servidor no
               es activarlo. Tampoco llama a su paso de inicio,
-              <code>iniciar_proyecto</code>, pensado para una SPA con Vite: deja en
-              <code>development.md</code> cómo adaptarlo a Laravel
+              <code>iniciar_proyecto</code>, que crea una SPA con Vite: deja en
+              <code>development.md</code> cómo aplicarlo dentro de Laravel
               (<code>resources/js/</code> en lugar de <code>src/</code>, tokens en
-              <code>app.css</code>, componentes Base UI en lugar de los Radix del kit)
-              para cuando el servidor esté aprobado.
+              <code>app.css</code>, la plantilla Blade raíz en una ruta comodín) para
+              cuando el servidor esté aprobado.
             </p>
             <p>
-              El stack pide GitLab CI y el kit trae GitHub Actions: la skill genera
-              <code>.gitlab-ci.yml</code> con los mismos comandos
-              (<code>composer setup</code> y <code>composer ci:check</code>) y retira
-              <code>.github/workflows/</code> si no tiene cambios. La imagen del
-              registro corporativo queda <code>[POR DEFINIR]</code>. También excluye
-              la documentación del formateador del kit y documenta el SSO como la
-              autenticación requerida, aunque el kit traiga la suya: esa es código de
-              aplicación y no la retira.
+              El stack pide GitLab CI: si no hay <code>.gitlab-ci.yml</code>, la skill
+              lo genera con el formato, las pruebas y la compilación de la SPA, y
+              retira <code>.github/workflows/</code> si existe y no tiene cambios. La
+              imagen del registro corporativo queda <code>[POR DEFINIR]</code>. También
+              documenta el SSO como la autenticación requerida; si el proyecto trae
+              otra, la señala sin retirarla, porque es código de aplicación.
             </p>
             <p>
               Después retira de <code>.claude/</code> lo de los stacks que el proyecto no
@@ -1314,10 +1317,9 @@ skills/api-design, contract-first <span class="g">✓</span>   <span class="c">h
               Cuando el proyecto tiene dos partes, arranque y pruebas llevan un comando
               por parte, salvo que un único script arranque las dos, como
               <code>composer dev</code>. Las pruebas de las vistas quedan pendientes:
-              el <code>package.json</code> del kit trae <code>dev</code>,
-              <code>build</code>, <code>check</code> y <code>types:check</code>, pero
-              ningún ejecutor de pruebas, y el setup no inventa un
-              <code>npm test</code> que no existe. Su informe recomienda el paso
+              el <code>package.json</code> de Laravel solo trae <code>dev</code> y
+              <code>build</code>, y el setup no inventa un <code>npm test</code> que
+              no existe. Su informe recomienda el paso
               siguiente.
             </p>
           </div>
@@ -1349,12 +1351,12 @@ skills/api-design, contract-first <span class="g">✓</span>   <span class="c">h
             <figure class="codigo">
               <figcaption>Estado antes y después<span class="etiqueta et-verde">Laravel + React</span></figcaption>
               <div class="terminal">Backend  · pruebas       <span class="g">✓ preparado</span>      <span class="c">PHPUnit viene con Laravel</span>
-Backend  · análisis      <span class="g">✓ preparado</span>      <span class="c">composer types:check (Larastan del kit)</span>
+Backend  · análisis      <span class="r">✗ falta</span> → <span class="g">Larastan</span>
 Backend  · base pruebas  <span class="g">✓ preparado</span>      <span class="c">SQLite en memoria, la declarada para pruebas</span>
 Backend  · Oracle        <span class="r">✗ falta oci8</span>    <span class="c">solo producción; software del sistema: se informa</span>
 Vistas   · componentes   <span class="r">✗ falta</span> → <span class="g">Vitest + Testing Library</span>
-Vistas   · lint          <span class="g">✓ preparado</span>      <span class="c">npm run check del kit</span>
-Vistas   · tipos         <span class="g">✓ preparado</span>      <span class="c">npm run types:check del kit</span>
+Vistas   · lint          <span class="r">✗ falta</span> → <span class="g">ESLint + react-hooks + jsx-a11y</span>
+Vistas   · tipos         <span class="r">✗ falta</span> → <span class="g">tsc --noEmit</span>
 <span class="c">Extremo  · Playwright    — no por ahora</span></div>
             </figure>
             <p>
@@ -2785,7 +2787,7 @@ git diff --cached --check   <span class="c">errores de espacios en blanco</span>
 
       <div class="ramas">
         <div class="rama">
-          <span class="rama-sello rama-si">API REST + SPA</span>
+          <span class="rama-sello rama-si">laravel-api</span>
           <h3>El recorrido de este documento</h3>
           <p>
             Laravel expone endpoints JSON y React los consume. Hay un contrato que
@@ -2794,7 +2796,7 @@ git diff --cached --check   <span class="c">errores de espacios en blanco</span>
           </p>
         </div>
         <div class="rama">
-          <span class="rama-sello rama-spec">Inertia.js</span>
+          <span class="rama-sello rama-spec">laravel-inertia</span>
           <h3>Sin API intermedia</h3>
           <p>
             El controlador pasa los datos directamente a la página React, sin endpoint
@@ -2809,7 +2811,7 @@ git diff --cached --check   <span class="c">errores de espacios en blanco</span>
 
       <div class="ramas">
         <div class="rama">
-          <span class="rama-sello rama-si">react18 · laravel10</span>
+          <span class="rama-sello rama-si">react18 · laravel-api · laravel-inertia</span>
           <h3>Con catálogo</h3>
           <p>
             Ambos declaran <code>context.mcp</code>. En Laravel el catálogo aplica a las
