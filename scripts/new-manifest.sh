@@ -6,7 +6,7 @@ output_path="dist/manifest.json"
 archive_path="dist/aiconventions.zip"
 template_version=""
 tracked_only="false"
-default_exclude_paths=(".github" "scripts" ".gitattributes")
+default_exclude_paths=(".github" "scripts" ".gitattributes" "README.md" "pila_tecnologica.md" ".agents" ".codex" "AGENTS.md")
 exclude_paths=()
 
 usage() {
@@ -21,7 +21,9 @@ Opciones:
   --template-version VERSION  Version de la plantilla, por ejemplo 2026.09.29.
   --tracked-only              Incluye solo archivos versionados en Git.
   --exclude PATH              Excluye un archivo o carpeta del manifest. Repetible.
-                              Por defecto, si no se indica, excluye .github, scripts y .gitattributes.
+                              Por defecto, si no se indica, excluye .github, scripts,
+                              .gitattributes, README.md, pila_tecnologica.md,
+                              .agents, .codex y AGENTS.md.
   -h, --help                  Muestra esta ayuda.
 USAGE
 }

@@ -110,11 +110,12 @@ El script calcula los hashes SHA-256 de los archivos gestionados, añade al
 manifest el hash del zip y escribe ambos artefactos en `dist/`. En Git Bash
 necesita tener disponible el comando `zip`. Si quieres usar solo los archivos
 ya versionados en Git, añade `--tracked-only`. Si no indicas exclusiones, el
-script deja fuera `.github`, `scripts` y `.gitattributes`. Para usar otra
+script deja fuera `.github`, `scripts`, `.gitattributes`, `README.md` y
+`pila_tecnologica.md`, `.agents`, `.codex` y `AGENTS.md`. Para usar otra
 lista de archivos o carpetas excluidos, añade `--exclude` una o varias veces:
 
 ```bash
-bash scripts/new-manifest.sh --template-version "26.09.0" --exclude "docs" --exclude "pila_tecnologica.md"
+bash scripts/new-manifest.sh --template-version "26.09.0" --exclude "docs"
 ```
 
 El workflow de GitHub Actions `Build distribution` solo se ejecuta al empujar
