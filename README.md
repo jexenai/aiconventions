@@ -1,7 +1,7 @@
 # Plantilla de contexto para agentes de IA
 
-Esta plantilla comparte instrucciones entre Claude Code y Codex sin cargar toda
-la documentación en cada tarea. OpenSpec es opcional.
+Esta plantilla da instrucciones a Claude Code sin cargar toda la
+documentación en cada tarea. OpenSpec es opcional.
 
 Este documento explica cómo usarla. Por qué está organizada así y cómo
 ampliarla sin romperla está en [docs/diseno.md](docs/diseno.md).
@@ -13,35 +13,33 @@ ampliarla sin romperla está en [docs/diseno.md](docs/diseno.md).
 | `AGENTS.md`                  | Ficha del proyecto, reglas comunes y rutas de consulta |
 | `.ai/project/architecture.md` | Reglas, alcance, mapa, dominio y seguridad             |
 | `.ai/project/development.md` | Comandos, base de datos de pruebas, convenciones propias, API, sistema de diseño y entrega |
-| `.claude/rules/`             | Pautas de código, seguridad y pruebas (solo Claude Code) |
+| `.claude/rules/`             | Pautas de código, seguridad y pruebas                  |
 | `.ai/skills/README.md`       | Catálogo de procedimientos reutilizables               |
 
-`CLAUDE.md` importa `AGENTS.md`. No añadas imports de todos los documentos:
-los detalles se consultan solo cuando la tarea los necesita.
+`AGENTS.md` es el único punto de entrada; no hay `CLAUDE.md`. No añadas
+imports de todos los documentos: los detalles se consultan solo cuando la
+tarea los necesita.
 
 ## Integraciones nativas
 
-| Herramienta | Skills            | Agentes           | Reglas de código |
-| ----------- | ----------------- | ----------------- | ---------------- |
-| Claude Code | `.claude/skills/` | `.claude/agents/` | `.claude/rules/` |
-| Codex       | `.agents/skills/` | `.codex/agents/`  | No disponible    |
+| Skills            | Agentes           | Reglas de código |
+| ----------------- | ----------------- | ---------------- |
+| `.claude/skills/` | `.claude/agents/` | `.claude/rules/` |
 
-En Codex, `.agents/` y `.codex/` no son equivalentes: la primera contiene
-skills y la segunda configuración y agentes propios de Codex.
+Los procedimientos propios de la plantilla tienen su fuente en `.ai/skills/`;
+en `.claude/skills/` solo hay un adaptador mínimo que la remite.
 
 ### Permisos
 
 Estos archivos aplican controles que no dependen de que el modelo obedezca:
 
-| Herramienta | Archivo | Control |
-| ----------- | ------- | ------- |
-| Claude Code | `.claude/settings.json` | Bloquea leer y editar `.env.prod*`, editar `.env`, `.env.local` y `.env.*.local`, y leer claves y certificados (el `.env` local sí puede leerse); permite sin preguntar las órdenes de Git del commit inicial del setup y `git rm`; pide confirmación antes de `git push` y de las migraciones y los comandos `db:` de Artisan |
-| Claude Code | `.claude/hooks/revisor-solo-lectura.sh` | Los revisores solo pueden ejecutar lecturas de Git, comprobaciones estáticas y auditorías de dependencias; nunca pruebas ni comandos que escriban |
-| Codex | `.codex/config.toml` | Limita la escritura al repositorio, desactiva la red y pide aprobación para salir del sandbox |
+| Archivo | Control |
+| ------- | ------- |
+| `.claude/settings.json` | Bloquea leer y editar `.env.prod*`, editar `.env`, `.env.local` y `.env.*.local`, y leer claves y certificados (el `.env` local sí puede leerse); permite sin preguntar las órdenes de Git del commit inicial del setup y `git rm`; pide confirmación antes de `git push` y de las migraciones y los comandos `db:` de Artisan |
+| `.claude/hooks/revisor-solo-lectura.sh` | Los revisores solo pueden ejecutar lecturas de Git, comprobaciones estáticas y auditorías de dependencias; nunca pruebas ni comandos que escriban |
 
-Codex no permite bloquear la lectura de archivos concretos. La regla de
-Claude Code no cubre la lectura desde la terminal (`cat .env`). En ambos
-casos, la protección definitiva está en no versionar secretos.
+La regla de lectura no cubre la lectura desde la terminal (`cat .env`): la
+protección definitiva está en no versionar secretos.
 
 ### Memoria automática
 
@@ -66,8 +64,7 @@ Quien quiera la memoria para sí puede reactivarla en su
    [pila_tecnologica.md](pila_tecnologica.md) y copia la plantilla elegida de
    `templates/` como `docs/stack.yaml`. Las tecnologías y versiones solo se
    mantienen en cada plantilla.
-2. Ejecuta `/setup-project-context` en Claude Code o
-   `$setup-project-context` en Codex. Las skills de setup solo se ejecutan al
+2. Ejecuta `/setup-project-context`. Las skills de setup solo se ejecutan al
    invocarlas: el agente no las lanza por su cuenta. Si el proyecto no tiene
    repositorio Git o no tiene commits, el setup lo inicializa y crea el commit
    inicial antes de empezar. Si está dentro de otro repositorio (un
@@ -82,8 +79,7 @@ Quien quiera la memoria para sí puede reactivarla en su
    setup; cuando un dato ya está resuelto, la pregunta lo propone como
    primera opción para confirmarlo.
 4. Si eliges instalar OpenSpec, la misma ejecución continúa con
-   `setup-openspec` y te pregunta las herramientas y la confirmación de la
-   instalación. Revisa al final la tabla del informe, con una fila por
+   `setup-openspec` y te pide confirmación antes de la instalación. Revisa al final la tabla del informe, con una fila por
    pregunta y por fase.
 5. Con las tecnologías, las vistas y la base de datos confirmadas, el setup
    retira lo de los stacks que no uses. La sección "Stacks" del informe
@@ -217,7 +213,7 @@ define el workflow que él mismo instala. La decisión de adoptarlo está en
 `Especificaciones` de la ficha. Al instalarlo, `openspec/config.yaml` fija el
 orden de pruebas primero en cada cambio.
 
-## Revisores (solo Claude Code)
+## Revisores
 
 | Agente | Revisa |
 | ------ | ------ |
@@ -234,7 +230,7 @@ política. También puedes pedirlos directamente sobre un cambio de OpenSpec,
 ficheros, carpetas o commits: «revisa `app/Http/Controllers/Pedidos` con
 php-reviewer».
 
-## Skills de código (solo Claude Code)
+## Skills de código
 
 Referencia técnica que Claude no carga por su cuenta. La usan los revisores,
 las reglas indican cuándo leerla y tú puedes invocarla (`/laravel-tdd`).
@@ -242,16 +238,12 @@ las reglas indican cuándo leerla y tú puedes invocarla (`/laravel-tdd`).
 | Stack | Skills |
 | ----- | ------ |
 | Spring Boot | `springboot-security`, `jpa-patterns`, `springboot-tdd`, `openapi-mapstruct` |
-| Laravel | `laravel-security`, `laravel-tdd` y el procedimiento `laravel-deploy` |
+| Laravel | `laravel-security`, `laravel-tdd` |
 | Spring Boot y Laravel | `api-design` |
 | React | `react-testing`, `frontend-a11y`, `e2e-testing` |
 | API REST con SPA | `contract-first` (no aplica con Inertia) |
 
-`laravel-deploy` es un procedimiento con fuente común en `.ai/skills/`:
-comprueba que un proyecto Laravel está listo para desplegar, sin desplegar
-nada.
-
-## Reglas de código (solo Claude Code)
+## Reglas de código
 
 `.claude/rules/` contiene pautas breves por lenguaje (`comun/`, `java/`,
 `php/`, `react/` e `inertia/`). Cada una se carga sola al leer un fichero que

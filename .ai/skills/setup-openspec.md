@@ -29,21 +29,16 @@ que instala; esta plantilla no la duplica.
 Este procedimiento solo plantea las preguntas de esta sección, con su
 cabecera, texto y opciones, usando el mecanismo de la tabla
 [Mecanismo de preguntas](setup-project-context.md#mecanismo-de-preguntas):
-`AskUserQuestion` en Claude Code y mensaje numerado en Codex. No preguntes en
-texto libre ni añadas otras preguntas.
+`AskUserQuestion`. No preguntes en texto libre ni añadas otras preguntas.
 
 | Id | Cabecera | Pregunta | Opciones |
 | -- | -------- | -------- | -------- |
 | P9 | OpenSpec | ¿El proyecto va a usar OpenSpec para las especificaciones? | `Sí, instalarlo ahora` · `No se usa` · `Decidir más tarde` |
-| O1 | Herramientas | ¿Para qué herramientas se configura OpenSpec? (selección múltiple) | `Claude Code` · `Codex` |
-| O2 | Instalación | ¿Ejecuto la instalación y la inicialización? | `Ejecutar <comandos>` · `Cancelar y dejar pendiente` |
+| O1 | Instalación | ¿Ejecuto la instalación y la inicialización? | `Ejecutar <comandos>` · `Cancelar y dejar pendiente` |
 
 P9 es la misma pregunta que la ronda 3 de `setup-project-context`: si llegas
-desde allí con la respuesta `Sí, instalarlo ahora`, no la repitas. O1 y O2 van
-en dos rondas seguidas: los comandos de O2 dependen de las herramientas
-elegidas en O1. Ninguna opción lleva `(Recomendado)`,
-salvo en O1 las herramientas cuya configuración ya exista en el repositorio
-(`.claude/` o `.agents/`).
+desde allí con la respuesta `Sí, instalarlo ahora`, no la repitas. Ninguna
+opción lleva `(Recomendado)`.
 
 Si una ronda no obtiene respuesta, no vuelvas a preguntar: conserva
 `[POR DEFINIR]`, no instales nada y decláralo pendiente.
@@ -70,12 +65,12 @@ Si una ronda no obtiene respuesta, no vuelvas a preguntar: conserva
 1. Consulta la documentación oficial vigente para el comando de instalación e
    inicialización y sus opciones. No des por fijos los nombres de los flags:
    compruébalos antes de ejecutarlos.
-2. Plantea O1. Con sus herramientas, prepara los comandos y plantea O2 en
-   una segunda ronda; en su descripción indica los comandos exactos, el
-   gestor de paquetes, el ámbito de la instalación y que requiere acceso a
-   red. Si el usuario cancela, aplica el paso 4 de [Decidir](#decidir).
+2. Prepara los comandos y plantea O1; en su descripción indica los comandos
+   exactos, el gestor de paquetes, el ámbito de la instalación y que requiere
+   acceso a red. Si el usuario cancela, aplica el paso 4 de
+   [Decidir](#decidir).
 3. Ejecuta la inicialización en la raíz indicando de forma no interactiva
-   solo las herramientas elegidas en O1, porque el modo interactivo puede
+   solo Claude Code como herramienta, porque el modo interactivo puede
    bloquearse en un entorno sin terminal.
 4. Sustituye el contenido que genera la inicialización de `openspec/config.yaml`,
    que suele ser una plantilla comentada, por un contexto breve y la política de
@@ -152,10 +147,11 @@ Si una ronda no obtiene respuesta, no vuelvas a preguntar: conserva
    `spec-driven`, ajusta los nombres de artefacto a los que declare.
 
 5. Revisa todos los archivos generados antes de versionarlos: `openspec/`, las
-   skills y comandos de cada herramienta configurada y los marcadores internos
-   que deje. Comprueba también si ha modificado `AGENTS.md` o `CLAUDE.md`; si
-   añade bloques, resuelve las duplicidades ajustando el texto de la plantilla,
-   no el bloque gestionado por OpenSpec.
+   skills y comandos de Claude Code y los marcadores internos
+   que deje. Comprueba también si ha modificado `AGENTS.md`; si añade
+   bloques, resuelve las duplicidades ajustando el texto de la plantilla, no
+   el bloque gestionado por OpenSpec. Si ha creado un `CLAUDE.md`, indícalo
+   en el informe: el único punto de entrada es `AGENTS.md`.
 
 ## Registrar la decisión
 
@@ -177,10 +173,9 @@ estos valores:
 4. Revisa el diff para detectar archivos generados fuera de lo esperado.
 
 Al terminar, informa de lo siguiente. Si llegas desde `setup-project-context`,
-añádelo a su informe, con O1 y O2 como filas adicionales de la tabla del
-guion:
+añádelo a su informe, con O1 como fila adicional de la tabla del guion:
 
-- Una tabla con las filas P9, O1 y O2 y las columnas `Pregunta`, `Respuesta`
+- Una tabla con las filas P9 y O1 y las columnas `Pregunta`, `Respuesta`
   y `Estado`, marcando `No planteada` las que este procedimiento no requirió.
 - La decisión del usuario y dónde ha quedado registrada.
 - Comando ejecutado y versión instalada, si se ha instalado.

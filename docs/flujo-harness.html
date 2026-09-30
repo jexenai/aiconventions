@@ -1104,7 +1104,7 @@
           <tbody>
             <tr>
               <td><span class="actor a-harness">Harness</span></td>
-              <td>El programa que envuelve al modelo (Claude Code). Carga <code>CLAUDE.md</code> y las reglas por ruta, aplica permisos y arranca los servidores MCP</td>
+              <td>El programa que envuelve al modelo (Claude Code). Carga <code>AGENTS.md</code> y las reglas por ruta, aplica permisos y arranca los servidores MCP</td>
               <td>No interpreta la documentación: no sabe qué dice la ficha</td>
             </tr>
             <tr>
@@ -1394,10 +1394,9 @@ Vistas   · tipos         <span class="r">✗ falta</span> → <span class="g">t
             <div class="paso-meta"><span class="actor a-harness">Harness</span></div>
             <h3>Cargar el punto de entrada</h3>
             <p>
-              Lee <code>CLAUDE.md</code>, que importa <code>AGENTS.md</code>. Es una
-              carga mecánica: el harness no entiende el contenido, solo lo inyecta. Por
-              eso la ficha vive ahí —es el único archivo que todas las herramientas
-              cargan siempre—.
+              Lee <code>AGENTS.md</code>. Es una carga mecánica: el harness no
+              entiende el contenido, solo lo inyecta. Por eso la ficha vive ahí —es
+              el único archivo que se carga siempre—.
             </p>
           </div>
         </li>
@@ -1801,14 +1800,6 @@ paths:
           toca código, cero.
         </p>
       </div>
-
-      <div class="nota">
-        <span class="nota-rotulo">Solo en Claude Code</span>
-        <p>
-          Codex no tiene reglas por ruta. Allí el agente principal solo recibe lo que queda en
-          <code>development.md</code>: comandos y convenciones propias del proyecto.
-        </p>
-      </div>
     </section>
 
     <!-- ============ FASE 4 · BACKEND ============ -->
@@ -2104,7 +2095,6 @@ paths:
           <div class="v-fila c-ruta"><span class="v-et"><code>comun/</code> y <code>php/</code> pruebas — al abrir una prueba</span><span class="v-barra"><span style="--w:47%"></span></span><span class="v-tok">≈700</span></div>
           <div class="v-fila c-demanda"><span class="v-et">Skill <code>api-design</code> — la pidió la regla al crear el endpoint</span><span class="v-barra"><span style="--w:97%"></span></span><span class="v-tok">≈1.450</span></div>
           <div class="v-fila fuera"><span class="v-et">Reglas <code>react/</code></span><span class="v-barra"></span><span class="v-tok">0</span></div>
-          <div class="v-fila fuera"><span class="v-et">Procedimiento <code>laravel-deploy</code> — solo al desplegar</span><span class="v-barra"></span><span class="v-tok">0</span></div>
           <div class="v-fila fuera"><span class="v-et">Reglas y skills de Java</span><span class="v-barra"></span><span class="v-tok">retiradas</span></div>
           <div class="v-fila fuera"><span class="v-et"><code>architecture.md</code> y otras especificaciones</span><span class="v-barra"></span><span class="v-tok">0</span></div>
         </div>
@@ -2927,9 +2917,7 @@ git diff --cached --check   <span class="c">errores de espacios en blanco</span>
         <span class="nota-rotulo">Pendiente de comprobar</span>
         <p>
           Algunos puntos de este recorrido no están verificados contra las herramientas
-          reales: si Codex aplica una aprobación equivalente a los
-          <code>mcp_servers</code> de <code>.codex/config.toml</code>; el comportamiento
-          en monorepos, donde <code>.mcp.json</code> es de raíz y no admite alcance por
+          reales: el comportamiento en monorepos, donde <code>.mcp.json</code> es de raíz y no admite alcance por
           subdirectorio; y los nombres exactos de los comandos de OpenSpec, que
           dependen de la versión instalada.
         </p>
@@ -2940,11 +2928,6 @@ git diff --cached --check   <span class="c">errores de espacios en blanco</span>
           Para confirmarlo en un proyecto concreto, <code>/context</code> muestra las
           reglas cargadas y el hook <code>InstructionsLoaded</code> registra cuándo
           entra cada una.
-        </p>
-        <p>
-          Además, el sandbox de Codex fija <code>network_access = false</code>, que
-          bloqueará tanto la instalación de OpenSpec como la conexión con el
-          servidor <code>dsjex</code> mientras no se apruebe la salida.
         </p>
       </div>
     </section>

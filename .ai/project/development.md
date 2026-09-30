@@ -127,7 +127,7 @@ igualmente ese orden y avisa al usuario.
 
 ## Entrega
 
-- Revisores (solo Claude Code): `java-reviewer`, `php-reviewer`,
+- Revisores: `java-reviewer`, `php-reviewer`,
   `react-reviewer` y `security-reviewer` se lanzan solo cuando el usuario lo
   decide. Tras `/opsx:verify` y antes de archivar, tras un cambio grande o al
   tocar una parte crítica, pregúntale si quiere pasar alguno, proponiendo los
@@ -146,5 +146,3 @@ igualmente ese orden y avisa al usuario.
 - Si el árbol cambia después de validarlo, repite las comprobaciones afectadas.
 - Antes de liberar una versión, analiza las dependencias con la herramienta
   del stack (OWASP Dependency-Check, `composer audit` o `npm audit`).
-- En Laravel, antes de desplegar, sigue
-  [laravel-deploy.md](../skills/laravel-deploy.md).

@@ -70,13 +70,13 @@ puede decidir sin una línea base.
       `.gitignore` excluye los ficheros de entorno, secretos, dependencias
       descargadas y resultados de compilación que aparezcan.
       Comprueba también que `.gitignore` no excluye ficheros de la plantilla
-      que deben versionarse (`.claude/`, `.ai/`, `.codex/`, `.agents/`,
-      `AGENTS.md`, `CLAUDE.md` y `.mcp.json`, que no lleva secretos y hace
-      llegar el sistema de diseño a todo el equipo; el `.gitignore` que genera
-      el framework puede excluir varios, como hace el del kit de Laravel con
-      React). Si los excluye, no edites `.gitignore`: haz
-      el commit sin ellos e infórmalo en la sección "Comprobaciones" del
-      informe, proponiendo retirar esas líneas y versionarlos después.
+      que deben versionarse (`.claude/`, `.ai/`, `AGENTS.md` y `.mcp.json`,
+      que no lleva secretos y hace llegar el sistema de diseño a todo el
+      equipo; el `.gitignore` que genera el framework puede excluir varios,
+      como hace el del kit de Laravel con React). Si los excluye, no edites
+      `.gitignore`: haz el commit sin ellos e infórmalo en la sección
+      "Comprobaciones" del informe, proponiendo retirar esas líneas y
+      versionarlos después.
    2. Si algún fichero que se incluiría contiene secretos o datos
       personales, o no está claro si debe versionarse, no hagas el commit:
       detente e infórmalo.
@@ -179,13 +179,13 @@ no añadas otras.
 
 ### Mecanismo de preguntas
 
-| Herramienta | Cómo preguntar                                                                                                                                                                                                                                                                                                                                                                                                      |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Claude Code | Una llamada a `AskUserQuestion` por ronda, con la cabecera, el texto y las opciones del guion. Nunca preguntes en texto libre: si la herramienta no está disponible o el usuario la rechaza, sigue la regla de [respuestas ausentes](#respuestas-ausentes)                                                                                                                                                          |
-| Codex       | Un único mensaje por ronda con las preguntas numeradas `P1`…`P9` y las opciones con letras, y espera la respuesta antes de pasar a la ronda siguiente. No uses `request_user_input` aunque aparezca entre las herramientas: fuera del modo Plan puede rechazarse y haría variar la forma de preguntar. En ejecuciones no interactivas (`codex exec`), sigue la regla de [respuestas ausentes](#respuestas-ausentes) |
+Haz una llamada a `AskUserQuestion` por ronda, con la cabecera, el texto y
+las opciones del guion. Nunca preguntes en texto libre: si la herramienta no
+está disponible o el usuario la rechaza, sigue la regla de
+[respuestas ausentes](#respuestas-ausentes).
 
-La opción de escribir un valor propio siempre está disponible: en Claude Code
-la añade la herramienta como `Other`; en Codex, indícalo al final del mensaje.
+La opción de escribir un valor propio siempre está disponible: la añade la
+herramienta como `Other`.
 
 ### Ronda 1: ficha
 
@@ -466,7 +466,7 @@ repetir el procedimiento.
    | Componente       | Se conserva si                                         | Artefactos                                                                                                                                                                                                                                                                                                                                                                                                     |
    | ---------------- | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
    | Spring Boot      | P2 incluye Java o Spring Boot                          | `.claude/rules/java/`, `.claude/agents/java-reviewer.md`, `.claude/skills/springboot-security/`, `springboot-tdd/`, `jpa-patterns/`, `openapi-mapstruct/`                                                                                                                                                                                                                                                      |
-   | Laravel          | P2 incluye PHP o Laravel                               | `.claude/rules/php/`, `.claude/agents/php-reviewer.md`, `.claude/skills/laravel-security/`, `laravel-tdd/`; el procedimiento `laravel-deploy` (`.ai/skills/laravel-deploy.md`, `.claude/skills/laravel-deploy/`, `.agents/skills/laravel-deploy/`), su fila en `.ai/skills/README.md`, su línea en la sección "Entrega" de `development.md` y la aclaración sobre PHP en Windows de su sección "Entorno local" |
+   | Laravel          | P2 incluye PHP o Laravel                               | `.claude/rules/php/`, `.claude/agents/php-reviewer.md`, `.claude/skills/laravel-security/`, `laravel-tdd/` y la aclaración sobre PHP en Windows de la sección "Entorno local" de `development.md` |
    | Oracle           | P7 incluye Oracle en algún entorno                     | `.claude/rules/java/oracle.md` y `.claude/rules/php/oracle.md`                                                                                                                                                                                                                                                                                                                                                 |
    | React            | P2 o P4 incluyen React                                 | `.claude/rules/react/`, `.claude/agents/react-reviewer.md`, `.claude/skills/react-testing/`, `frontend-a11y/`, `e2e-testing/`                                                                                                                                                                                                                                                                                  |
    | Backend          | Se conserva Spring Boot o Laravel                      | `.claude/rules/comun/seguridad.md`, `.claude/skills/api-design/` y la sección "API" de `development.md`                                                                                                                                                                                                                                                                                                        |

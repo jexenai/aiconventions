@@ -25,7 +25,7 @@ Los agentes no lo leen durante su trabajo.
   | Tecnologías y versiones del estándar | `templates/*.yaml` |
 
 - **Controles que no dependen del modelo.** Lo que no debe ocurrir nunca va
-  en `.claude/settings.json` o `.codex/config.toml`, no solo en texto.
+  en `.claude/settings.json` o en un hook, no solo en texto.
 
 ## Skills y agentes
 
@@ -38,11 +38,10 @@ Los agentes no lo leen durante su trabajo.
   hacerlo por defecto para tareas breves y dependientes del contexto actual.
 - El commit se ejecuta directamente mediante su skill. No necesita un agente
   intermedio y nunca debe lanzarse automáticamente sin petición del usuario.
-- Las skills de setup solo se ejecutan al invocarlas. En Claude Code lo fija
-  `disable-model-invocation` en su `SKILL.md`; en Codex, el archivo
-  `agents/openai.yaml` de cada skill.
-- Los procedimientos tienen su fuente común en `.ai/skills/` y adaptadores
-  mínimos en `.claude/skills/` y `.agents/skills/`.
+- Las skills de setup solo se ejecutan al invocarlas: lo fija
+  `disable-model-invocation` en su `SKILL.md`.
+- Los procedimientos son propios de la plantilla: tienen su fuente en
+  `.ai/skills/` y un adaptador mínimo en `.claude/skills/`.
 - Solo dos procedimientos pueden instalar, y siempre con confirmación en el
   momento: `setup-openspec` (OpenSpec) y `setup-testing` (herramientas de
   pruebas y análisis, como dependencias de desarrollo). El resto de la
@@ -139,9 +138,6 @@ formas:
   principio y la otra remite a ella con la salvedad «si existe».
 - Son breves a propósito: se cargan cada vez que se toca código. El detalle
   extenso va en skills, que solo se leen cuando hacen falta.
-
-> Aclaración: de momento son solo para Claude Code. Codex no tiene reglas por
-> ruta y solo recibe lo que queda en `development.md`.
 
 > Aclaración: la regla de React se activa con cualquier `.js`/`.ts`, también
 > con los estáticos de un proyecto Spring Boot (`src/main/resources/static/`).
