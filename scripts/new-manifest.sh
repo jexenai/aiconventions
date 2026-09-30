@@ -6,7 +6,7 @@ output_path="dist/manifest.json"
 archive_path="dist/aiconventions.zip"
 template_version=""
 tracked_only="false"
-default_exclude_paths=(".github" "scripts" ".gitattributes" "README.md" "pila_tecnologica.md" ".agents" ".codex" "AGENTS.md")
+default_exclude_paths=(".github" "scripts" ".gitattributes" "README.md" "pila_tecnologica.md" ".agents" ".codex" "AGENTS.md" "templates")
 exclude_paths=()
 
 usage() {
@@ -23,7 +23,7 @@ Opciones:
   --exclude PATH              Excluye un archivo o carpeta del manifest. Repetible.
                               Por defecto, si no se indica, excluye .github, scripts,
                               .gitattributes, README.md, pila_tecnologica.md,
-                              .agents, .codex y AGENTS.md.
+                              .agents, .codex, AGENTS.md y templates.
   -h, --help                  Muestra esta ayuda.
 USAGE
 }
