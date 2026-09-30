@@ -6,6 +6,8 @@ output_path="dist/manifest.json"
 archive_path="dist/aiconventions.zip"
 template_version=""
 tracked_only="false"
+default_exclude_paths=(".github" "scripts" ".gitattributes")
+exclude_paths=()
 
 usage() {
   cat <<'USAGE'
@@ -18,6 +20,8 @@ Opciones:
   --archive PATH              Ruta del zip. Por defecto: dist/aiconventions.zip.
   --template-version VERSION  Version de la plantilla, por ejemplo 2026.09.29.
   --tracked-only              Incluye solo archivos versionados en Git.
+  --exclude PATH              Excluye un archivo o carpeta del manifest. Repetible.
+                              Por defecto, si no se indica, excluye .github, scripts y .gitattributes.
   -h, --help                  Muestra esta ayuda.
 USAGE
 }
@@ -43,6 +47,10 @@ while [[ $# -gt 0 ]]; do
     --tracked-only)
       tracked_only="true"
       shift
+      ;;
+    --exclude)
+      exclude_paths+=("${2:?Falta valor para --exclude}")
+      shift 2
       ;;
     -h|--help)
       usage
@@ -106,6 +114,28 @@ relative_path() {
   printf '%s\n' "$relative" | tr '\\' '/'
 }
 
+normalize_manifest_path() {
+  local path="$1"
+
+  path="${path//\\//}"
+  path="${path#./}"
+  path="${path%/}"
+  printf '%s\n' "$path"
+}
+
+normalize_exclude_path() {
+  local base="$1"
+  local path="$2"
+  local relative
+
+  if [[ "$path" = /* || "$path" =~ ^[A-Za-z]:[/\\] ]]; then
+    relative="$(realpath -m --relative-to="$base" "$path")"
+    normalize_manifest_path "$relative"
+  else
+    normalize_manifest_path "$path"
+  fi
+}
+
 file_size() {
   stat -c '%s' "$1"
 }
@@ -158,8 +188,19 @@ archive_relative="$(relative_path "$root_path" "$archive_abs")"
 mkdir -p "$(dirname "$output_abs")" "$(dirname "$archive_abs")"
 
 files_tmp="$(mktemp)"
+excludes_tmp="$(mktemp)"
 sorted_files_tmp="$(mktemp)"
-trap 'rm -f "$files_tmp" "$sorted_files_tmp"' EXIT
+trap 'rm -f "$files_tmp" "$excludes_tmp" "$sorted_files_tmp"' EXIT
+
+if [[ "${#exclude_paths[@]}" -eq 0 ]]; then
+  exclude_paths=("${default_exclude_paths[@]}")
+fi
+
+for exclude_path in "${exclude_paths[@]}"; do
+  normalized_exclude="$(normalize_exclude_path "$root_path" "$exclude_path")"
+  [[ -n "$normalized_exclude" && "$normalized_exclude" != "." ]] || continue
+  printf '%s\n' "$normalized_exclude" >> "$excludes_tmp"
+done
 
 if git -C "$root_path" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   git -C "$root_path" ls-files -z | tr '\0' '\n' > "$files_tmp"
@@ -178,8 +219,25 @@ else
   ) > "$files_tmp"
 fi
 
-awk -v output="$output_relative" -v archive="$archive_relative" '
-  NF > 0 && $0 != output && $0 != archive && $0 !~ /^dist\// { print }
+awk -v output="$output_relative" -v archive="$archive_relative" -v excludes="$excludes_tmp" '
+  BEGIN {
+    while ((getline exclude < excludes) > 0) {
+      excludes_count += 1
+      excluded_paths[excludes_count] = exclude
+    }
+  }
+
+  function is_excluded(path, i, prefix) {
+    for (i = 1; i <= excludes_count; i += 1) {
+      prefix = excluded_paths[i] "/"
+      if (path == excluded_paths[i] || index(path, prefix) == 1) {
+        return 1
+      }
+    }
+    return 0
+  }
+
+  NF > 0 && $0 != output && $0 != archive && $0 !~ /^dist\// && !is_excluded($0) { print }
 ' "$files_tmp" |
   sort -u > "$sorted_files_tmp"
 
