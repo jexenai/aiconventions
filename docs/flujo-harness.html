@@ -2623,7 +2623,9 @@ Veredicto: <span class="r">Bloqueado</span> (1 ALTO)</div>
               vez; y no se archiva con hallazgos críticos o altos abiertos salvo que el
               usuario lo acepte de forma explícita. Los detalles temporales del cambio
               se quedan en el histórico; no se copian a <code>.ai/project/</code>, que
-              documenta lo estable.
+              documenta lo estable. Lo estable que deja el cambio sí se añade, como
+              pide <code>AGENTS.md</code>: aquí, el término <em>cliente</em> y la
+              regla de que solo los gestores dan de alta, en <code>architecture.md</code>.
             </p>
           </div>
         </li>
@@ -2902,7 +2904,7 @@ git diff --cached --check   <span class="c">errores de espacios en blanco</span>
             <tr>
               <td>Procedimientos repetibles</td>
               <td><code>.ai/skills/</code></td>
-              <td>Contenido común, con adaptadores mínimos por herramienta</td>
+              <td>Fuente única, con un adaptador mínimo en <code>.claude/skills/</code></td>
             </tr>
             <tr>
               <td>Qué herramientas de prueba se instalan</td>

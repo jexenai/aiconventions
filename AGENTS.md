@@ -73,4 +73,7 @@ contexto solo ante una dependencia, un riesgo o una contradicción relevante.
   workflow instalado y consulta únicamente sus artefactos necesarios.
 - Si las fuentes discrepan, señala la diferencia y resuélvela con evidencia o
   pide aclaración cuando afecte al resultado.
+- Si al terminar un cambio queda algo estable que el contexto no recoge (un
+  término, una capacidad, una decisión o una regla de seguridad), añádelo a
+  `architecture.md` o `development.md`. Registra solo lo implementado.
 - Al terminar, indica qué cambió, qué comprobaste y qué queda pendiente.
