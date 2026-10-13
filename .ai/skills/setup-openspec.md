@@ -86,30 +86,40 @@ Si una ronda no obtiene respuesta, no vuelvas a preguntar: conserva
      Las reglas comunes están en AGENTS.md.
      La documentación estable está en .ai/project/.
      Lee solo el contexto y los artefactos necesarios para el cambio.
-     Redacta las especificaciones y los cambios en español de España.
-     Al recibir una petición con varios requisitos, identifica las capacidades
-     que puedan especificarse, implementarse y revisarse de forma
-     independiente y crea un cambio OpenSpec por cada una. Cada cambio debe
-     tener su propia carpeta en openspec/changes/, una propuesta, deltas y
-     tareas limitados a un objetivo cohesionado y un resultado concreto y
-     comprobable. No representes varias capacidades independientes como
-     hitos o bloques de tareas dentro de un único cambio. Agrúpalas solo
-     cuando no puedan entregarse, revisarse o mantenerse de forma
-     independiente; en ese caso, documenta la dependencia que obliga a
-     tratarlas como un único cambio.
+     Idioma: redacta todos los artefactos en español de España, incluidos
+     títulos, nombres de requisitos y escenarios, tareas y comentarios, y
+     traduce los encabezados de las plantillas (Capacidades, Impacto,
+     Contexto, Objetivos y no objetivos, Decisiones, Riesgos...). Deja
+     literalmente en inglés la sintaxis de OpenSpec, con el texto que la
+     sigue en español: `## Why`, `## What Changes`, `## Purpose`,
+     `## Requirements`, `## ADDED Requirements` (y MODIFIED, REMOVED,
+     RENAMED), `### Requirement:`, `#### Scenario:`, `SHALL`/`MUST` y
+     `**GIVEN**`/`**WHEN**`/`**THEN**`/`**AND**`; traducir los encabezados
+     hace fallar `validate`, `show` o `change list`.
+     Nombra los cambios en español, en kebab-case y sin tildes ni eñes
+     (`registro-solicitudes`), salvo los términos que nombran un componente
+     técnico (`autenticacion-sso`, `exportacion-excel`); las capacidades, en
+     kebab-case y preferiblemente en inglés, como el código.
+     Si una petición tiene varios requisitos, crea un cambio OpenSpec por cada
+     capacidad que pueda especificarse, implementarse y revisarse de forma
+     independiente, con su carpeta en openspec/changes/ y una propuesta,
+     deltas y tareas limitados a un objetivo cohesionado y a un resultado
+     concreto y comprobable; no las conviertas en hitos o bloques de tareas
+     de un único cambio. Agrúpalas solo si no pueden entregarse, revisarse o
+     mantenerse por separado, y documenta la dependencia que lo obliga.
 
    rules:
      specs:
        - Cada escenario en Given/When/Then, verificable de forma automática.
+       - Cada requisito incluye `SHALL` o `MUST` ("El sistema SHALL mostrar…").
      tasks:
        - Toda tarea que cambie comportamiento empieza por la prueba del
          escenario que cubre, y esa prueba debe fallar antes de implementar.
        - Indica en la tarea qué escenario del delta cubre.
-       - Limita las tareas a la capacidad definida por el cambio. Si aparecen
-         varias capacidades independientes, crea cambios OpenSpec separados
-         en lugar de convertirlas en hitos del mismo cambio.
+       - Limita las tareas a la capacidad del cambio; si aparece otra
+         independiente, crea un cambio aparte.
        - Divide las tareas de un mismo cambio en pasos concretos y
-         secuenciales; indica las dependencias con otros cambios cuando
+         secuenciales, con casillas `- [ ] 1.1`; indica las dependencias con otros cambios cuando
          existan.
 
    operations:

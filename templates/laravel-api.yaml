@@ -14,6 +14,11 @@ context:
   - package: yajra/laravel-oci8
     purpose: Conexión con Oracle 19c en preproducción y producción; Laravel no soporta Oracle de serie
   auth: SSO corporativo (JWT)
+  authSetup:
+  - Si la aplicación ofrece un modo de autenticación local para desarrollar sin el SSO, `.env.example` lo activa (`SSO_MODE=local`) con un comentario que avisa de que nunca va en servidores accesibles, y el arranque falla si se usa fuera del entorno local.
+  - Ese modo local es el que permite el primer arranque tras `composer setup`; en un `.env` que ya existía se añade a mano.
+  - El fichero `phpunit.xml` fija el modo del SSO (`<env name="SSO_MODE" value="sso"/>`), porque las pruebas corren con `APP_ENV=testing` y un `.env` con modo local haría fallar el arranque de toda la suite.
+  - El documento `development.md` recoge en "Entorno local" el primer arranque y cómo fijar la identidad en pruebas manuales (cabeceras `users` y `profiles`).
   deployment:
     packaging: Código PHP desplegado sobre Apache 2.4
     documentRoot: public/
