@@ -24,7 +24,7 @@ jobs:
         shell: bash
         run: |
           version="${GITHUB_REF_NAME#v}"
-          bash scripts/new-manifest.sh --template-version "$version" --exclude "docs"
+          bash scripts/new-manifest.sh --template-version "$version"
 
       - name: Upload distribution artifact
         uses: actions/upload-artifact@v4
