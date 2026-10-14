@@ -38,5 +38,6 @@ context:
         build: npm run build
         test: npm test
         testE2e: npm run test:e2e
+        formatCheck: npm run format:check
         format: npm run format
         staticAnalysis: npm run lint
