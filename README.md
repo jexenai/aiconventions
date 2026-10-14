@@ -238,6 +238,22 @@ política. También puedes pedirlos directamente sobre un cambio de OpenSpec,
 ficheros, carpetas o commits: «revisa `app/Http/Controllers/Pedidos` con
 php-reviewer».
 
+## Ejecutor de pruebas
+
+`test-runner` ejecuta formato, análisis, compilación y pruebas y devuelve
+solo el resultado y los fallos, para no llenar el contexto de la
+conversación principal con la salida de la suite. La plantilla lo trae
+genérico y sin comandos: `setup-project-context` y `setup-testing` le
+escriben los del proyecto, ya resueltos a partir de la tabla "Comandos", la
+"Base de datos de pruebas" y el "Entorno local" de
+[development.md](.ai/project/development.md), y los autorizan en
+`.claude/settings.json`. Hasta entonces no ejecuta nada.
+
+Se le puede acotar el alcance por tipo (`formato`, `analisis`, `compilar`,
+`unit`, `integration`, `e2e`), por parte en proyectos con backend y vistas,
+o a una prueba concreta: «lanza test-runner solo con unit e integration de
+backend». Sin alcance, ejecuta todo salvo `e2e`. No modifica código.
+
 ## Skills de código
 
 Referencia técnica que Claude no carga por su cuenta. La usan los revisores,

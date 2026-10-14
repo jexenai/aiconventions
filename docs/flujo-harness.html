@@ -186,6 +186,7 @@
   .a-skill    { background: var(--warn-soft);   color: var(--warn);   border-color: var(--warn); }
   .a-spec     { background: var(--spec-soft);   color: var(--spec);   border-color: var(--spec); }
   .a-revisor  { background: var(--stop-soft);   color: var(--stop);   border-color: var(--stop); }
+  .a-pruebas  { background: var(--surface-alt); color: var(--muted);  border-color: var(--muted); border-style: dashed; }
 
   /* ---------- Índice lateral ---------- */
 
@@ -981,6 +982,7 @@
       <span class="actor a-skill">Skill</span>
       <span class="actor a-spec">OpenSpec</span>
       <span class="actor a-revisor">Subagente revisor</span>
+      <span class="actor a-pruebas">Subagente de pruebas</span>
     </div>
   </header>
 
@@ -1008,11 +1010,11 @@
     <section class="fase" id="empezar">
       <div class="fase-cab">
         <span class="fase-ord">§</span>
-        <h2>Para empezar: siete ideas</h2>
+        <h2>Para empezar: ocho ideas</h2>
       </div>
 
       <p>
-        Si nunca has programado con un agente de IA, estas siete ideas bastan para
+        Si nunca has programado con un agente de IA, estas ocho ideas bastan para
         seguir el resto del documento. Todo lo demás son detalles de cómo la
         plantilla las aplica.
       </p>
@@ -1030,6 +1032,13 @@
           <dd>Otro agente que el agente principal lanza solo si tú lo pides o lo
           confirmas. Trabaja con su propia ventana, sin ver la conversación: lee el
           cambio terminado, informa de lo que encuentra y no modifica código.</dd>
+        </div>
+        <div>
+          <dt>Subagente de pruebas</dt>
+          <dd>El agente <code>test-runner</code>, en el que el agente principal delega las
+          comprobaciones del área o de la suite. Usa los comandos que el proyecto tiene
+          registrados y devuelve solo el resultado y los fallos, para que la salida
+          completa no llene la ventana. Tampoco modifica código.</dd>
         </div>
         <div>
           <dt>Ventana de contexto</dt>
@@ -1092,7 +1101,7 @@
       </div>
 
       <p>
-        Seis actores intervienen en el ciclo y conviene no confundirlos, porque
+        Siete actores intervienen en el ciclo y conviene no confundirlos, porque
         cada uno falla de una manera distinta.
       </p>
 
@@ -1126,6 +1135,11 @@
               <td><span class="actor a-revisor">Subagente revisor</span></td>
               <td>Un subagente que lanza el agente principal: otro agente, con su propia ventana limpia, que lee el cambio terminado y devuelve un informe</td>
               <td>No modifica código y no se lanza si el usuario no lo pide o lo confirma</td>
+            </tr>
+            <tr>
+              <td><span class="actor a-pruebas">Subagente de pruebas</span></td>
+              <td>El agente <code>test-runner</code>: ejecuta formato, análisis, compilación y pruebas con los comandos que el setup le escribe a partir de <code>development.md</code>, acotado al alcance que le indica el agente principal, y devuelve solo el resultado y los fallos</td>
+              <td>No modifica código, no instala nada, no inventa los comandos que falten y no ejecuta pruebas sobre una base de datos sin confirmar</td>
             </tr>
             <tr>
               <td><span class="actor a-usuario">Usuario</span></td>
@@ -1285,6 +1299,7 @@ agents/php-reviewer     <span class="g">✓</span>
 agents/react-reviewer   <span class="g">✓</span>
 agents/security-reviewer<span class="g">✓</span>            <span class="c">siempre</span>
 <span class="t">agents/java-reviewer</span>    <span class="r">✗</span>
+agents/test-runner      <span class="g">✓</span>            <span class="c">siempre: el setup le escribe los comandos</span>
 skills/laravel-*        <span class="g">✓</span>
 skills/react-testing, frontend-a11y, e2e-testing <span class="g">✓</span>
 skills/api-design, contract-first <span class="g">✓</span>   <span class="c">hay API REST + SPA</span>
@@ -1294,6 +1309,23 @@ skills/api-design, contract-first <span class="g">✓</span>   <span class="c">h
               El informe del setup lo resume en su sección «Stacks», con una fila por
               componente: conservado, retirado o pendiente.
             </p>
+            <p>
+              Lo último que hace la fase es escribir los comandos del subagente de pruebas.
+              <code>test-runner</code> llega de la plantilla genérico, con un bloque vacío:
+              usa un modelo menor y no debe interpretar la tabla «Comandos», que puede tener
+              huecos, filas compartidas o comandos que corrigen ficheros. La skill resuelve
+              todo eso ahora y deja en el agente una fila por parte y alcance, lista para
+              ejecutar, y autoriza cada comando en <code>.claude/settings.json</code>. En un
+              proyecto recién creado aún faltan herramientas: las filas sin comando se omiten
+              y <code>setup-testing</code> completará el bloque.
+            </p>
+            <div class="terminal"><span class="c">&lt;!-- comandos-test-runner:inicio --&gt;</span>
+formato      Backend  vendor/bin/pint --test
+unit         Backend  php artisan test --testsuite=Unit --compact
+integration  Backend  php artisan test --testsuite=Feature --compact
+prueba       Backend  php artisan test --compact --filter={prueba}
+<span class="c">compilar     Backend  —   no aplica</span>
+<span class="c">&lt;!-- comandos-test-runner:fin --&gt;</span></div>
           </div>
         </li>
 
@@ -1368,6 +1400,19 @@ Vistas   · tipos         <span class="r">✗ falta</span> → <span class="g">t
               la primera prueba del escenario tiene un vecino que leer.
             </p>
             <div class="terminal"><span class="c">| Pruebas habituales | Backend: php artisan test · Vistas: npm test |</span></div>
+            <p>
+              Con los comandos ya registrados, vuelve a generar el bloque de comandos de
+              <code>test-runner</code>. Es el mismo paso con el que lo dejó
+              <code>setup-project-context</code>, ahora con las herramientas nuevas: solo
+              comandos que no corrigen, unitarias e integración por separado, la salida
+              resumida y cada comando autorizado en <code>.claude/settings.json</code>. El
+              subagente usa un modelo menor y no interpreta la tabla: ejecuta estas filas.
+            </p>
+            <div class="terminal">unit         Backend  php artisan test --testsuite=Unit --compact
+integration  Backend  php artisan test --testsuite=Feature --compact
+unit         Vistas   npm test -- --reporter=dot      <span class="c">incluye integration</span>
+analisis     Vistas   npm run lint
+<span class="c">compilar     Backend  —   no aplica</span></div>
           </div>
         </li>
       </ol>
@@ -1409,8 +1454,8 @@ Vistas   · tipos         <span class="r">✗ falta</span> → <span class="g">t
             <p>
               Aplica las reglas de <code>deny</code> y <code>ask</code> de
               <code>.claude/settings.json</code>, detecta el <code>.mcp.json</code>
-              versionado y registra las skills y los subagentes revisores disponibles. De los
-              subagentes revisores solo carga una descripción de unas treinta palabras, para
+              versionado y registra las skills y los subagentes disponibles (revisores y
+              de pruebas). De los subagentes solo carga una descripción de unas treinta palabras, para
               saber que existen. Las reglas de <code>.claude/rules/</code> quedan a la
               espera: cada una indica en su cabecera <code>paths:</code> qué ficheros la
               activan, y ninguno se ha abierto todavía.
@@ -1438,7 +1483,7 @@ Vistas   · tipos         <span class="r">✗ falta</span> → <span class="g">t
         <h4>Qué hay en la ventana al terminar la fase 1</h4>
         <div class="carga">
           <div class="fila-carga"><span><code>AGENTS.md</code> — ficha y reglas generales</span><span class="estado e-si">Cargado</span></div>
-          <div class="fila-carga"><span>Descripción de skills y subagentes revisores</span><span class="estado e-bajo">Declaradas</span></div>
+          <div class="fila-carga"><span>Descripción de skills y subagentes</span><span class="estado e-bajo">Declaradas</span></div>
           <div class="fila-carga"><span>Reglas de <code>.claude/rules/</code></span><span class="estado e-bajo">A la espera de un fichero</span></div>
           <div class="fila-carga"><span><code>.ai/project/development.md</code></span><span class="estado e-no">No leído</span></div>
           <div class="fila-carga"><span><code>.ai/project/architecture.md</code></span><span class="estado e-no">No leído</span></div>
@@ -2103,7 +2148,9 @@ paths:
           sido corregir un controlador, sin tocar pruebas, las reglas se quedarían
           en ≈ 2.100 en lugar de ≈ 2.800. El resto de la ventana lo ocupan la
           conversación, el código y las salidas de las pruebas; por eso el agente
-          principal filtra las pruebas y solo muestra el resumen y los fallos.
+          principal filtra cada ejecución a la prueba del escenario y delega las del
+          área o la suite en el subagente de pruebas, que solo devuelve el resumen y
+          los fallos.
         </p>
       </div>
     </section>
@@ -2314,18 +2361,24 @@ paths:
         <li class="paso">
           <span class="paso-ord">06</span>
           <div class="paso-cuerpo">
-            <div class="paso-meta"><span class="actor a-agente">Agente principal</span></div>
+            <div class="paso-meta"><span class="actor a-agente">Agente principal</span><span class="actor a-pruebas">Subagente de pruebas</span></div>
             <h3>Cerrar el apply con las pruebas del área</h3>
             <p>
-              Última tarea del plan: ejecutar las pruebas de las dos partes con los
-              comandos de la ficha, no con unos adivinados. El resultado se guarda
-              para la verificación y para los subagentes revisores, que así no tendrán que
-              repetirlas.
+              Última tarea del plan: ejecutar las pruebas de las dos partes. El agente
+              principal no las lanza él mismo: delega en <code>test-runner</code> con un
+              alcance, y el subagente ejecuta los comandos que el setup le escribió a partir
+              de la tabla «Comandos» de <code>development.md</code>, no unos adivinados. A la ventana principal
+              solo vuelve el informe. El resultado se guarda para la verificación y para
+              los subagentes revisores, que así no tendrán que repetirlas.
             </p>
-            <div class="terminal verde">$ php artisan test
-  Tests:  <span class="g">24 passed</span>   <span class="c">(3 nuevas)</span>
-$ npm test
-  Tests  <span class="g">41 passed</span>   <span class="c">(1 nueva)</span></div>
+            <div class="envio">
+              Alcance: unit e integration, backend y vistas.
+            </div>
+            <div class="terminal verde">Resultado global: OK
+Backend · unit         <span class="g">OK (16 pruebas)</span>
+Backend · integration  <span class="g">OK (8 pruebas)</span>
+Vistas  · unit         <span class="g">OK (41 pruebas)</span>
+Vistas  · integration  <span class="g">OK</span>   <span class="c">incluida en unit</span></div>
           </div>
         </li>
       </ol>
@@ -2887,6 +2940,11 @@ git diff --cached --check   <span class="c">errores de espacios en blanco</span>
               <td>Contexto limpio y solo lectura; se lanza cuando el usuario lo decide</td>
             </tr>
             <tr>
+              <td>Comandos que ejecuta el subagente de pruebas</td>
+              <td>Bloque de <code>.claude/agents/test-runner.md</code></td>
+              <td>Lo deriva el setup de <code>development.md</code>, que sigue siendo la fuente: el modelo menor ejecuta sin interpretar</td>
+            </tr>
+            <tr>
               <td>Componentes vetados y tokens propios</td>
               <td><code>development.md</code></td>
               <td>Son decisiones vuestras; el registro no las conoce</td>
@@ -2909,7 +2967,7 @@ git diff --cached --check   <span class="c">errores de espacios en blanco</span>
             <tr>
               <td>Qué herramientas de prueba se instalan</td>
               <td><code>setup-testing</code></td>
-              <td>Solo con confirmación; los comandos resultantes pasan a <code>development.md</code></td>
+              <td>Solo con confirmación; los comandos resultantes pasan a <code>development.md</code> y al bloque de <code>test-runner</code></td>
             </tr>
           </tbody>
         </table>
@@ -2920,8 +2978,10 @@ git diff --cached --check   <span class="c">errores de espacios en blanco</span>
         <p>
           Algunos puntos de este recorrido no están verificados contra las herramientas
           reales: el comportamiento en monorepos, donde <code>.mcp.json</code> es de raíz y no admite alcance por
-          subdirectorio; y los nombres exactos de los comandos de OpenSpec, que
-          dependen de la versión instalada.
+          subdirectorio; los nombres exactos de los comandos de OpenSpec, que
+          dependen de la versión instalada; y si un subagente en segundo plano
+          rechaza los comandos no autorizados, motivo por el que el setup añade los de
+          <code>test-runner</code> a <code>permissions.allow</code>.
         </p>
         <p>
           Sí está comprobado en la documentación de Claude Code que las reglas por

@@ -20,6 +20,8 @@ Los agentes no lo leen durante su trabajo.
   | Datos mínimos del proyecto | Ficha de `AGENTS.md` |
   | Comandos, base de datos de pruebas, convenciones propias y API | `.ai/project/development.md` |
   | Cuándo ofrecer los revisores y qué hacer con sus hallazgos | Sección "Entrega" de `development.md` |
+  | Cuándo delegar en `test-runner` | Sección "Comandos" de `development.md` |
+  | Comandos que ejecuta `test-runner` (derivados de "Comandos") | Bloque generado en `.claude/agents/test-runner.md` |
   | Orden de pruebas primero | `rules` y `operations` de `openspec/config.yaml` |
   | Pautas generales de código, seguridad y pruebas | `.claude/rules/` |
   | Tecnologías y versiones del estándar | `templates/*.yaml` |
@@ -82,6 +84,29 @@ Los agentes no lo leen durante su trabajo.
   `jpa-patterns`; `react-reviewer`, `frontend-a11y`; `java-reviewer` y
   `php-reviewer`, `api-design` si se tocan controladores de la API; y
   `security-reviewer`, la de seguridad del stack.
+
+### Ejecutor de pruebas
+
+- Un único `test-runner` para todos los stacks. Lo que cambia entre stacks
+  son los comandos, no el trabajo: la plantilla lo trae genérico, con un
+  bloque de comandos vacío, y el setup lo especializa.
+- Usa `haiku`, que no debe interpretar una tabla con huecos, filas
+  compartidas o comandos que corrigen. Por eso el criterio va en
+  [Generar los comandos de test-runner](../.ai/skills/setup-project-context.md#generar-los-comandos-de-test-runner),
+  que aplica un modelo capaz con el usuario delante: elige solo comandos de
+  lectura, compila sin pruebas, separa unitarias e integración, marca las
+  inclusiones, incorpora el "Entorno local" y bloquea las filas con base de
+  datos sin confirmar. El agente solo ejecuta las filas del bloque.
+- La fuente sigue siendo la tabla "Comandos" de `development.md`, que usa
+  también la conversación principal. El bloque es derivado: lo regeneran
+  `setup-project-context`, `setup-testing` y cualquier tarea que cambie la
+  tabla, la "Base de datos de pruebas" o el "Entorno local".
+- El mismo paso añade cada comando ejecutable a `permissions.allow`, para
+  que el agente no dependa de confirmaciones al ejecutarse en segundo plano.
+- Ejecuta pruebas, así que no lleva el hook de los revisores. Su límite es
+  el bloque y el prompt: sin comandos ajenos al bloque, sin instalar ni
+  arreglar. Su valor está en no llenar el contexto principal con la salida
+  de la suite.
 
 ### Skills de código
 

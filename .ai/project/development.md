@@ -36,6 +36,21 @@ usuario ejecutar `setup-testing` (`.ai/skills/setup-testing.md`). Al ejecutar
 pruebas, filtra al área afectada y muestra solo el resumen y los fallos: la
 salida completa de una suite llena la ventana de contexto.
 
+En el ciclo rojo-verde de un escenario, ejecuta tú la prueba concreta con la
+fila "Una sola prueba o clase". Para las comprobaciones del área o de la
+suite tras un cambio de código o de pruebas, delega en el agente
+`test-runner` (`.claude/agents/test-runner.md`), que devuelve solo el
+resultado global y los fallos. Sin más indicaciones ejecuta formato,
+análisis, compilación, unitarias e integración. Para acotar, indícale en el
+prompt el alcance: `formato`, `analisis`, `compilar`, `unit`, `integration`
+o `e2e` (combinables), la parte («unit de backend») o una prueba concreta.
+No modifica código: los arreglos los hace la conversación principal.
+
+`test-runner` no lee esta tabla: ejecuta los comandos que el setup le genera
+a partir de ella, de la "Base de datos de pruebas" y del "Entorno local". Si
+cambias cualquiera de las tres, regenera su bloque con
+[Generar los comandos de test-runner](../skills/setup-project-context.md#generar-los-comandos-de-test-runner).
+
 ### Base de datos de pruebas
 
 Las pruebas que reinician la base de datos (`RefreshDatabase`, migraciones
@@ -59,6 +74,10 @@ comandos. Registra solo las comprobadas.
 | Sistema operativo y distribución del lenguaje | [POR DEFINIR] |
 | Versión local del intérprete frente a la declarada | [POR DEFINIR] |
 | Ajustes necesarios para ejecutar herramientas | [POR DEFINIR] |
+
+Anota aquí cualquier forma obligatoria de lanzar los comandos (shell,
+capitalización de la ruta, opciones de memoria): el setup la incorpora a los
+comandos de `test-runner`.
 
 > Aclaración: en Windows con PHP de Laragon o XAMPP, `openssl_pkey_new()`
 > falla si no encuentra `openssl.cnf`; en las pruebas que generan claves,
@@ -136,9 +155,9 @@ igualmente ese orden y avisa al usuario.
   Propón `security-reviewer` si el cambio toca autenticación, autorización,
   entrada de usuario, endpoints, consultas, ficheros subidos, secretos o
   dependencias. Los revisores no ejecutan pruebas (un hook se lo impide):
-  antes de lanzarlos, ejecuta las pruebas del área afectada, respetando la
-  "Base de datos de pruebas", y pasa a cada uno el resultado sobre el mismo
-  árbol. Si elige varios, lánzalos en paralelo.
+  antes de lanzarlos, ejecuta las pruebas del área afectada con
+  `test-runner`, que respeta la "Base de datos de pruebas", y pasa a cada
+  uno el resultado sobre el mismo árbol. Si elige varios, lánzalos en paralelo.
 - Corrige los hallazgos CRÍTICO y ALTO antes de entregar o archivar. Si
   alguno queda sin corregir, expón por qué y hazlo solo con la conformidad
   explícita del usuario.

@@ -205,6 +205,8 @@ test("muestra el nombre del usuario en la cabecera", () => {
    `development.md`, con una fila por parte, y resume los habituales en la
    ficha de `AGENTS.md`.
 2. Completa la tabla "Base de datos de pruebas" con la respuesta a T4.
+3. Regenera los comandos de `test-runner` y sus permisos con
+   [Generar los comandos de test-runner](setup-project-context.md#generar-los-comandos-de-test-runner).
 
 Termina con un informe con estas secciones:
 
@@ -212,7 +214,8 @@ Termina con un informe con estas secciones:
    `Respuesta` y `Estado` (`Confirmada`, `No planteada` o `Pendiente`).
 2. **Estado:** la tabla de la fase 1 actualizada.
 3. **Instalación:** comandos ejecutados, paquetes y versiones.
-4. **Ficheros:** creados y modificados.
+4. **Ficheros:** creados y modificados, y las filas del bloque de
+   `test-runner` generadas u omitidas con su motivo.
 5. **Comprobaciones:** resultado de cada semilla y herramienta, y los errores
    existentes que no se corrigieron.
 6. **CI:** fragmento de `.gitlab-ci.yml` con un job por herramienta

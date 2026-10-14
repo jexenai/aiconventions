@@ -138,7 +138,8 @@ Si una ronda no obtiene respuesta, no vuelvas a preguntar: conserva
          - Si una tarea declara otra verificación que no es una prueba
            automática, dilo al informar en lugar de darla por probada.
          - Antes de dar el cambio por aplicado, ejecuta las pruebas del área
-           afectada y conserva el resultado para la verificación.
+           afectada con el agente test-runner, si existe, y conserva el
+           resultado para la verificación.
          - Al ejecutar pruebas, filtra al escenario o al área y muestra solo
            el resumen y los fallos.
      archive:

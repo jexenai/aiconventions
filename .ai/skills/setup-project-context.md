@@ -26,7 +26,9 @@ misma manera, se ejecute por primera vez o se repita.
 - No modifiques código de aplicación ni configuración funcional salvo que el
   usuario amplíe expresamente el alcance. La única excepción es el ajuste
   del [formateador](#excluir-la-documentación-del-formateador) que fija el
-  stack declarado. En `AGENTS.md` edita solo su ficha.
+  stack declarado. En `AGENTS.md` edita solo su ficha. En
+  `.claude/agents/test-runner.md` y `.claude/settings.json`, solo lo que
+  indica [Generar los comandos de test-runner](#generar-los-comandos-de-test-runner).
 - No borres ficheros, salvo los artefactos que indique
   [Retirar los stacks no usados](#retirar-los-stacks-no-usados).
 - No llames a las herramientas de los servidores MCP: hasta que el usuario
@@ -118,9 +120,10 @@ Solo lectura. No edites nada en esta fase.
 7. Comprueba que las rutas y comandos citados existen. Distingue claramente
    entre comandos observados y comandos realmente ejecutados.
 8. Si existe `.claude/agents/`, comprueba la versión de Claude Code con
-   `claude --version`. Los revisores declaran `omitClaudeMd`, que requiere
-   Claude Code 2.1.271 o superior; con una versión anterior, el campo no tiene
-   efecto y cada revisor vuelve a cargar `AGENTS.md` al arrancar. No actualices
+   `claude --version`. Los revisores y `test-runner` declaran `omitClaudeMd`,
+   que requiere Claude Code 2.1.271 o superior; con una versión anterior, el
+   campo no tiene efecto y cada agente vuelve a cargar `AGENTS.md` al
+   arrancar. No actualices
    la herramienta: anota la versión para el informe.
 9. Si `context.declared.language` fija una versión, consulta la del intérprete
    instalado (`php -v`, `java -version`, `node -v`). Si es inferior a la
@@ -277,6 +280,9 @@ Aplica las respuestas y la clasificación de la fase 2:
 - `.claude/` y `development.md`: retira lo de los stacks que el proyecto no
   usa, aplicando
   [Retirar los stacks no usados](#retirar-los-stacks-no-usados).
+- `.claude/agents/test-runner.md` y `.claude/settings.json`: al final, con
+  los documentos ya actualizados, aplica
+  [Generar los comandos de test-runner](#generar-los-comandos-de-test-runner).
 
 Mantén cada dato en una única fuente. Enlaza documentos relacionados en lugar
 de copiar reglas completas entre ellos.
@@ -302,7 +308,9 @@ Según la respuesta a P9:
    fichero indicado contiene todos sus `patterns` en la clave `key`, o
    anota por qué el paso queda pendiente.
 5. Revisa que no se hayan documentado ejemplos como configuración activa.
-6. Contrasta los comandos registrados con scripts, manifiestos o CI.
+6. Contrasta los comandos registrados con scripts, manifiestos o CI, y
+   comprueba que el bloque de `test-runner` y las reglas `allow` coinciden
+   con ellos y que ninguna fila del bloque escribe ficheros.
 7. Comprueba que no queda ningún artefacto de los componentes retirados y
    que ningún fichero de `.claude/` ni `development.md` los cita sin la
    salvedad «si existe». Busca por el nombre de cada carpeta, agente y skill
@@ -338,7 +346,8 @@ Termina siempre con un informe con estas secciones, en este orden:
    `Conservado`, `Retirado` o `Pendiente` y el motivo. No omitas filas.
 7. **Pendientes:** marcadores restantes con su motivo concreto. Si algún
    comando de pruebas, lint o análisis sigue pendiente porque falta la
-   herramienta, indica la respuesta a S1.
+   herramienta, indica la respuesta a S1. Incluye las filas omitidas del
+   bloque de `test-runner` y su motivo.
 8. **Comprobaciones:** comprobaciones ejecutadas y limitaciones de la revisión,
    incluida la versión de Claude Code de la fase 1. Si es anterior a 2.1.271
    o no se pudo obtener, recomienda actualizarla antes de usar los revisores.
@@ -379,7 +388,9 @@ Destino de cada clave de `buildTools.commands`:
 | `build`                 | —        | Compilar                                                                       |
 | `formatCheck`, `format` | —        | Comprobar formato (`formatCheck`; `format` es el que corrige)                  |
 | `staticAnalysis`        | —        | Ejecutar análisis estático                                                     |
-| `test`                  | P6       | Pruebas unitarias y de integración                                             |
+| `test`                  | P6       | Pruebas unitarias, y también de integración si no hay `testIntegration`        |
+| `testIntegration`       | —        | Pruebas de integración                                                         |
+| `testE2e`               | —        | Pruebas de extremo a extremo                                                   |
 | `testFilter`            | —        | Una sola prueba o clase                                                        |
 | `migrate`               | —        | Ninguna: solo se cita si una tarea lo necesita                                 |
 
@@ -445,6 +456,88 @@ un paso del setup y no un fichero de la plantilla.
    errores. No ejecutes `npm run check:fix` para resolverlo: reescribiría
    los documentos.
 
+## Generar los comandos de test-runner
+
+Aplica al final de la fase 4, cuando `development.md` ya está actualizado y
+los stacks no usados se han retirado. También lo aplican `setup-testing` en
+su fase 6 y cualquier tarea que cambie la tabla "Comandos", la "Base de datos
+de pruebas" o el "Entorno local". `test-runner` usa `haiku` y no interpreta
+la tabla: aquí se resuelve todo lo que exige criterio, para que el agente
+solo ejecute.
+
+1. Si no existe `.claude/agents/test-runner.md`, omite esta sección e
+   indícalo en el informe.
+2. Construye una fila por parte y alcance a partir de la tabla "Comandos":
+
+   | Fila de "Comandos" | Alcance |
+   | ------------------ | ------- |
+   | Comprobar formato | `formato` |
+   | Ejecutar análisis estático | `analisis` |
+   | Compilar | `compilar` |
+   | Pruebas unitarias | `unit` |
+   | Pruebas de integración | `integration` |
+   | Pruebas de extremo a extremo | `e2e` |
+   | Una sola prueba o clase | `prueba` |
+
+3. Resuelve cada fila con estas reglas:
+   - **Sin comando** (`[POR DEFINIR]`): no la incluyas; el agente informará
+     «sin comando». Si el paso no existe en esa parte (compilar en PHP,
+     tipos en JavaScript sin TypeScript), inclúyela sin comando y con
+     `Condición` = `no aplica`.
+   - **Solo lectura:** nunca incluyas un comando que escriba ficheros
+     (`spotless:apply`, `spotlessApply`, `--fix`, `:fix`, `--write`, `pint`
+     sin `--test`). Si el formato solo tiene el comando que corrige, no
+     incluyas la fila y anótalo en "Pendientes".
+   - **Compilar sin pruebas:** si el comando también ejecuta las pruebas,
+     usa su variante sin ellas (`mvn -DskipTests package`,
+     `./gradlew assemble`).
+   - **Unitarias e integración:** si comparten comando y la herramienta
+     permite separarlas (`testsuites` `Unit` y `Feature` de `phpunit.xml`,
+     carpetas de Vitest, Surefire y Failsafe), usa un filtro por tipo
+     (`php artisan test --testsuite=Unit`). Si no, una sola fila `unit` con
+     `Incluye` = `integration`.
+   - **Inclusiones:** si una fila ejecuta también lo de otra (`mvn verify`
+     ejecuta las unitarias de `mvn test`), anótalo en `Incluye`.
+   - **Prueba concreta:** sustituye el marcador del comando
+     (`NombreDeLaPrueba`) por `{prueba}`.
+   - **Salida resumida:** añade la opción de la herramienta que reduce la
+     salida sin ocultar los fallos (`--compact` en Artisan, `-q` en Maven,
+     `--reporter=dot` en Vitest), si el comando no la lleva.
+   - **Entorno local:** incorpora al comando los ajustes obligatorios de esa
+     tabla (shell, ruta, `--memory-limit`).
+   - **Base de datos:** si la fila ejecuta pruebas que usan base de datos
+     (`RefreshDatabase`, migraciones, repositorios JPA) y la "Base de datos
+     de pruebas" está `[POR DEFINIR]` o apunta a una base compartida, pon
+     `Condición` = `no ejecutar: base de datos de pruebas sin confirmar`.
+     Una base aislada (SQLite en memoria, Testcontainers) no la necesita.
+     Decide con la configuración de pruebas, sin leer el `.env`.
+   - **Requisitos:** un requisito de la columna "Directorio o requisito"
+     que no sea un directorio (servidor arrancado, navegadores de
+     Playwright) va a `Condición` = `requiere: <requisito>`.
+4. Sustituye solo el contenido entre `<!-- comandos-test-runner:inicio … -->`
+   y `<!-- comandos-test-runner:fin -->` por una tabla con las columnas
+   `Alcance`, `Parte`, `Comando`, `Directorio`, `Incluye` y `Condición`
+   (`—` si está vacía), con las filas en el orden de la tabla del paso 2.
+   Si no queda ninguna fila, deja «Sin generar.». No edites el resto del
+   fichero.
+
+   ```markdown
+   | Alcance | Parte | Comando | Directorio | Incluye | Condición |
+   | ------- | ----- | ------- | ---------- | ------- | --------- |
+   | formato | Backend | vendor/bin/pint --test | . | — | — |
+   | compilar | Backend | — | — | — | no aplica |
+   | unit | Backend | php artisan test --testsuite=Unit --compact | . | — | — |
+   | integration | Backend | php artisan test --testsuite=Feature --compact | . | — | no ejecutar: base de datos de pruebas sin confirmar |
+   | prueba | Backend | php artisan test --compact --filter={prueba} | . | — | — |
+   ```
+
+5. Añade a `permissions.allow` de `.claude/settings.json` una regla
+   `Bash(<comando>)` por cada fila que se pueda ejecutar (sin `no aplica` ni
+   `no ejecutar`) y, para la fila `prueba`, `Bash(<comando hasta {prueba}>*)`.
+   Antes de sustituir el bloque, lee el anterior y quita de `allow` las
+   reglas de sus comandos que ya no estén. No toques las demás reglas.
+6. Anota en el informe las filas generadas y las omitidas con su motivo.
+
 ## Retirar los stacks no usados
 
 La plantilla trae reglas, revisores y skills de Claude Code para Spring Boot,
@@ -460,8 +553,8 @@ repetir el procedimiento.
    `Pendiente`.
 2. Conserva o retira cada componente según esta tabla. Lo que no aparece
    (`.claude/rules/comun/estilo-codigo.md`, `comun/pruebas.md`,
-   `security-reviewer`, las demás skills de procedimientos y las de OpenSpec)
-   se conserva siempre.
+   `security-reviewer`, `test-runner`, las demás skills de procedimientos y
+   las de OpenSpec) se conserva siempre.
 
    | Componente       | Se conserva si                                         | Artefactos                                                                                                                                                                                                                                                                                                                                                                                                     |
    | ---------------- | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
