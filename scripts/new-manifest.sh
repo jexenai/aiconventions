@@ -6,7 +6,7 @@ output_path="dist/manifest.json"
 archive_path="dist/aiconventions.zip"
 template_version=""
 tracked_only="false"
-default_exclude_paths=(".github" "scripts" ".gitattributes" "README.md" "pila_tecnologica.md" ".agents" ".codex" "templates", "docs")
+default_exclude_paths=(".github" "scripts" ".gitattributes" "README.md" "pila_tecnologica.md" ".agents" ".codex" "templates" "docs")
 exclude_paths=()
 
 usage() {
