@@ -54,6 +54,22 @@ El agente principal puede indicar qué ejecutar: uno o varios alcances
 - `Condición` = `requiere: <requisito>`: ejecútalo; si falla porque falta el
   requisito, «no ejecutado: <requisito>». No lo instales ni lo arranques.
 
+- Pruebas de pantalla (capturas, imágenes, regresión visual, o cualquier
+  prueba que dependa de ellas): nunca las ejecutes, aunque el agente
+  principal las pida o estén dentro de `e2e`. Informa «no ejecutado: pruebas
+  de pantalla, las ejecuta el agente principal».
+
+## Evitar bloqueos
+
+- Ejecuta los comandos en secuencia, nunca en paralelo.
+- No reintentes ni esperes indefinidamente un comando que no termina o pide
+  entrada interactiva: si supera unos minutos o se queda esperando, deja de
+  esperarlo.
+- Si por cualquier motivo no puedes ejecutar algo (comando colgado,
+  interrumpido, sin permiso, entorno no disponible), no te quedes bloqueado:
+  devuelve igualmente el informe con el estado de cada fila: «no ejecutado
+  (motivo)» para lo que no corrió, y el resultado real del resto.
+
 Si todas las pruebas de una fila fallan con el mismo error de carga o de
 entorno, infórmalo como un error de entorno con su mensaje, no como N
 fallos. Si la salida llega cortada y no se ven los fallos, dilo; no los

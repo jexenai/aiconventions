@@ -26,6 +26,11 @@ publicar, desplegar ni incluir cambios ajenos al alcance indicado.
 3. Ejecuta `git diff --cached --check` para detectar errores de whitespace.
 4. Respeta las comprobaciones obligatorias del proyecto y los hooks de Git. No
    los desactives para conseguir que el commit termine correctamente.
+5. No ejecutes pruebas si la última comprobación de este mismo árbol (la
+   conversación lo muestra) fue correcta y no hay cambios posteriores en los
+   ficheros que van al commit. Ejecútalas solo si no hay comprobación previa,
+   falló, o el árbol cambió después. Un hook de Git que ejecute pruebas sigue
+   su curso.
 
 ## Mensaje
 

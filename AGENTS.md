@@ -76,4 +76,11 @@ contexto solo ante una dependencia, un riesgo o una contradicción relevante.
 - Si al terminar un cambio queda algo estable que el contexto no recoge (un
   término, una capacidad, una decisión o una regla de seguridad), añádelo a
   `architecture.md` o `development.md`. Registra solo lo implementado.
+- Si delegas las pruebas en `test-runner`, no repitas esas mismas
+  comprobaciones mientras trabaja (ni en paralelo ni después sobre el mismo
+  árbol): duplicarlas puede bloquear el entorno, p. ej. la base de datos de
+  pruebas. Espera su informe y úsalo. Si devuelve «no ejecutado», lo que no
+  ejecutó queda sin comprobar; no lo des por validado.
+- Las pruebas de pantalla (capturas, imágenes, regresión visual) nunca las
+  ejecuta `test-runner`: las lanzas tú.
 - Al terminar, indica qué cambió, qué comprobaste y qué queda pendiente.
