@@ -1,0 +1,78 @@
+standard: 26.9.21
+context:
+  template: springboot-react
+  declared:
+    language: Java 21 y Node.js LTS 22
+    framework: Spring Boot 4 + React 18
+    server: WebLogic Server 15.1.1 (backend) / Apache 2.4 (SPA)
+    ci: GitLab CI
+  database: Oracle 19c
+  deployment:
+    packaging: war
+    target: Despliegue del war en WebLogic Server 15.1.1
+    assets: SPA compilada con Vite y desplegada en Apache 2.4
+  ui:
+    views: React 18
+    entry: frontend/src/
+    rootTemplate: frontend/index.html
+    bridge: API REST + SPA
+    dependencies:
+    - package: react
+      purpose: Interfaz de usuario de la SPA
+    - package: react-dom
+      purpose: Montaje de la SPA en el navegador
+    - package: vite
+      purpose: Servidor de desarrollo y compilación de la SPA
+    - package: "@vitejs/plugin-react"
+      purpose: Integración de React con Vite
+  conventions:
+    paths:
+      code: src/main/java/
+      migrations: src/main/resources/db/migration/
+      tests: src/test/java/
+      testResources: src/test/resources/
+      config: src/main/resources/
+      views: frontend/src/
+      viewTests: frontend/src/tests/
+      e2e: frontend/tests/e2e/
+      static: frontend/public/
+      frontendBuild: frontend/dist/
+      frontendConfig: frontend/vite.config.ts
+      ci: .gitlab-ci.yml
+    generated:
+    - target/
+    - build/
+    - .gradle/
+    - bin/
+    - out/
+    - frontend/node_modules/
+    - frontend/dist/
+    - frontend/coverage/
+    buildTools:
+    - file: pom.xml
+      commands:
+        install: mvn dependency:resolve
+        run: mvn spring-boot:run
+        build: mvn package
+        test: mvn test
+        testIntegration: mvn verify
+        format: mvn spotless:apply
+        staticAnalysis: mvn checkstyle:check
+    - file: build.gradle
+      commands:
+        install: ./gradlew dependencies
+        run: ./gradlew bootRun
+        build: ./gradlew build
+        test: ./gradlew test
+        testIntegration: ./gradlew integrationTest
+        format: ./gradlew spotlessApply
+        staticAnalysis: ./gradlew checkstyleMain
+    - file: frontend/package.json
+      commands:
+        install: npm ci
+        run: npm run dev
+        build: npm run build
+        test: npm test
+        testE2e: npm run test:e2e
+        format: npm run format
+        staticAnalysis: npm run lint

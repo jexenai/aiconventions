@@ -1,5 +1,6 @@
 | template | framework | lenguaje | servidor | bd | detalles |
 | --- | --- | --- | --- | --- | --- |
+| springboot-react | Spring + React | Java 21 / JS | Weblogic Server 15.1.1 / Apache | Oracle 19 c | Spring + React 18 |
 | springboot4 | Spring Boot 4 | Java 21 | Weblogic Server 15.1.1 | Oracle 19 c | Proyecto con Springboot 4 |
 | springboot3 | Spring Boot 3 | Java 17 | JBoss EAP 8 | Oracle 19 c | Aplicacion web Java para JBoss EAP 8 |
 | react18 | React 18 min | Node.js LTS v22 | Apache 2.4 | N/A | Frontend web React |
