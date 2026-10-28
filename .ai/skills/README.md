@@ -9,6 +9,7 @@ procedimientos. No cargues todas las skills al comenzar.
 | Preparar el contexto | Al adoptar la plantilla, completar campos pendientes o actualizar la estructura documentada | [setup-project-context.md](setup-project-context.md) |
 | Decidir sobre OpenSpec | Al adoptar la plantilla o cuando se plantee usar OpenSpec: decisión del usuario y, si procede, instalación e inicialización | [setup-openspec.md](setup-openspec.md) |
 | Preparar las pruebas | Cuando a una parte del proyecto le faltan las herramientas para ejecutar sus pruebas o su análisis: instalación con confirmación, pruebas semilla y comandos | [setup-testing.md](setup-testing.md) |
+| Liberar una versión | Cuando el usuario pide liberar una versión o generar el manual de usuario: manual con capturas por perfil en `docs/manual/`, novedades, commit y tag, con su revisión antes de cerrar. Solo Claude Code | [liberar-version](../../.claude/skills/liberar-version/SKILL.md) |
 
 ## Añadir un procedimiento
 
@@ -22,6 +23,10 @@ decisiones o comprobaciones. Cada procedimiento debe indicar:
 
 Mantén el contenido en `.ai/skills/` y crea únicamente un adaptador mínimo
 en `.claude/skills/`.
+
+Excepción: `liberar-version` vive entera en `.claude/skills/liberar-version/`,
+sin fuente aquí, porque depende de Claude Code (lee las capturas que genera
+para revisarlas) y lleva plantillas propias junto al procedimiento.
 
 Una skill no necesita un agente para ejecutarse. Delega en uno únicamente si
 la tarea requiere aislamiento de contexto, herramientas especializadas o

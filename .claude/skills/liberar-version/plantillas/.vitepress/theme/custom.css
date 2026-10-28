@@ -1,0 +1,82 @@
+/*
+ * Estilo de la aplicación. La skill liberar-version lo completa con los
+ * tokens de la propia aplicación (colores, tipografías, radio) y anota de
+ * dónde sale cada valor. Si cambian allí, cámbialos aquí.
+ *
+ * Tipografías: importa aquí las mismas que carga la aplicación, por ejemplo
+ * @import '@fontsource/<fuente>/400.css';
+ */
+
+:root {
+  /* Tipografías de la aplicación: cuerpo y títulos. */
+  --vp-font-family-base: system-ui, sans-serif;
+  --manual-fuente-titulos: var(--vp-font-family-base);
+
+  /* Color principal (botones, enlaces, entrada activa del menú). */
+  --vp-c-brand-1: #3451b2; /* principal */
+  --vp-c-brand-2: #3a5ccc; /* principal al pasar el ratón */
+  --vp-c-brand-3: #3451b2; /* fondo de botones */
+  --vp-c-brand-soft: rgba(100, 108, 255, 0.14); /* acento suave */
+
+  /* Fondos, textos y bordes. */
+  --vp-c-bg: #ffffff; /* fondo */
+  --vp-c-bg-alt: #f6f6f7; /* menú lateral */
+  --vp-c-bg-soft: #f6f6f7; /* fondos atenuados */
+  --vp-c-bg-elv: #ffffff; /* tarjetas */
+  --vp-c-text-1: rgba(60, 60, 67); /* texto */
+  --vp-c-text-2: rgba(60, 60, 67, 0.78); /* texto secundario */
+  --vp-c-text-3: rgba(60, 60, 67, 0.56);
+  --vp-c-divider: #e2e2e3; /* bordes */
+  --vp-c-border: #c2c2c4;
+
+  --vp-button-brand-text: #ffffff; /* texto sobre el color principal */
+  --manual-radio: 8px; /* radio de esquinas */
+}
+
+.dark {
+  /* Los mismos tokens en el tema oscuro de la aplicación, si lo tiene. */
+}
+
+/* Títulos con la tipografía de títulos de la aplicación. */
+.vp-doc h1,
+.vp-doc h2,
+.vp-doc h3,
+.VPNavBarTitle .title,
+.VPSidebarItem.level-0 > .item .text {
+  font-family: var(--manual-fuente-titulos);
+}
+
+/* Avisos de pantallas reservadas a un perfil (citas) con el color de la marca. */
+.vp-doc blockquote {
+  border-left-color: var(--vp-c-brand-1);
+  background: var(--vp-c-bg-soft);
+  border-radius: 0 var(--manual-radio) var(--manual-radio) 0;
+  padding: 8px 16px;
+}
+.vp-doc blockquote > p {
+  color: var(--vp-c-text-1);
+}
+
+.vp-doc table {
+  border-radius: var(--manual-radio);
+}
+
+/* ---------- Capturas ampliables (medium-zoom) ---------- */
+
+/* Por encima de la barra superior y del menú de VitePress. */
+.medium-zoom-overlay,
+.medium-zoom-image--opened {
+  z-index: 100;
+}
+
+/* La imagen ampliada nunca se pinta más grande que su tamaño real. */
+.medium-zoom-image--opened {
+  max-width: none;
+}
+
+/* Las capturas llevan borde para separarlas del texto, y se indica que se pueden ampliar. */
+.vp-doc img {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: var(--manual-radio);
+  cursor: zoom-in;
+}

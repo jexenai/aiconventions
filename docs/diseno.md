@@ -43,11 +43,16 @@ Los agentes no lo leen durante su trabajo.
 - Las skills de setup solo se ejecutan al invocarlas: lo fija
   `disable-model-invocation` en su `SKILL.md`.
 - Los procedimientos son propios de la plantilla: tienen su fuente en
-  `.ai/skills/` y un adaptador mínimo en `.claude/skills/`.
-- Solo dos procedimientos pueden instalar, y siempre con confirmación en el
-  momento: `setup-openspec` (OpenSpec) y `setup-testing` (herramientas de
-  pruebas y análisis, como dependencias de desarrollo). El resto de la
-  plantilla prohíbe instalar.
+  `.ai/skills/` y un adaptador mínimo en `.claude/skills/`. La excepción es
+  `liberar-version`, que vive entera en `.claude/skills/liberar-version/`:
+  solo funciona con Claude Code (revisa las capturas que genera leyéndolas
+  como imágenes) y sus plantillas tienen que viajar junto al procedimiento.
+  El catálogo de `.ai/skills/README.md` la enlaza igualmente.
+- Solo tres procedimientos pueden instalar, y siempre con confirmación en el
+  momento: `setup-openspec` (OpenSpec), `setup-testing` (herramientas de
+  pruebas y análisis, como dependencias de desarrollo) y `liberar-version`
+  (VitePress, `medium-zoom` y el navegador de Playwright, la primera vez que
+  se genera el manual). El resto de la plantilla prohíbe instalar.
 - `setup-testing` elige las herramientas en su propia tabla, no en
   `templates/`, hasta que se decida cómo declarar el estándar de pruebas en
   las plantillas. Las versiones las toma de la documentación oficial,
@@ -127,6 +132,38 @@ formas:
   `e2e-testing` al escribir pruebas de Playwright y `contract-first` antes
   de cambiar el contrato de la API.
   La lectura funciona aunque la skill no sea invocable por el modelo.
+
+### Manual de usuario
+
+`liberar-version` genera y mantiene el manual de usuario. Decisiones:
+
+- **Una versión liberada es un tag en un commit que ya contiene su manual.**
+  Git no avisa al crear un tag y un manual generado después quedaría fuera
+  de él, así que la skill es la que crea el tag, tras la revisión del
+  usuario. Los tags se pueden seguir creando a mano: la skill documenta
+  después el último tag si el código no ha cambiado desde él, o recoge sus
+  cambios en la siguiente versión. No hay hook que bloquee `git tag`.
+- **Una sola versión del manual, la última.** Las aplicaciones web solo
+  tienen una versión en uso; el historial queda en los tags y en
+  `novedades.md`.
+- **VitePress, publicado con la aplicación en `/manual/`.** El build de la
+  aplicación encadena el del manual dentro de su carpeta de salida, así que
+  se despliega sin pasos extra. Es contenido estático: lo ve quien llegue al
+  servidor, igual que la aplicación.
+- **El texto lo redacta Claude y lo edita el usuario.** En cada versión solo
+  se tocan los párrafos afectados por cambios visibles, para no pisar sus
+  ediciones. El orden sale de la interfaz (menú y recorrido de cada
+  pantalla) y el contenido de las especificaciones; si discrepan, manda lo
+  implementado.
+- **Capturas deterministas.** Playwright contra un build de la aplicación
+  servido aparte (el servidor de desarrollo compila al vuelo y las capturas
+  en paralelo fallan), con la API simulada con datos ficticios, la sesión
+  fijada por perfil y los elementos de desarrollo ocultos. Se versionan en
+  `docs/manual/img/`; el HTML no.
+- **El estilo es el de la aplicación de cada proyecto.** La plantilla de
+  `custom.css` lleva valores neutros; la skill los sustituye por los tokens
+  de la aplicación (o del servidor MCP de sistema de diseño) y comprueba el
+  resultado en claro, oscuro y móvil.
 
 ## Reglas de código
 
