@@ -37,6 +37,9 @@ Antes de escribir o corregir una prueba, lee
   `findBy*` o `waitFor`.
 - *Hooks* propios con `renderHook`. Sin *snapshots* de componentes grandes:
   se aceptan sin revisarlos y no dicen qué se rompió.
+- Cobertura con Vitest y el proveedor v8 si está configurado. Su informe
+  `lcov` (`coverage/lcov.info`) es el que lee Sonar, si el proyecto lo usa
+  (`sonar.javascript.lcov.reportPaths`).
 
 > Aclaración: en Laravel con vistas React, las pruebas de extremo a extremo
 > son las únicas que recorren backend y frontend juntos. Con Inertia, el

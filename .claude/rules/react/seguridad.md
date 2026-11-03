@@ -17,6 +17,13 @@ paths:
   `rel="noopener noreferrer"`.
 - Sesión en cookies `httpOnly` gestionadas por el backend, no tokens en
   `localStorage`.
+- Los avisos de Sonar sobre componentes genéricos de una librería de UI
+  copiada al proyecto (p. ej. shadcn/ui en `components/ui`:
+  `javascript:S6850` en un encabezado sin contenido, `javascript:S6853` en una
+  etiqueta sin control) son falsos positivos si el contenido o el control
+  llegan por `children`, `htmlFor` o anidados desde cada uso. Se marcan en
+  Sonar con ese motivo, no con `// NOSONAR`. Cualquier otro aviso se corrige
+  en el código.
 
 > Aclaración: en Laravel con vistas React y sesión de Laravel (Inertia o
 > Sanctum en modo SPA), axios envía el token CSRF desde la cookie

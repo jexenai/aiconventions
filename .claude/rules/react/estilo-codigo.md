@@ -18,6 +18,14 @@ paths:
   orden o se eliminan.
 - Sin `console.log` ni código de depuración. ESLint y Prettier si están
   configurados.
+- Promesa que se lanza a propósito sin esperarla (p. ej. `invalidateQueries`
+  dentro de `onSuccess`, para que la mutación no espere al refresco): márcala
+  con `void`. Sonar avisa si no (`javascript:S9383`). Si el resultado importa,
+  devuélvela o usa `await`.
+- Un fichero de componentes solo exporta componentes: las variantes
+  (`cva`), constantes y funciones auxiliares que no se importen desde fuera
+  no se exportan, y las que sí, van a su propio fichero
+  (`react/only-export-components`, si el linter del proyecto la incluye).
 
 ## En ficheros `.ts` y `.tsx`
 
