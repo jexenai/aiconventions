@@ -78,6 +78,11 @@ Lo transversal se organiza igual, como una entidad más:
 - Controlador: HTTP, sin lógica. Recibe el DTO, llama al caso de uso y
   convierte el resultado con el mapper.
 - Repositorio: acceso a datos, sin reglas de negocio.
+- `JdbcTemplate` solo para consultas que JPA no cubre (p. ej. objetos de
+  base de datos fuera del modelo de entidades), siempre dentro de un
+  repositorio. Al insertar con `KeyHolder`, pide la columna de la clave
+  (`new String[] {"ID"}`) y protege `getKey()` con `Objects.requireNonNull`
+  y un mensaje que diga qué inserción no devolvió su identificador.
 - El contrato OpenAPI se actualiza antes de crear o cambiar una operación, y
   el código se implementa después sobre las interfaces generadas.
 - La API devuelve DTO generados del contrato y rellenados con MapStruct

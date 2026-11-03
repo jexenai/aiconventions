@@ -44,4 +44,8 @@ probado dentro de cada una:
   obsoleto en Spring Boot 3.4 y eliminado en Spring Boot 4.
 - Variantes del mismo caso con `@ParameterizedTest`.
 - Código asíncrono con Awaitility, no con `Thread.sleep()`.
-- Cobertura con JaCoCo si está configurado.
+- Toda prueba lleva al menos una aserción de Hamcrest, también las de
+  arranque del contexto (p. ej. `assertThat(contexto, notNullValue())`):
+  Sonar marca como bloqueante (`java:S2699`) una prueba sin aserciones.
+- Cobertura con JaCoCo si está configurado. Su informe XML (con Maven, en la
+  fase `verify`) es el que lee Sonar, si el proyecto lo usa.

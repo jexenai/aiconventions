@@ -18,5 +18,9 @@ paths:
   de sesión o los envíos de correo.
 - Al cliente, mensajes de error genéricos; el detalle va al log del servidor,
   sin secretos ni datos personales.
+- Los avisos de Sonar que resulten ser falsos positivos se marcan en Sonar
+  con el motivo, no con `// NOSONAR` en el código, salvo que no haya otra
+  opción: así el código no se llena de marcas y la justificación queda en el
+  panel.
 
 > Aclaración: solo se carga con código de backend.

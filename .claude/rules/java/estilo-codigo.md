@@ -28,3 +28,8 @@ paths:
   causa. Solo el manejador centralizado captura `Exception`.
 - Logs con SLF4J y marcadores `{}`; nunca `System.out` ni
   `printStackTrace()`.
+- Recursos JDBC y de E/S (`Connection`, `PreparedStatement`, `ResultSet`,
+  flujos) con `try-with-resources`. Solo se dejan abiertos si se ceden a otro
+  objeto que los cierra (p. ej. un flujo que se copia a la respuesta): en ese
+  caso, un comentario lo explica y el `catch` los cierra si falla antes de la
+  cesión.
