@@ -3,7 +3,7 @@ context:
   template: springboot-react
   declared:
     language: Java 21 y Node.js LTS 22
-    framework: Spring Boot 4 + React 18
+    framework: Spring Boot 3 + React 18
     server: WebLogic Server 15.1.1 (backend) / Apache 2.4 (SPA)
     ci: GitLab CI
   database: Oracle 19c
