@@ -16,9 +16,7 @@ paths:
   constantes en `UPPER_SNAKE_CASE`; paquetes en minúsculas. Sufijos por rol
   (`*Controller`, `*Repository`, `*Mapper`, `*Exception`, `*Interceptor`,
   `*Validator`) y una clase pública por fichero. Los casos de uso no llevan
-  sufijo: se nombran con `Verbo+Entidad+PosibleDetalle`
-  (`CrearConvocatoria`, `BuscarConvocatoriaPorIdentificador`; ver
-  `patrones.md`).
+  sufijo (`comun/estilo-codigo.md`).
 - Campos `final` por defecto; sin *setters* salvo en entidades JPA.
 - Colecciones vacías en lugar de `null`. `Optional` solo como retorno, nunca
   en campos ni parámetros, y sin `get()`: usa `orElseThrow()`, `map()` u

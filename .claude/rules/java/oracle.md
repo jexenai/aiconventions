@@ -1,6 +1,6 @@
 ---
 paths:
-  - "**/*.java"
+  - "**/{models,repositories}/**/*.java"
   - "**/*.sql"
   - "**/db/{migration,changelog}/**"
 ---
@@ -14,5 +14,14 @@ paths:
   `CHAR(1)` con un convertidor.
 - Una lista `IN` admite como máximo 1000 elementos (ORA-01795): divide la
   consulta.
+- La cadena vacía es `NULL`: `''` se guarda y se lee como `NULL`, y
+  `= ''` nunca coincide. No distingas vacío de nulo en reglas ni consultas,
+  y no declares `NOT NULL` una columna de texto que admite vacío.
+- Las palabras reservadas no sirven como nombre de tabla o columna
+  (`comment`, `level`, `size`, `date`, `number`, `mode`, `row`, `file`...).
+  Elige otro nombre para el campo; si el esquema ya existe, declara el
+  nombre real (`patrones.md`).
+- `LIKE` distingue mayúsculas y minúsculas: para búsquedas que no las
+  distingan, aplica `UPPER()` o `LOWER()` a los dos lados.
 - H2 no reproduce el dialecto de Oracle 19c. Las consultas nativas y las
   migraciones se prueban contra Oracle, por ejemplo con Testcontainers.

@@ -38,6 +38,7 @@ Estos archivos aplican controles que no dependen de que el modelo obedezca:
 | ------- | ------- |
 | `.claude/settings.json` | Bloquea leer y editar `.env.prod*`, editar `.env`, `.env.local` y `.env.*.local`, y leer claves y certificados (el `.env` local sí puede leerse); permite sin preguntar las órdenes de Git del commit inicial del setup y `git rm`; pide confirmación antes de `git push` y de las migraciones y los comandos `db:` de Artisan, tanto desde Bash como desde PowerShell. Al terminar, el setup retira los permisos de `git init`, `git add` y `git commit`: desde entonces, cada commit pide confirmación |
 | `.claude/hooks/revisor-solo-lectura.sh` | Los revisores solo pueden ejecutar lecturas de Git, comprobaciones estáticas y auditorías de dependencias; nunca pruebas ni comandos que escriban |
+| `.claude/hooks/test-runner-solo-bloque.sh` | `test-runner` solo puede ejecutar los comandos que el setup le genera, escritos igual; nada de instalar, migrar ni corregir |
 
 La regla de lectura no cubre la lectura desde la terminal (`cat .env`): la
 protección definitiva está en no versionar secretos.
@@ -305,7 +306,7 @@ las reglas indican cuándo leerla y tú puedes invocarla (`/laravel-tdd`).
 | Stack | Skills |
 | ----- | ------ |
 | Spring Boot | `springboot-security`, `jpa-patterns`, `springboot-tdd`, `openapi-mapstruct` |
-| Laravel | `laravel-security`, `laravel-tdd` |
+| Laravel | `laravel-patterns`, `laravel-security`, `laravel-tdd` |
 | Spring Boot y Laravel | `api-design` |
 | React | `react-testing`, `frontend-a11y`, `e2e-testing` |
 | API REST con SPA | `contract-first` (no aplica con Inertia) |

@@ -1,6 +1,6 @@
 ---
 paths:
-  - "**/*.java"
+  - "**/{mappers,controllers,actions,validator,models}/**/*.java"
 ---
 # Java: DTO y mapeo
 
@@ -22,6 +22,11 @@ Antes de crear o cambiar un mapper, lee
   campos a mano en controladores, casos de uso ni validadores, ni con
   métodos `default` en el mapper. Regístralos como beans de Spring
   (`componentModel = "spring"` en `MapeoConfig`).
+- Las entidades JPA usan Lombok (`@Getter`, `@Setter`, `@Builder` y sus dos
+  constructores, como muestra `jpa-patterns`). Es una dependencia del
+  estándar: si falta en el manifiesto, dilo en lugar de escribir a mano
+  *getters*, *setters* o *builders*. Su procesador de anotaciones se
+  declara antes que el de MapStruct (`openapi-mapstruct`).
 - Con `@Builder` en la entidad, MapStruct construye el alta a través del
   *builder*: `id`, `version` y los campos de auditoría
   (`.claude/skills/jpa-patterns/SKILL.md`) no llegan del DTO, así que

@@ -2,7 +2,7 @@
 name: security-reviewer
 description: Revisa la seguridad en Spring Boot, Laravel y React (entrada, autorización, secretos, dependencias). Solo si el usuario lo pide o lo confirma; cuándo ofrecerlo, en la Entrega de development.md. Solo informa.
 tools: Read, Grep, Glob, Bash
-model: sonnet
+model: opus
 omitClaudeMd: true
 hooks:
   PreToolUse:
@@ -45,7 +45,9 @@ personal, da el fichero y la línea, nunca su valor.
 4. **Dependencias**, si el cambio las toca o antes de liberar:
    OWASP Dependency-Check en Java (plugin de Maven o Gradle, si está
    configurado), `composer audit` en PHP y `npm audit --audit-level=high`
-   en React. Si la herramienta no está disponible, dilo.
+   en React. Si la herramienta no está disponible, dilo. Si una parte
+   está en una subcarpeta, no uses `cd`: `npm --prefix <carpeta> audit`,
+   `composer --working-dir=<carpeta> audit` o `mvn -f <carpeta>/pom.xml`.
 
 ## Además de las reglas, revisa
 

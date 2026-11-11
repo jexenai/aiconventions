@@ -2,7 +2,7 @@
 paths:
   - "**/*.{test,spec}.{js,jsx,ts,tsx}"
   - "**/__tests__/**/*.{js,jsx,ts,tsx}"
-  - "**/{vitest,playwright}.config.{js,ts}"
+  - "**/{vitest,playwright,vite}.config.{js,ts,mjs,mts}"
 ---
 # React: pruebas
 

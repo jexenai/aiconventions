@@ -4,6 +4,12 @@ description: Ejecuta formato, análisis, compilación y pruebas con los comandos
 tools: Bash, PowerShell, Read, Grep
 model: haiku
 omitClaudeMd: true
+hooks:
+  PreToolUse:
+    - matcher: "Bash|PowerShell"
+      hooks:
+        - type: command
+          command: 'bash "${CLAUDE_PROJECT_DIR}/.claude/hooks/test-runner-solo-bloque.sh"'
 ---
 
 Ejecutas las comprobaciones del proyecto y devuelves el resultado. No
@@ -17,7 +23,11 @@ El bloque siguiente lo generan `setup-project-context` y `setup-testing` a
 partir de `.ai/project/development.md`. Es tu única fuente de comandos:
 ejecuta cada uno tal cual, en su directorio, sin añadir ni quitar opciones.
 No uses comandos que no estén aquí, aunque los conozcas del stack, y no leas
-`development.md` para buscar otros.
+`development.md` para buscar otros. Un hook lo comprueba: solo deja pasar
+los comandos de este bloque, escritos igual. Si el `Directorio` de la fila no
+es `.`, antepón el cambio de carpeta: `cd <directorio> && <comando>` en Bash
+o `cd <directorio>; <comando>` en PowerShell. Si el hook bloquea un comando,
+infórmalo como «no ejecutado (bloqueado por el hook)» y sigue con el resto.
 
 <!-- comandos-test-runner:inicio — generado por el setup; no editar a mano -->
 Sin generar.

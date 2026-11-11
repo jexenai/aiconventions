@@ -40,31 +40,22 @@ Lo transversal se organiza igual, como una entidad más:
 
 ## Capas
 
-- La lógica de dominio vive solo en `actions` y en el validador de
-  `validator`. Controladores, entidades, mappers, DTO, repositorios e
-  interceptores no deciden reglas de negocio.
-- Caso de uso: una clase `@Service` por operación, con el nombre
-  `Verbo+Entidad+PosibleDetalle` (`CrearConvocatoria`,
-  `BuscarConvocatoriaPorIdentificador`, `BuscarConvocatoriasConFiltros`,
-  `CerrarConvocatoria`), sin sufijo, y un único método público `ejecutar`.
-  Recibe el DTO de entrada, lo convierte con el mapper, carga las
-  referencias con su repositorio y devuelve la entidad. Lleva
-  `@Transactional` (con `readOnly = true` en las lecturas); nunca
-  transacciones en controladores. Es breve y se lee con el vocabulario
-  funcional del dominio (`comun/estilo-codigo.md`); no comprueba reglas de
-  negocio, las delega en el validador.
-- Validador: una única clase `@Component` por entidad, con el sufijo
-  `Validator` (`ConvocatoriaValidator`). Expone un método público por
-  acción que necesita validación, con un nombre legible desde el dominio
-  (`validarCreacion`, `validarModificacion`, `validarBorrado`); cada uno
-  compone las reglas aplicables a la acción, en su orden de lectura. Cada
-  regla compartida o atómica es un método privado con un nombre que
-  expresa la condición de negocio (`comprobarQueLaConvocatoriaEsModificable`),
-  reutilizado desde los métodos públicos: nunca dupliques una comprobación
-  entre acciones. Puede depender de repositorios y de otros componentes de
-  lectura cuando una regla necesite comprobar estado persistido. Informa
-  del incumplimiento con la excepción de dominio del proyecto y un mensaje
-  que identifica la regla vulnerada.
+Qué es un caso de uso y un validador, cómo se nombran y qué hace cada uno
+está en `comun/organizacion-backend.md`. Aquí, solo lo propio de Spring Boot:
+
+- Caso de uso: una clase `@Service` en `actions/{entidades}`. Recibe el DTO
+  de entrada, lo convierte con el mapper, carga las referencias con su
+  repositorio y devuelve la entidad. Lleva `@Transactional` (con
+  `readOnly = true` en las lecturas); nunca transacciones en controladores.
+- Que el caso de uso reciba el DTO generado es deliberado: es el contrato
+  de entrada y evita mantener un tercer modelo. Si otro caso de uso o un
+  proceso sin HTTP (tarea programada, mensaje) necesita la misma operación,
+  no construyas un DTO para llamarlo: extrae el paso común a un caso de uso
+  que reciba la entidad o los valores del dominio, y el que recibe el DTO
+  delega en él.
+- Validador: una clase `@Component` en `validator`. Para las reglas que
+  dependen del estado persistido, usa repositorios y otros componentes de
+  lectura.
 - La autorización (rol y propiedad del recurso) no es regla de negocio y no
   va en el validador: `@PreAuthorize` en `ejecutar` o, si necesita la
   entidad cargada, en el caso de uso tras cargarla
@@ -73,8 +64,7 @@ Lo transversal se organiza igual, como una entidad más:
   `convocatoriaValidator.validarCreacion(convocatoria); repositorio.save(convocatoria);`.
 - El formato de la entrada (obligatorios, longitudes, patrones) lo declara
   el contrato OpenAPI y lo aplica Bean Validation al entrar en el
-  controlador; el validador no lo repite, solo las condiciones que
-  dependen del dominio, de su estado o de otros datos.
+  controlador.
 - Controlador: HTTP, sin lógica. Recibe el DTO, llama al caso de uso y
   convierte el resultado con el mapper.
 - Repositorio: acceso a datos, sin reglas de negocio.
@@ -109,6 +99,9 @@ Lo transversal se organiza igual, como una entidad más:
   `convocatoria_parametro`, `fechaInicio` en la columna `fecha_inicio`, la
   relación `zona` en `zona_id`, y el identificador usa la secuencia
   `convocatoria_parametro_seq`. Las migraciones crean esos nombres.
+  Excepciones, con `name` explícito y un comentario que lo explique: una
+  tabla heredada que no sigue la convención, o un nombre que resultaría ser
+  una palabra reservada de la base de datos (`oracle.md`, si existe).
 - Relaciones `LAZY`. Carga lo necesario con `JOIN FETCH` o `@EntityGraph`
   para evitar consultas N+1.
 - Listados paginados con `Pageable` y `Page<T>`.

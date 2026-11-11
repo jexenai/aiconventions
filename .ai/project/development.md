@@ -49,7 +49,7 @@ No modifica código: los arreglos los hace la conversación principal.
 `test-runner` no lee esta tabla: ejecuta los comandos que el setup le genera
 a partir de ella, de la "Base de datos de pruebas" y del "Entorno local". Si
 cambias cualquiera de las tres, regenera su bloque con
-[Generar los comandos de test-runner](../../.claude/skills/setup-project-context/SKILL.md#generar-los-comandos-de-test-runner).
+[Generar los comandos de test-runner](../../.claude/skills/setup-project-context/comandos-test-runner.md).
 
 ### Base de datos de pruebas
 

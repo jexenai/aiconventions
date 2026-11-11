@@ -38,7 +38,9 @@ personal, da el fichero y la línea, nunca su valor.
    convenciones propias de
    `.ai/project/development.md`, que prevalecen sobre las reglas. Si el
    alcance toca rutas o controladores de la API, lee también
-   `.claude/skills/api-design/SKILL.md`, si existe.
+   `.claude/skills/api-design/SKILL.md`, si existe. Si toca casos de uso,
+   validadores, modelos o consultas, lee también
+   `.claude/skills/laravel-patterns/SKILL.md`, si existe.
 3. **Versiones.** Comprueba en `composer.json` las versiones de PHP y Laravel
    antes de señalar una característica como disponible.
 4. **Comprobaciones.** Ejecuta Pint en modo comprobación
@@ -46,7 +48,9 @@ personal, da el fichero y la línea, nunca su valor.
    `development.md`. Las pruebas no las ejecutas: quien te lanza te pasa su
    resultado sobre el mismo árbol; cítalo en el informe. Si no te lo pasa,
    indica las pruebas como comprobación no ejecutada. Si un comando está
-   `[POR DEFINIR]`, no lo inventes: dilo en el informe.
+   `[POR DEFINIR]`, no lo inventes: dilo en el informe. Si el proyecto
+   PHP está en una subcarpeta, no uses `cd`:
+   `composer --working-dir=<carpeta> lint:check`.
 
 ## Además de las reglas, revisa
 
@@ -85,7 +89,7 @@ Corrección: qué cambiar.
   silenciadas, entrada sin validar.
 - **ALTO:** lógica en controladores, N+1, falta de autorización o de pruebas
   del escenario.
-- **MEDIO:** estilo PSR-12, legibilidad, rendimiento menor.
+- **MEDIO:** formato de Pint, legibilidad, rendimiento menor.
 
 Termina con el resultado de las comprobaciones ejecutadas y un veredicto:
 **Aprobado** (sin CRÍTICO ni ALTO), **Con avisos** (solo MEDIO) o

@@ -28,35 +28,25 @@ La estructura de carpetas concreta de cada stack está en su `patrones.md`.
 
 - El dominio se agrupa por entidad, con la carpeta en plural
   (`convocatorias/`).
-- En el backend, la lógica de dominio vive solo en los casos de uso y en el
-  validador de cada entidad. Controladores, modelos, mappers, DTO,
-  repositorios y el resto son auxiliares: no deciden reglas de negocio.
 - Un caso de uso por operación, con el formato
   `Verbo+Entidad+PosibleDetalle` y sin sufijos como `Service`. En el backend
-  es una clase en `PascalCase` (`BuscarTramitePorIdentificador`,
-  `CrearUsuario`, `BuscarConsejeriasConFiltros`), en la carpeta de casos de
-  uso que fija el `patrones.md` de su stack. En React es una
-  función de API en `camelCase` (`crearUsuario`; ver `react/patrones.md`).
+  es una clase en `PascalCase` (`CrearUsuario`; ver
+  `comun/organizacion-backend.md`). En React es una función de API en
+  `camelCase` (`crearUsuario`; ver `react/patrones.md`).
 - Cada caso de uso es breve y hace una sola cosa: así es reutilizable y un
   humano lo entiende sin esfuerzo. Escríbelo con el vocabulario funcional
   acordado (`architecture.md`), no con términos técnicos que el negocio no
   usaría, y reutiliza otros casos de uso antes de repetir sus pasos.
-
-  > Aclaración: si `ejecutar` no cabe en una pantalla, es una señal de que
-  > conviene extraer un paso a otro caso de uso.
-
-- Las reglas de negocio de una entidad van en su validador
-  (`TramiteValidator`), en su propia carpeta, con un método público por
-  acción (`validarCreacion`, `validarModificacion`, `validarBorrado`). El
-  caso de uso no comprueba reglas: delega en el método correspondiente del
-  validador, justo antes de guardar, y se mantiene centrado en coordinar el
-  caso de uso. El formato de la entrada (obligatorios, longitudes,
-  patrones) se valida en el límite: contrato, petición o formulario.
+- El formato de la entrada (obligatorios, longitudes, patrones) se valida en
+  el límite: contrato, petición o formulario.
 
 ## Diseño
 
-Escribe para que lo entienda sin esfuerzo un desarrollador senior de nivel
-medio, no uno avanzado.
+Escribe para que cualquier desarrollador con experiencia lo entienda en una
+primera lectura, sin tener que descifrarlo. Nada rebuscado: ni trucos del
+lenguaje o del framework que haya que conocer de antemano, ni construcciones
+que obliguen a seguir varios saltos para saber qué ocurre. Ante dos
+soluciones correctas, elige la que se explica sola.
 
 - Código explícito y lineal, y una responsabilidad por función.
 - Nombres descriptivos completos (`jugadorActual`, no `ja` ni `flag`).
@@ -70,9 +60,10 @@ medio, no uno avanzado.
   números o textos con significado.
 - Prefiere datos inmutables: devuelve valores nuevos en lugar de modificar
   parámetros o estado compartido.
-- El acceso a datos y a servicios externos vive en su capa (repositorio,
-  cliente de API) y el resto depende de ella, no del ORM o del SDK
-  directamente. Interfaces pequeñas y específicas; si hay varias
+- El acceso a datos y a servicios externos vive en su capa (repositorio o
+  cliente de API; en Laravel, los modelos Eloquent, ver `php/patrones.md`)
+  y el resto depende de ella, no de SQL suelto ni del SDK directamente.
+  Interfaces pequeñas y específicas; si hay varias
   implementaciones, deben poder sustituirse sin romper a quien las usa.
 - No ocultes fallos con capturas genéricas ni con valores de sustitución.
   Si absorbes un error a propósito, comenta por qué.
@@ -93,3 +84,7 @@ medio, no uno avanzado.
 - Comenta el porqué, no lo que ya dice el código. Comenta siempre los
   *workarounds* y las decisiones que parezcan raras a primera vista. Elimina
   los comentarios obsoletos y el código comentado: el historial lo guarda.
+- Si el proyecto usa Sonar, sus avisos se corrigen en el código. Los que
+  resulten ser falsos positivos se marcan en Sonar con el motivo, no con
+  `// NOSONAR`, salvo que no haya otra opción: así el código no se llena de
+  marcas y la justificación queda en el panel.

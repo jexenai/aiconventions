@@ -34,7 +34,7 @@ misma manera, se ejecute por primera vez o se repita.
   del [formateador](#excluir-la-documentación-del-formateador) que fija el
   stack declarado. En `AGENTS.md` edita solo su ficha. En
   `.claude/agents/test-runner.md` y `.claude/settings.json`, solo lo que
-  indican [Generar los comandos de test-runner](#generar-los-comandos-de-test-runner)
+  indican [Generar los comandos de test-runner](comandos-test-runner.md)
   y [Retirar los permisos del commit inicial](#retirar-los-permisos-del-commit-inicial).
 - No borres ficheros, salvo los artefactos que indique
   [Retirar los stacks no usados](#retirar-los-stacks-no-usados).
@@ -289,7 +289,7 @@ Aplica las respuestas y la clasificación de la fase 2:
   [Retirar los stacks no usados](#retirar-los-stacks-no-usados).
 - `.claude/agents/test-runner.md` y `.claude/settings.json`: al final, con
   los documentos ya actualizados, aplica
-  [Generar los comandos de test-runner](#generar-los-comandos-de-test-runner)
+  [Generar los comandos de test-runner](comandos-test-runner.md)
   y, después,
   [Retirar los permisos del commit inicial](#retirar-los-permisos-del-commit-inicial).
 
@@ -468,92 +468,6 @@ un paso del setup y no un fichero de la plantilla.
    errores. No ejecutes `npm run check:fix` para resolverlo: reescribiría
    los documentos.
 
-## Generar los comandos de test-runner
-
-Aplica al final de la fase 4, cuando `development.md` ya está actualizado y
-los stacks no usados se han retirado. También lo aplican `setup-testing` en
-su fase 6 y cualquier tarea que cambie la tabla "Comandos", la "Base de datos
-de pruebas" o el "Entorno local". `test-runner` usa `haiku` y no interpreta
-la tabla: aquí se resuelve todo lo que exige criterio, para que el agente
-solo ejecute.
-
-1. Si no existe `.claude/agents/test-runner.md`, omite esta sección e
-   indícalo en el informe.
-2. Construye una fila por parte y alcance a partir de la tabla "Comandos":
-
-   | Fila de "Comandos" | Alcance |
-   | ------------------ | ------- |
-   | Comprobar formato | `formato` |
-   | Ejecutar análisis estático | `analisis` |
-   | Compilar | `compilar` |
-   | Pruebas unitarias | `unit` |
-   | Pruebas de integración | `integration` |
-   | Pruebas de extremo a extremo | `e2e` |
-   | Una sola prueba o clase | `prueba` |
-
-3. Resuelve cada fila con estas reglas:
-   - **Sin comando** (`[POR DEFINIR]`): no la incluyas; el agente informará
-     «sin comando». Si el paso no existe en esa parte (compilar en PHP,
-     tipos en JavaScript sin TypeScript), inclúyela sin comando y con
-     `Condición` = `no aplica`.
-   - **Solo lectura:** nunca incluyas un comando que escriba ficheros
-     (`spotless:apply`, `spotlessApply`, `--fix`, `:fix`, `--write`, `pint`
-     sin `--test`). Si el formato solo tiene el comando que corrige, no
-     incluyas la fila y anótalo en "Pendientes".
-   - **Compilar sin pruebas:** si el comando también ejecuta las pruebas,
-     usa su variante sin ellas (`mvn -DskipTests package`,
-     `./gradlew assemble`).
-   - **Unitarias e integración:** si comparten comando y la herramienta
-     permite separarlas (`testsuites` `Unit` y `Feature` de `phpunit.xml`,
-     carpetas de Vitest, Surefire y Failsafe), usa un filtro por tipo
-     (`php artisan test --testsuite=Unit`). Si no, una sola fila `unit` con
-     `Incluye` = `integration`.
-   - **Inclusiones:** si una fila ejecuta también lo de otra (`mvn verify`
-     ejecuta las unitarias de `mvn test`), anótalo en `Incluye`.
-   - **Prueba concreta:** sustituye el marcador del comando
-     (`NombreDeLaPrueba`) por `{prueba}`.
-   - **Salida resumida:** añade la opción de la herramienta que reduce la
-     salida sin ocultar los fallos (`--compact` en Artisan, `-q` en Maven,
-     `--reporter=dot` en Vitest), si el comando no la lleva.
-   - **Entorno local:** incorpora al comando los ajustes obligatorios de esa
-     tabla (shell, ruta, `--memory-limit`).
-   - **Base de datos:** si la fila ejecuta pruebas que usan base de datos
-     (`RefreshDatabase`, migraciones, repositorios JPA) y la "Base de datos
-     de pruebas" está `[POR DEFINIR]` o apunta a una base compartida, pon
-     `Condición` = `no ejecutar: base de datos de pruebas sin confirmar`.
-     Una base aislada (SQLite en memoria, Testcontainers) no la necesita.
-     Decide con la configuración de pruebas, sin leer el `.env`.
-   - **Requisitos:** un requisito de la columna "Directorio o requisito"
-     que no sea un directorio (servidor arrancado, navegadores de
-     Playwright) va a `Condición` = `requiere: <requisito>`.
-4. Sustituye solo el contenido entre `<!-- comandos-test-runner:inicio … -->`
-   y `<!-- comandos-test-runner:fin -->` por una tabla con las columnas
-   `Alcance`, `Parte`, `Comando`, `Directorio`, `Incluye` y `Condición`
-   (`—` si está vacía), con las filas en el orden de la tabla del paso 2.
-   Si no queda ninguna fila, deja «Sin generar.». No edites el resto del
-   fichero.
-
-   ```markdown
-   | Alcance | Parte | Comando | Directorio | Incluye | Condición |
-   | ------- | ----- | ------- | ---------- | ------- | --------- |
-   | formato | Backend | vendor/bin/pint --test | . | — | — |
-   | compilar | Backend | — | — | — | no aplica |
-   | unit | Backend | php artisan test --testsuite=Unit --compact | . | — | — |
-   | integration | Backend | php artisan test --testsuite=Feature --compact | . | — | no ejecutar: base de datos de pruebas sin confirmar |
-   | prueba | Backend | php artisan test --compact --filter={prueba} | . | — | — |
-   ```
-
-5. Añade a `permissions.allow` de `.claude/settings.json`, por cada fila que
-   se pueda ejecutar (sin `no aplica` ni `no ejecutar`), dos reglas:
-   `Bash(<comando>)` y `PowerShell(<comando>)`. Para la fila `prueba`,
-   `Bash(<comando hasta {prueba}>*)` y su equivalente de `PowerShell`.
-   `test-runner` declara las dos herramientas y en Windows puede usar
-   cualquiera; una regla de `Bash` no cubre lo que se ejecuta con
-   `PowerShell`. Antes de sustituir el bloque, lee el anterior y quita de
-   `allow` las reglas de sus comandos que ya no estén. No toques las demás
-   reglas.
-6. Anota en el informe las filas generadas y las omitidas con su motivo.
-
 ## Retirar los permisos del commit inicial
 
 Aplica al final de la fase 4, también al repetir el procedimiento y aunque
@@ -589,10 +503,10 @@ repetir el procedimiento.
    | Componente       | Se conserva si                                         | Artefactos                                                                                                                                                                                                                                                                                                                                                                                                     |
    | ---------------- | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
    | Spring Boot      | P2 incluye Java o Spring Boot                          | `.claude/rules/java/`, `.claude/agents/java-reviewer.md`, `.claude/skills/springboot-security/`, `springboot-tdd/`, `jpa-patterns/`, `openapi-mapstruct/`                                                                                                                                                                                                                                                      |
-   | Laravel          | P2 incluye PHP o Laravel                               | `.claude/rules/php/`, `.claude/agents/php-reviewer.md`, `.claude/skills/laravel-security/`, `laravel-tdd/` y la aclaración sobre PHP en Windows de la sección "Entorno local" de `development.md` |
+   | Laravel          | P2 incluye PHP o Laravel                               | `.claude/rules/php/`, `.claude/agents/php-reviewer.md`, `.claude/skills/laravel-security/`, `laravel-tdd/`, `laravel-patterns/` y la aclaración sobre PHP en Windows de la sección "Entorno local" de `development.md` |
    | Oracle           | P7 incluye Oracle en algún entorno                     | `.claude/rules/java/oracle.md` y `.claude/rules/php/oracle.md`                                                                                                                                                                                                                                                                                                                                                 |
    | React            | P2 o P4 incluyen React                                 | `.claude/rules/react/`, `.claude/agents/react-reviewer.md`, `.claude/skills/react-testing/`, `frontend-a11y/`, `e2e-testing/`                                                                                                                                                                                                                                                                                  |
-   | Backend          | Se conserva Spring Boot o Laravel                      | `.claude/rules/comun/seguridad.md`, `.claude/skills/api-design/` y la sección "API" de `development.md`                                                                                                                                                                                                                                                                                                        |
+   | Backend          | Se conserva Spring Boot o Laravel                      | `.claude/rules/comun/seguridad.md`, `.claude/rules/comun/organizacion-backend.md`, `.claude/skills/api-design/` y la sección "API" de `development.md`                                                                                                                                                                                                                                                                                                        |
    | Contrato con SPA | Se conserva React o el backend, y P4 no indica Inertia | `.claude/skills/contract-first/`                                                                                                                                                                                                                                                                                                                                                                               |
    | Inertia          | Se conservan Laravel y React, y P4 indica Inertia      | `.claude/rules/inertia/`                                                                                                                                                                                                                                                                                                                                                                                       |
    | Manual de usuario | Se conserva React                                     | `.claude/skills/liberar-version/` y su fila en `.claude/skills/README.md` |

@@ -16,8 +16,9 @@ paths:
   anterior, usa `setX(prev => ...)`.
 - En listas, `key` estable y única; no el índice si los elementos cambian de
   orden o se eliminan.
-- Sin `console.log` ni código de depuración. ESLint y Prettier si están
-  configurados.
+- Sin `console.log` ni código de depuración. Formato y lint con las
+  herramientas del proyecto (ESLint y Prettier, o el `check` del kit de
+  Laravel), si están configuradas.
 - Promesa que se lanza a propósito sin esperarla (p. ej. `invalidateQueries`
   dentro de `onSuccess`, para que la mutación no espere al refresco): márcala
   con `void`. Sonar avisa si no (`javascript:S9383`). Si el resultado importa,

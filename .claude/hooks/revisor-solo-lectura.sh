@@ -10,24 +10,9 @@ bloquear() {
   exit 2
 }
 
-entrada=$(cat)
-
-# Extrae tool_input.command sin depender de jq.
-comando=$(printf '%s' "$entrada" | tr '\n' ' ' \
-  | sed -nE 's/.*"command"[[:space:]]*:[[:space:]]*"((\\.|[^"\\])*)".*/\1/p')
-[ -n "$comando" ] || bloquear "no se pudo leer el comando"
-# Descodifica los escapes de JSON. La barra invertida literal (\\) se aparta
-# primero para no confundir una ruta de Windows (C:\\new, C:\\users) con un
-# salto de línea (\n) o un escape Unicode (\u).
-marca=$(printf '\001')
-comando=$(printf '%s' "$comando" | sed -e "s/\\\\\\\\/$marca/g")
-case "$comando" in
-  *'\n'* | *'\r'*) bloquear "no se admiten comandos de varias líneas" ;;
-  # Un escape \uXXXX podría ocultar ;, & o >: no se descodifica, se bloquea.
-  *'\u'*) bloquear "el comando contiene escapes que no se pueden comprobar" ;;
-esac
-comando=$(printf '%s' "$comando" \
-  | sed -e 's/\\"/"/g' -e 's/\\\//\//g' -e 's/\\t/ /g' -e "s/$marca/\\\\/g")
+# shellcheck source=leer-comando.sh
+. "$(dirname "$0")/leer-comando.sh"
+leer_comando
 
 # Sin encadenar, redirigir ni sustituir: un único comando simple.
 case "$comando" in
@@ -139,6 +124,11 @@ case "$programa" in
     [ -n "$sin_descarga" ] || npx_instalado "$herramienta"
     exit 0 ;;
   npm)
+    # Proyecto en una subcarpeta (frontend/): npm --prefix <carpeta> …
+    if [ "$1" = "--prefix" ]; then
+      [ $# -ge 2 ] || bloquear "falta la carpeta de --prefix"
+      shift 2
+    fi
     case "$1" in
       audit)
         shift
@@ -152,6 +142,13 @@ case "$programa" in
         esac ;;
     esac ;;
   composer)
+    # Proyecto en una subcarpeta: composer --working-dir=<carpeta> …
+    case "$1" in
+      --working-dir=*) shift ;;
+      -d | --working-dir)
+        [ $# -ge 2 ] || bloquear "falta la carpeta de --working-dir"
+        shift 2 ;;
+    esac
     case "$1" in
       validate | audit | lint:check | types:check) exit 0 ;;
     esac ;;

@@ -212,7 +212,7 @@ test("muestra el nombre del usuario en la cabecera", () => {
    ficha de `AGENTS.md`.
 2. Completa la tabla "Base de datos de pruebas" con la respuesta a T4.
 3. Regenera los comandos de `test-runner` y sus permisos con
-   [Generar los comandos de test-runner](../setup-project-context/SKILL.md#generar-los-comandos-de-test-runner).
+   [Generar los comandos de test-runner](../setup-project-context/comandos-test-runner.md).
 
 Termina con un informe con estas secciones:
 

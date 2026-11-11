@@ -40,12 +40,14 @@ probado dentro de cada una:
   métodos del validador, cuyo nombre ya expresa la acción, basta
   `condicion_resultado` (`conCodigoDuplicado_lanzaExcepcion`). Si cubre un
   escenario de OpenSpec, su nombre va en `@DisplayName`.
-- Dobles en el contexto de Spring con `@MockitoBean`, no con `@MockBean`,
-  obsoleto en Spring Boot 3.4 y eliminado en Spring Boot 4.
+- Dobles en el contexto de Spring con `@MockitoBean` desde Spring Boot 3.4,
+  donde `@MockBean` queda obsoleto (se elimina en Spring Boot 4). Con una
+  versión anterior a la 3.4, `@MockBean`: `@MockitoBean` aún no existe.
 - Variantes del mismo caso con `@ParameterizedTest`.
 - Código asíncrono con Awaitility, no con `Thread.sleep()`.
-- Toda prueba lleva al menos una aserción de Hamcrest, también las de
-  arranque del contexto (p. ej. `assertThat(contexto, notNullValue())`):
+- Toda prueba lleva al menos una aserción (de Hamcrest o, con MockMvc, un
+  `andExpect`), también las de arranque del contexto (p. ej.
+  `assertThat(contexto, notNullValue())`):
   Sonar marca como bloqueante (`java:S2699`) una prueba sin aserciones.
 - Cobertura con JaCoCo si está configurado. Su informe XML (con Maven, en la
   fase `verify`) es el que lee Sonar, si el proyecto lo usa.
