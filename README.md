@@ -14,7 +14,7 @@ ampliarla sin romperla está en [docs/diseno.md](docs/diseno.md).
 | `.ai/project/architecture.md` | Reglas, alcance, mapa, dominio y seguridad             |
 | `.ai/project/development.md` | Comandos, base de datos de pruebas, convenciones propias, API, sistema de diseño y entrega |
 | `.claude/rules/`             | Pautas de código, seguridad y pruebas                  |
-| `.ai/skills/README.md`       | Catálogo de procedimientos reutilizables               |
+| `.claude/skills/README.md`   | Catálogo de procedimientos reutilizables               |
 
 `AGENTS.md` es el único punto de entrada; no hay `CLAUDE.md`. No añadas
 imports de todos los documentos: los detalles se consultan solo cuando la
@@ -26,10 +26,9 @@ tarea los necesita.
 | ----------------- | ----------------- | ---------------- |
 | `.claude/skills/` | `.claude/agents/` | `.claude/rules/` |
 
-Los procedimientos propios de la plantilla tienen su fuente en `.ai/skills/`;
-en `.claude/skills/` solo hay un adaptador mínimo que la remite. La
-excepción es `liberar-version`, que vive entera en
-`.claude/skills/liberar-version/` (ver [Manual de usuario](#manual-de-usuario)).
+Los procedimientos propios de la plantilla (`commit`, las skills de setup y
+`liberar-version`) son skills nativas: cada una vive entera en su carpeta de
+`.claude/skills/`, y `.claude/skills/README.md` las cataloga.
 
 ### Permisos
 
@@ -37,7 +36,7 @@ Estos archivos aplican controles que no dependen de que el modelo obedezca:
 
 | Archivo | Control |
 | ------- | ------- |
-| `.claude/settings.json` | Bloquea leer y editar `.env.prod*`, editar `.env`, `.env.local` y `.env.*.local`, y leer claves y certificados (el `.env` local sí puede leerse); permite sin preguntar las órdenes de Git del commit inicial del setup y `git rm`; pide confirmación antes de `git push` y de las migraciones y los comandos `db:` de Artisan |
+| `.claude/settings.json` | Bloquea leer y editar `.env.prod*`, editar `.env`, `.env.local` y `.env.*.local`, y leer claves y certificados (el `.env` local sí puede leerse); permite sin preguntar las órdenes de Git del commit inicial del setup y `git rm`; pide confirmación antes de `git push` y de las migraciones y los comandos `db:` de Artisan, tanto desde Bash como desde PowerShell. Al terminar, el setup retira los permisos de `git init`, `git add` y `git commit`: desde entonces, cada commit pide confirmación |
 | `.claude/hooks/revisor-solo-lectura.sh` | Los revisores solo pueden ejecutar lecturas de Git, comprobaciones estáticas y auditorías de dependencias; nunca pruebas ni comandos que escriban |
 
 La regla de lectura no cubre la lectura desde la terminal (`cat .env`): la
@@ -218,9 +217,17 @@ un cambio pertenecen al cambio de OpenSpec, no a la documentación estable.
 
 OpenSpec no tiene documento propio en la plantilla: su forma de trabajo la
 define el workflow que él mismo instala. La decisión de adoptarlo está en
-`.ai/skills/setup-openspec.md` y queda registrada en la fila
+`.claude/skills/setup-openspec/SKILL.md` y queda registrada en la fila
 `Especificaciones` de la ficha. Al instalarlo, `openspec/config.yaml` fija el
 orden de pruebas primero en cada cambio.
+
+Los comandos `/opsx:*` no vienen en la plantilla: los genera OpenSpec al
+instalarlo, en la versión que corresponde. La plantilla solo aporta
+`/leer_requisitos`, que lee un documento de requisitos de `docs/` (o el que
+le indiques), lo divide en cambios de OpenSpec con hitos mostrables, los
+crea en orden de dependencias y añade al documento el plan de
+implementación. Solo planifica: no implementa nada. Si el proyecto no usa
+OpenSpec, el setup lo retira.
 
 ## Manual de usuario
 
@@ -317,3 +324,18 @@ Dos consecuencias prácticas:
   que hay cargadas.
 - Para crear un fichero nuevo, el agente lee antes uno vecino del mismo tipo:
   las reglas entran al leer, no al crear.
+
+## Pendientes conocidos
+
+Lo que la plantilla todavía no resuelve, reunido aquí para no tener que
+buscarlo. Cada punto enlaza el lugar donde se explica:
+
+| Pendiente | Qué falta | Dónde está descrito |
+| --------- | --------- | ------------------- |
+| Token del SSO con Inertia | Decidir con Identidad corporativa si el gateway inyecta el JWT en cada petición o Laravel abre una sesión tras el acceso | [Elegir entre `laravel-inertia` y `laravel-api`](#elegir-entre-laravel-inertia-y-laravel-api) |
+| Kit de Laravel sin su autenticación | Estudiar cómo crear cada variante sin la autenticación del kit, para usar el SSO desde el principio | [Elegir entre `laravel-inertia` y `laravel-api`](#elegir-entre-laravel-inertia-y-laravel-api) |
+| GitLab CI | El setup solo documenta la CI declarada; `setup-testing` propone los jobs como fragmento en su informe, pero nadie genera `.gitlab-ci.yml` | [Qué aplica el setup según el stack](#qué-aplica-el-setup-según-el-stack) |
+| Manual de usuario con Inertia | Probar `liberar-version` en un proyecto real con Laravel e Inertia; hasta entonces se detiene | Anexo de [liberar-version](.claude/skills/liberar-version/SKILL.md#pendiente-laravel-con-inertia) |
+| Estándar de pruebas en las plantillas | Decidir cómo declarar las herramientas de pruebas en `templates/*.yaml`; hoy las elige la tabla de `setup-testing` | [docs/diseno.md](docs/diseno.md#skills-y-agentes) |
+
+Al resolver uno, quita su fila y la nota del lugar enlazado.

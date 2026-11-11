@@ -28,6 +28,12 @@ Los agentes no lo leen durante su trabajo.
 
 - **Controles que no dependen del modelo.** Lo que no debe ocurrir nunca va
   en `.claude/settings.json` o en un hook, no solo en texto.
+  Las reglas de `Bash(…)` no cubren la herramienta PowerShell que Claude
+  Code ofrece en Windows: cada regla `ask` se declara para las dos. Los
+  permisos `allow` del commit inicial (`git init`, `git add`,
+  `git commit`) solo existen para la fase 0 del setup, que los retira al
+  terminar; si se quedaran, «no hagas commits sin petición» dependería solo
+  del texto.
 
 ## Skills y agentes
 
@@ -42,12 +48,17 @@ Los agentes no lo leen durante su trabajo.
   intermedio y nunca debe lanzarse automáticamente sin petición del usuario.
 - Las skills de setup solo se ejecutan al invocarlas: lo fija
   `disable-model-invocation` en su `SKILL.md`.
-- Los procedimientos son propios de la plantilla: tienen su fuente en
-  `.ai/skills/` y un adaptador mínimo en `.claude/skills/`. La excepción es
-  `liberar-version`, que vive entera en `.claude/skills/liberar-version/`:
-  solo funciona con Claude Code (revisa las capturas que genera leyéndolas
-  como imágenes) y sus plantillas tienen que viajar junto al procedimiento.
-  El catálogo de `.ai/skills/README.md` la enlaza igualmente.
+- Los procedimientos propios de la plantilla son skills nativas de Claude
+  Code: cada uno vive entero en su carpeta de `.claude/skills/`, con sus
+  plantillas al lado si las tiene (`liberar-version`). No hay una fuente
+  aparte con adaptadores: la plantilla solo se dirige a Claude Code (usa
+  `AskUserQuestion`, hooks, reglas por ruta y subagentes), y mantener dos
+  copias enlazadas no aportaba nada. `.claude/skills/README.md` es el
+  catálogo que enlaza `AGENTS.md`.
+- Los comandos `/opsx:*` no se versionan en la plantilla: los genera
+  OpenSpec al instalarlo y así corresponden a su versión. El único comando
+  propio es `/leer_requisitos`, que depende de OpenSpec y por eso tiene su
+  fila en la tabla de retirada del setup.
 - Solo tres procedimientos pueden instalar, y siempre con confirmación en el
   momento: `setup-openspec` (OpenSpec), `setup-testing` (herramientas de
   pruebas y análisis, como dependencias de desarrollo) y `liberar-version`
@@ -80,6 +91,12 @@ Los agentes no lo leen durante su trabajo.
   bloquea todo lo demás, incluido lo que no reconoce. Si el proyecto usa
   otro comando de comprobación, añádelo a la lista del script. Necesita
   `bash` (en Windows, Git Bash).
+  Las listas son cerradas a propósito: `npm audit` pasa pero `npm audit fix`
+  no, `tsc` solo con `--noEmit` y `-p`, y `npx` solo ejecuta lo que ya está
+  en `node_modules` (o con `--no-install`), porque si no descargaría el
+  paquete. Los scripts de `npm run` y `composer` admitidos son los que
+  declaran `templates/*.yaml` y `setup-testing`; al añadir un comando de
+  comprobación a una plantilla, añádelo también al hook.
 - Su bloque «Además de las reglas» solo contiene lo que las reglas no
   cubren (concurrencia, flujos con estado, entrada peligrosa, escenarios).
   La arquitectura y el estilo los comprueban leyendo las reglas: no los
@@ -97,7 +114,7 @@ Los agentes no lo leen durante su trabajo.
   bloque de comandos vacío, y el setup lo especializa.
 - Usa `haiku`, que no debe interpretar una tabla con huecos, filas
   compartidas o comandos que corrigen. Por eso el criterio va en
-  [Generar los comandos de test-runner](../.ai/skills/setup-project-context.md#generar-los-comandos-de-test-runner),
+  [Generar los comandos de test-runner](../.claude/skills/setup-project-context/SKILL.md#generar-los-comandos-de-test-runner),
   que aplica un modelo capaz con el usuario delante: elige solo comandos de
   lectura, compila sin pruebas, separa unitarias e integración, marca las
   inclusiones, incorpora el "Entorno local" y bloquea las filas con base de
@@ -108,6 +125,8 @@ Los agentes no lo leen durante su trabajo.
   tabla, la "Base de datos de pruebas" o el "Entorno local".
 - El mismo paso añade cada comando ejecutable a `permissions.allow`, para
   que el agente no dependa de confirmaciones al ejecutarse en segundo plano.
+  Lo añade como `Bash(…)` y como `PowerShell(…)`: el agente declara las dos
+  herramientas y una regla de una no cubre la otra.
 - Ejecuta pruebas, así que no lleva el hook de los revisores. Su límite es
   el bloque y el prompt: sin comandos ajenos al bloque, sin instalar ni
   arreglar. Su valor está en no llenar el contexto principal con la salida

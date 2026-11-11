@@ -32,7 +32,7 @@ Consulta la configuración real de CI antes de afirmar qué comprobaciones son
 obligatorias. No ejecutes literalmente los marcadores pendientes. Si una
 tarea necesita un comando de pruebas o de análisis que falta porque la
 herramienta no está instalada, no la instales por tu cuenta: propón al
-usuario ejecutar `setup-testing` (`.ai/skills/setup-testing.md`). Al ejecutar
+usuario ejecutar `setup-testing` (`.claude/skills/setup-testing/SKILL.md`). Al ejecutar
 pruebas, filtra al área afectada y muestra solo el resumen y los fallos: la
 salida completa de una suite llena la ventana de contexto.
 
@@ -49,7 +49,7 @@ No modifica código: los arreglos los hace la conversación principal.
 `test-runner` no lee esta tabla: ejecuta los comandos que el setup le genera
 a partir de ella, de la "Base de datos de pruebas" y del "Entorno local". Si
 cambias cualquiera de las tres, regenera su bloque con
-[Generar los comandos de test-runner](../skills/setup-project-context.md#generar-los-comandos-de-test-runner).
+[Generar los comandos de test-runner](../../.claude/skills/setup-project-context/SKILL.md#generar-los-comandos-de-test-runner).
 
 ### Base de datos de pruebas
 

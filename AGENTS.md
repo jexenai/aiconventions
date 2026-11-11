@@ -47,13 +47,13 @@ Lee solo el documento de la tarea:
 | --------- | --------- |
 | Entender el proyecto, sus rutas, arquitectura, dominio o seguridad | [.ai/project/architecture.md](.ai/project/architecture.md) |
 | Implementar, revisar calidad de código o ejecutar pruebas | [.ai/project/development.md](.ai/project/development.md) |
-| Usar un procedimiento reutilizable del proyecto | [.ai/skills/README.md](.ai/skills/README.md) |
+| Usar un procedimiento reutilizable del proyecto | [.claude/skills/README.md](.claude/skills/README.md) |
 
 Filas de la ficha que cambian la forma de trabajar:
 
 - `Especificaciones`: con `[POR DEFINIR]`, antes de una tarea no trivial
   pregunta si se usará OpenSpec y sigue
-  [setup-openspec.md](.ai/skills/setup-openspec.md); hasta resolverlo, no
+  [setup-openspec](.claude/skills/setup-openspec/SKILL.md); hasta resolverlo, no
   trabajes con especificaciones. No preguntes antes de `setup-project-context`
   ni de `setup-openspec`: ya lo incluyen. Con `OpenSpec <versión>`, sigue el
   workflow que instaló. Con `No se usa`, no lo propongas salvo que se pida.
