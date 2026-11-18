@@ -148,12 +148,12 @@ pendientes. No conviertas suposiciones en datos del proyecto.
 
 ### Manifest de distribución
 
-Antes de distribuir una versión de la plantilla, genera `dist/manifest.json`
-con una versión CalVer `YY.MM.PATCH`. El comando también crea
+Antes de distribuir manualmente una versión de la plantilla, genera
+`dist/manifest.json` con una versión `YY.MM.DD_HHMM`. El comando también crea
 `dist/aiconventions.zip` con los mismos archivos inventariados:
 
 ```bash
-bash scripts/new-manifest.sh --template-version "26.09.0"
+bash scripts/new-manifest.sh --template-version "26.09.29_1430"
 ```
 
 El script calcula los hashes SHA-256 de los archivos gestionados, añade al
@@ -165,27 +165,20 @@ script deja fuera `.github`, `scripts`, `.gitattributes`, `README.md` y
 lista de archivos o carpetas excluidos, añade `--exclude` una o varias veces:
 
 ```bash
-bash scripts/new-manifest.sh --template-version "26.09.0" --exclude "docs"
+bash scripts/new-manifest.sh --template-version "26.09.29_1430" --exclude "docs"
 ```
 
-El workflow de GitHub Actions `Build distribution` solo se ejecuta al empujar
-una etiqueta `vYY.MM.PATCH` o `YY.MM.PATCH`, por ejemplo `v26.09.0`. Usa esa
-etiqueta como versión de plantilla y publica `manifest.json` y
-`aiconventions.zip` como artefactos del job y como assets de la release.
+El workflow de GitHub Actions `Build distribution` se ejecuta en cada push a
+cualquier rama. Genera una etiqueta y una release con la hora de Madrid en
+formato `YY.MM.DD_HHMM`, por ejemplo `26.11.18_1020`, y publica
+`manifest.json` y `aiconventions.zip` como artefactos del job y assets de la
+release. Si esa etiqueta ya existe, avanza al siguiente minuto disponible.
 
 URLs de descarga de la última release:
 
 ```text
 https://github.com/jexenai/aiconventions/releases/latest/download/manifest.json
 https://github.com/jexenai/aiconventions/releases/latest/download/aiconventions.zip
-```
-
-Para publicar manualmente una versión:
-
-```bash
-git tag v26.09.0
-git push origin main
-git push origin v26.09.0
 ```
 
 Si tu rama principal no se llama `main`, cambia `main` por el nombre real de
