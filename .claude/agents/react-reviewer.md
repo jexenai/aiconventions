@@ -45,12 +45,15 @@ nunca su valor.
    TypeScript antes de señalar una característica como disponible.
 4. **Comprobaciones.** Ejecuta el lint (`npm run lint`) y, si es
    TypeScript, la comprobación de tipos (`npm run typecheck` o
-   `npx tsc --noEmit`). Las pruebas no las ejecutas: quien te lanza te pasa
+   `npx --no-install tsc --noEmit`). Las pruebas no las ejecutas: quien te lanza te pasa
    su resultado sobre el mismo árbol; cítalo en el informe. Si no te lo
    pasa, indica las pruebas como comprobación no ejecutada. Si no hay ESLint
    con `eslint-plugin-react-hooks`, anótalo como hallazgo MEDIO y recomienda
    la skill `setup-testing`; revisa entonces a mano las dependencias de los
-   *hooks*.
+   *hooks*. Si el frontend está en una subcarpeta (`frontend/`), no uses
+   `cd`: `npm --prefix frontend run lint`; para los tipos, su script
+   (`npm --prefix frontend run typecheck`), porque `npx` busca en la carpeta
+   actual.
 
 ## Además de las reglas, revisa
 
@@ -88,7 +91,7 @@ Corrección: qué cambiar.
 ```
 
 - **CRÍTICO:** seguridad (XSS, secretos en el *bundle*, tokens en
-  `localStorage`), *hooks* condicionales, mutación del estado.
+  `localStorage` fuera del modo de desarrollo), *hooks* condicionales, mutación del estado.
 - **ALTO:** dependencias de efectos incorrectas, efectos sin limpieza,
   accesibilidad que impide usar la pantalla, `key` inestable, falta de
   pruebas del escenario.

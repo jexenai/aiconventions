@@ -12,7 +12,7 @@ paths:
 $this->actingAs($user)
     ->get(route('pedidos.index'))
     ->assertInertia(fn (AssertableInertia $pagina) => $pagina
-        ->component('Pedidos/Index')
+        ->component('pedidos/index')
         ->has('pedidos.data', 3)
         ->missing('pedidos.data.0.user.password'));
 ```

@@ -1237,8 +1237,9 @@
               usar OpenSpec es una decisión de equipo, no un dato deducible del
               repositorio. Si el usuario acepta, la misma ejecución continúa con
               <code>setup-openspec</code>, que pregunta las herramientas y confirma
-              la instalación antes de instalarlo —una de las dos excepciones a la
-              regla de no instalar dependencias; la otra es <code>setup-testing</code>—.
+              la instalación antes de instalarlo —una de las tres excepciones a la
+              regla de no instalar dependencias; las otras son <code>setup-testing</code>
+              y <code>liberar-version</code>—.
             </p>
             <p>
               Al inicializarlo escribe en <code>openspec/config.yaml</code> la política
@@ -2961,8 +2962,8 @@ git diff --cached --check   <span class="c">errores de espacios en blanco</span>
             </tr>
             <tr>
               <td>Procedimientos repetibles</td>
-              <td><code>.ai/skills/</code></td>
-              <td>Fuente única, con un adaptador mínimo en <code>.claude/skills/</code></td>
+              <td><code>.claude/skills/</code></td>
+              <td>Fuente única: cada procedimiento es una skill nativa, con su catálogo en <code>.claude/skills/README.md</code></td>
             </tr>
             <tr>
               <td>Qué herramientas de prueba se instalan</td>

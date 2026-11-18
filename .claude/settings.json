@@ -29,7 +29,10 @@
     "ask": [
       "Bash(git push *)",
       "Bash(php artisan migrate*)",
-      "Bash(php artisan db:*)"
+      "Bash(php artisan db:*)",
+      "PowerShell(git push *)",
+      "PowerShell(php artisan migrate*)",
+      "PowerShell(php artisan db:*)"
     ]
   }
 }

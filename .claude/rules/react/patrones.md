@@ -10,7 +10,7 @@ paths:
 
 ## Carpetas
 
-Aplica a la SPA con API REST. Con Inertia, las páginas están donde fija
+Aplica a la SPA con API REST. Con Inertia, las carpetas son las que fija
 `.claude/rules/inertia/patrones.md`, si existe, y la validación la hace el
 `FormRequest`.
 
@@ -22,12 +22,13 @@ en Laravel. Cada entidad tiene su carpeta en plural y en `kebab-case`
 | ------- | --------- |
 | `<vistas>/features/{entidades}/api` | Un caso de uso por operación, con el nombre `Verbo+Entidad+PosibleDetalle` en `camelCase` (`crearConvocatoria.ts`, `buscarConvocatoriasConFiltros.ts`) |
 | `<vistas>/features/{entidades}/hooks` | *Hooks* de la entidad (`useCrearConvocatoria`, `useConvocatorias`) |
-| `<vistas>/features/{entidades}/validator` | El validador de la entidad: una función por acción (`convocatoriaValidator.ts`, con `validarCreacion`, `validarModificacion`...) |
 | `<vistas>/features/{entidades}/components` | Componentes propios de la entidad |
 | `<vistas>/components`, `<vistas>/hooks` | Lo compartido por varias entidades |
 | `<vistas>/lib` | Cliente HTTP y sus interceptores |
 
-Crea estas solo cuando hagan falta: `<vistas>/auth` (sesión y usuario),
+Crea estas solo cuando hagan falta:
+`<vistas>/features/{entidades}/validator` (el validador de la entidad,
+`convocatoriaValidator.ts`), `<vistas>/auth` (sesión y usuario),
 `<vistas>/constants` (valores compartidos; los conjuntos cerrados, como uniones
 de literales o objetos `as const`), `<vistas>/types` (tipos compartidos por
 varias entidades) y guardas de ruta junto al *router*.
@@ -36,12 +37,18 @@ varias entidades) y guardas de ruta junto al *router*.
   carpeta de su entidad.
 - Cada caso de uso es breve y hace una sola cosa, con el vocabulario
   funcional del dominio (`comun/estilo-codigo.md`).
-- El validador de la entidad expone una función por acción
+- El validador de una entidad se crea solo si su formulario tiene reglas de
+  negocio que conviene adelantar al usuario; no copies por sistema las del
+  backend, que es quien valida de verdad. Expone una función por acción
   (`validarCreacion`, `validarModificacion`, `validarBorrado`), que recibe
   los datos del formulario y devuelve los errores por campo, componiendo
   comprobaciones privadas reutilizables cuando haga falta. Se llama al
-  enviar, justo antes del caso de uso de API. Adelanta las reglas para el
-  usuario, pero no sustituye la validación del backend.
+  enviar, justo antes del caso de uso de API.
+- Antes de validar un formulario, comprueba cómo lo hace el sistema de
+  diseño del proyecto, sea cual sea (ficha de `AGENTS.md` y su catálogo): si
+  trae su propio mecanismo (esquemas, componentes de formulario con
+  validación), el formato de los campos se declara con él y el validador se
+  queda solo con las reglas de negocio.
 - Las funciones de API y sus tipos siguen el contrato OpenAPI, si existe.
 
 ## *Hooks*
@@ -49,7 +56,8 @@ varias entidades) y guardas de ruta junto al *router*.
 - Solo en el nivel superior del componente o de otro *hook*: nunca en
   condiciones, bucles ni tras un `return` anticipado.
 - Todas las dependencias en `useEffect`, `useMemo` y `useCallback`. No
-  silencies `react-hooks/exhaustive-deps`: corrige la causa.
+  silencies el aviso del linter (`react-hooks/exhaustive-deps` en ESLint):
+  corrige la causa.
 - `useEffect` solo para sincronizar con el exterior. Lo que se calcula a
   partir de props o estado se calcula en el render, y la respuesta a un
   evento va en su manejador. Limpia lo que abras (suscripciones,
@@ -81,6 +89,10 @@ varias entidades) y guardas de ruta junto al *router*.
   las zonas que pueden fallar.
 
 ## Accesibilidad básica
+
+Antes de crear o cambiar un formulario o un componente interactivo (diálogo,
+menú, pestañas, desplegable), lee `.claude/skills/frontend-a11y/SKILL.md`,
+si existe.
 
 - `<button>` para acciones (nunca un `<div>` con `onClick`) y `<a>` para
   navegar.

@@ -46,7 +46,9 @@ valor.
    figuren en `development.md`. Las pruebas no las ejecutas: quien te lanza
    te pasa su resultado sobre el mismo árbol; cítalo en el informe. Si no te
    lo pasa, indica las pruebas como comprobación no ejecutada. Si un comando
-   está `[POR DEFINIR]`, no lo inventes: dilo en el informe.
+   está `[POR DEFINIR]`, no lo inventes: dilo en el informe. Si el
+   `pom.xml` está en una subcarpeta, no uses `cd`:
+   `mvn -f <carpeta>/pom.xml compile`.
 
 ## Además de las reglas, revisa
 

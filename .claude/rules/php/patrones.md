@@ -5,7 +5,9 @@ paths:
 # PHP: patrones de Laravel
 
 Al crear un endpoint o cambiar uno ya expuesto, lee antes
-`.claude/skills/api-design/SKILL.md`, si existe.
+`.claude/skills/api-design/SKILL.md`, si existe. Al crear o cambiar un caso
+de uso, un validador, un modelo o una consulta, lee antes
+`.claude/skills/laravel-patterns/SKILL.md`, si existe.
 
 ## Carpetas
 
@@ -37,34 +39,22 @@ Lo transversal se organiza igual, como una entidad más:
 
 ## Capas
 
-- La lógica de dominio vive solo en `app/Actions` y en el validador de
-  `app/Validator`. Controladores, `FormRequest`, `Resource`, modelos y
-  *middleware* no deciden reglas de negocio.
-- Caso de uso: una clase por operación, con el nombre
-  `Verbo+Entidad+PosibleDetalle` (`CrearConvocatoria`,
-  `BuscarConvocatoriaPorIdentificador`, `BuscarConvocatoriasConFiltros`,
-  `CerrarConvocatoria`), con un único método público `ejecutar()`. Toda
-  operación pasa por su caso de uso, aunque no tenga reglas. Si escribe en
-  varias tablas, usa `DB::transaction()`. Es breve y se lee con el
-  vocabulario funcional del dominio (`comun/estilo-codigo.md`); no comprueba
-  reglas de negocio, las delega en el validador.
-- Validador: una única clase por modelo, con el sufijo `Validator`
-  (`ConvocatoriaValidator`). Expone un método público por acción que
-  necesita validación, con un nombre legible desde el dominio
-  (`validarCreacion`, `validarModificacion`, `validarBorrado`); cada uno
-  compone las reglas aplicables a la acción, en su orden de lectura. Cada
-  regla compartida o atómica es un método privado con un nombre que expresa
-  la condición de negocio (`comprobarQueLaConvocatoriaEsModificable`),
-  reutilizado desde los métodos públicos: nunca dupliques una comprobación
-  entre acciones. Puede depender de repositorios o *query builders* cuando
-  una regla necesite comprobar estado persistido. Informa del incumplimiento
-  con la excepción de dominio que el manejador traduce a 422, con un mensaje
-  que identifica la regla vulnerada.
+Qué es un caso de uso y un validador, cómo se nombran y qué hace cada uno
+está en `comun/organizacion-backend.md`. Aquí, solo lo propio de Laravel:
+
+- Caso de uso: una clase en `app/Actions/{Entidades}`. Toda operación pasa
+  por su caso de uso, aunque no tenga reglas. Si escribe en varias tablas,
+  usa `DB::transaction()`.
+- Validador: una clase por modelo en `app/Validator`. Su excepción de
+  dominio es la que el manejador traduce a 422.
+- Eloquent es la capa de acceso a datos: no se añaden repositorios. Casos
+  de uso y validadores consultan y guardan con los modelos y sus *scopes*;
+  los controladores y los `FormRequest` no consultan, y el SQL suelto
+  (`DB::select`, `DB::raw`) queda para lo que Eloquent no cubre.
 - El caso de uso llama al método del validador justo antes de guardar:
   `$this->convocatoriaValidator->validarCreacion($convocatoria); $convocatoria->save();`.
 - El formato de la entrada (obligatorios, longitudes, patrones) lo valida el
-  `FormRequest`; el validador no lo repite, solo las condiciones que
-  dependen del dominio, de su estado o de otros datos. Excepción: las
+  `FormRequest`. Excepción: las
   comprobaciones de existencia y unicidad que Laravel resuelve con una
   regla declarativa (`unique`, `exists`) van también en el `FormRequest`,
   que devuelve el error en su campo. Si la condición tiene lógica de
@@ -79,10 +69,12 @@ Lo transversal se organiza igual, como una entidad más:
 
 ## Eloquent
 
-- Nombres por la convención de Laravel: sin `$table`, `$primaryKey` ni
-  claves foráneas explícitas en las relaciones. Si el plural que genera
-  Laravel no es correcto en español (`motivo_denegacions`), declara `$table`
-  en ese modelo con un comentario que lo explique.
+- Declara siempre `$table` en el modelo, con el plural correcto en español
+  (`solicitudes`, `motivos_denegacion`): el pluralizador de Laravel es
+  inglés y falla con casi todos los nombres terminados en consonante
+  (`solicituds`, `motivo_denegacions`). Lo demás, por la convención de
+  Laravel: sin `$primaryKey` ni claves foráneas explícitas en las
+  relaciones.
 - Relaciones con `with()` para evitar consultas N+1, y
   `Model::preventLazyLoading()` fuera de producción para detectarlas.
 - Listados con `paginate()`, nunca `all()` sin límite.

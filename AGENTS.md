@@ -47,13 +47,13 @@ Lee solo el documento de la tarea:
 | --------- | --------- |
 | Entender el proyecto, sus rutas, arquitectura, dominio o seguridad | [.ai/project/architecture.md](.ai/project/architecture.md) |
 | Implementar, revisar calidad de código o ejecutar pruebas | [.ai/project/development.md](.ai/project/development.md) |
-| Usar un procedimiento reutilizable del proyecto | [.ai/skills/README.md](.ai/skills/README.md) |
+| Usar un procedimiento reutilizable del proyecto | [.claude/skills/README.md](.claude/skills/README.md) |
 
 Filas de la ficha que cambian la forma de trabajar:
 
 - `Especificaciones`: con `[POR DEFINIR]`, antes de una tarea no trivial
   pregunta si se usará OpenSpec y sigue
-  [setup-openspec.md](.ai/skills/setup-openspec.md); hasta resolverlo, no
+  [setup-openspec](.claude/skills/setup-openspec/SKILL.md); hasta resolverlo, no
   trabajes con especificaciones. No preguntes antes de `setup-project-context`
   ni de `setup-openspec`: ya lo incluyen. Con `OpenSpec <versión>`, sigue el
   workflow que instaló. Con `No se usa`, no lo propongas salvo que se pida.
@@ -76,4 +76,11 @@ contexto solo ante una dependencia, un riesgo o una contradicción relevante.
 - Si al terminar un cambio queda algo estable que el contexto no recoge (un
   término, una capacidad, una decisión o una regla de seguridad), añádelo a
   `architecture.md` o `development.md`. Registra solo lo implementado.
+- Si delegas las pruebas en `test-runner`, no repitas esas mismas
+  comprobaciones mientras trabaja (ni en paralelo ni después sobre el mismo
+  árbol): duplicarlas puede bloquear el entorno, p. ej. la base de datos de
+  pruebas. Espera su informe y úsalo. Si devuelve «no ejecutado», lo que no
+  ejecutó queda sin comprobar; no lo des por validado.
+- Las pruebas de pantalla (capturas, imágenes, regresión visual) nunca las
+  ejecuta `test-runner`: las lanzas tú.
 - Al terminar, indica qué cambió, qué comprobaste y qué queda pendiente.

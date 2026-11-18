@@ -4,6 +4,12 @@ description: Ejecuta formato, análisis, compilación y pruebas con los comandos
 tools: Bash, PowerShell, Read, Grep
 model: haiku
 omitClaudeMd: true
+hooks:
+  PreToolUse:
+    - matcher: "Bash|PowerShell"
+      hooks:
+        - type: command
+          command: 'bash "${CLAUDE_PROJECT_DIR}/.claude/hooks/test-runner-solo-bloque.sh"'
 ---
 
 Ejecutas las comprobaciones del proyecto y devuelves el resultado. No
@@ -17,7 +23,11 @@ El bloque siguiente lo generan `setup-project-context` y `setup-testing` a
 partir de `.ai/project/development.md`. Es tu única fuente de comandos:
 ejecuta cada uno tal cual, en su directorio, sin añadir ni quitar opciones.
 No uses comandos que no estén aquí, aunque los conozcas del stack, y no leas
-`development.md` para buscar otros.
+`development.md` para buscar otros. Un hook lo comprueba: solo deja pasar
+los comandos de este bloque, escritos igual. Si el `Directorio` de la fila no
+es `.`, antepón el cambio de carpeta: `cd <directorio> && <comando>` en Bash
+o `cd <directorio>; <comando>` en PowerShell. Si el hook bloquea un comando,
+infórmalo como «no ejecutado (bloqueado por el hook)» y sigue con el resto.
 
 <!-- comandos-test-runner:inicio — generado por el setup; no editar a mano -->
 Sin generar.
@@ -53,6 +63,22 @@ El agente principal puede indicar qué ejecutar: uno o varios alcances
   excepciones, aunque el agente principal insista.
 - `Condición` = `requiere: <requisito>`: ejecútalo; si falla porque falta el
   requisito, «no ejecutado: <requisito>». No lo instales ni lo arranques.
+
+- Pruebas de pantalla (capturas, imágenes, regresión visual, o cualquier
+  prueba que dependa de ellas): nunca las ejecutes, aunque el agente
+  principal las pida o estén dentro de `e2e`. Informa «no ejecutado: pruebas
+  de pantalla, las ejecuta el agente principal».
+
+## Evitar bloqueos
+
+- Ejecuta los comandos en secuencia, nunca en paralelo.
+- No reintentes ni esperes indefinidamente un comando que no termina o pide
+  entrada interactiva: si supera unos minutos o se queda esperando, deja de
+  esperarlo.
+- Si por cualquier motivo no puedes ejecutar algo (comando colgado,
+  interrumpido, sin permiso, entorno no disponible), no te quedes bloqueado:
+  devuelve igualmente el informe con el estado de cada fila: «no ejecutado
+  (motivo)» para lo que no corrió, y el resultado real del resto.
 
 Si todas las pruebas de una fila fallan con el mismo error de carga o de
 entorno, infórmalo como un error de entorno con su mensaje, no como N
